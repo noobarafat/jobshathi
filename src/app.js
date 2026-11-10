@@ -1,12 +1,33 @@
 /* ───────── The app: account, pages, events ───────── */
 (() => {
-  /* Storage: this browser only. `Store` is the one place to change when a server (Firebase / Supabase) keeps the accounts. */
+  /* Storage: the person's online account (Cloud → Firestore users/{uid}) follows them to any device.
+     This browser keeps a copy too (localStorage), so the app opens instantly and works offline.
+     Every change is written here at once and sent to the account a moment later. */
   const mem = {};
   let storageWorks = true;
+  const SYNCED = ['account', 'profile', 'marks', 'lang', 'theme'];
+  const keep = (k, v) => { mem[k] = v; try { localStorage.setItem('jobshathi:' + k, JSON.stringify(v)); storageWorks = true; } catch { storageWorks = false; } };
   const Store = {
     get(k, d) { try { const v = localStorage.getItem('jobshathi:' + k); return v == null ? (k in mem ? mem[k] : d) : JSON.parse(v); } catch { return k in mem ? mem[k] : d; } },
-    set(k, v) { mem[k] = v; try { localStorage.setItem('jobshathi:' + k, JSON.stringify(v)); storageWorks = true; } catch { storageWorks = false; } },
+    set(k, v) { keep(k, v); if (SYNCED.includes(k)) { keep('updatedAt', Date.now()); keep('dirty', true); Sync.soon(); } },
     clear() { Object.keys(mem).forEach(k => delete mem[k]); try { Object.keys(localStorage).filter(k => k.startsWith('jobshathi:')).forEach(k => localStorage.removeItem(k)); } catch { /* nothing was kept */ } },
+  };
+  /* Sends the whole account to users/{uid}. `dirty` stays true until the account has it, so nothing made offline is lost. */
+  const Sync = {
+    timer: 0, busy: false, again: false, paused: false,
+    soon() { clearTimeout(this.timer); this.timer = setTimeout(() => this.push(), 700); },
+    async push() {
+      const u = Cloud.user();
+      if (this.paused || !u || !S.account || !S.profile || S.account.uid !== u.uid) return false;
+      if (this.busy) { this.again = true; return false; }
+      this.busy = true;
+      const stamp = Store.get('updatedAt', Date.now());
+      const r = await Cloud.save(u.uid, { account: S.account, profile: S.profile, marks: S.marks, lang: S.lang, theme: S.theme, updatedAt: stamp });
+      this.busy = false;
+      if (r.ok && Store.get('updatedAt', 0) === stamp) keep('dirty', false);
+      if (this.again) { this.again = false; this.push(); }
+      return r.ok;
+    },
   };
 
   const DEMO_JOBS = Engine.prepareJobs(SAMPLE_JOBS);
@@ -16,7 +37,7 @@
   const S = {
     account: Store.get('account', null), profile: Store.get('profile', null), marks: Object.assign(emptyMarks(), Store.get('marks', {})),
     lang: Store.get('lang', (navigator.language || '').toLowerCase().startsWith('bn') ? 'bn' : 'en'), theme: Store.get('theme', 'auto'),
-    jobs: DEMO_JOBS, results: [], demo: true, route: 'welcome', f: newFilter(), stab: 'saved', draft: null, step: 0, editOne: false, done: false, err: '', wq: '', delAsk: false, sheet: null,
+    jobs: DEMO_JOBS, results: [], demo: true, route: 'welcome', f: newFilter(), stab: 'saved', draft: null, step: 0, editOne: false, done: false, err: '', wq: '', delAsk: false, delReauth: false, busy: '', sheet: null,
     installed: (window.matchMedia && matchMedia('(display-mode: standalone)').matches) || navigator.standalone === true,
   };
   if (S.profile && !S.account) { S.account = { id: 'u' + Date.now().toString(36), name: S.profile.name || '', contact: '', createdAt: Date.now() }; Store.set('account', S.account); }
@@ -55,6 +76,8 @@
   const ic = n => svg(ICON[n]);
   const chip = (a, v, on, label, cls = '') => `<button type="button" class="chip ${cls}" data-a="${a}" data-v="${esc(v)}" data-fid="${a}:${esc(v)}" aria-pressed="${!!on}">${label}</button>`;
   const B = s => `<b>${esc(s)}</b>`;
+  const GLOGO = '<svg class="g-logo" viewBox="0 0 48 48" aria-hidden="true"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>';
+  const cloudOn = () => !!FIREBASE_CONFIG.apiKey && Cloud.status !== 'failed';
 
   /* ── profile ⇄ setup draft ── */
   const blankDraft = () => ({ name: '', contact: '', fields: [], roles: [], keywords: [], skills: [], level: 'fresher', edu: '', age: '', types: [], bd: false, remote: false, districts: [], areas: {}, minSalary: '', avoid: [] });
@@ -165,6 +188,7 @@
       <div><div class="slip-title"><span>${t('fitTitle')}</span><small>${t('meets', { a: num(r.met), b: num(r.of) })}</small></div>${checklist(r)}</div></div>` : '';
     return `<section class="hero"><div><h1>${t('heroTitle')}</h1><p class="lead">${t('heroLead')}</p>
       <div class="cta"><button type="button" class="btn primary big" data-a="start">${t('getStarted')}</button>
+      ${!S.account && cloudOn() ? `<div class="have"><span>${t('haveAccount')}</span><button type="button" class="btn" data-a="google" data-fid="google" ${S.busy === 'google' ? 'disabled' : ''}>${GLOGO}${S.busy === 'google' ? t('wait') : t('googleBtn')}</button></div>` : ''}
       <div class="trust"><span>${ic('check')}${t('trust1')}</span><span>${ic('check')}${t('trust2')}</span><span>${ic('check')}${t('trust3')}</span></div></div></div>
       <div>${demo}</div></section>
       <ol class="steps"><li><div><b>${t('how1')}</b><span>${t('how1d')}</span></div></li><li><div><b>${t('how2')}</b><span>${t('how2d')}</span></div></li><li><div><b>${t('how3')}</b><span>${t('how3d')}</span></div></li></ol>`;
@@ -301,13 +325,21 @@
     const row = (title, value, step) => `<button type="button" class="rowlink" data-a="edit" data-v="${step}" data-fid="row:${step}"><span><b>${title}</b><span>${esc(value || t('none'))}</span></span>${ic('chevR')}</button>`;
     const seg = (act, opts, cur) => `<div class="seg">${opts.map(([v, label]) => `<button type="button" data-a="${act}" data-v="${v}" data-fid="${act}:${v}" aria-pressed="${cur === v}">${label}</button>`).join('')}</div>`;
     return `<div class="stack" style="max-width:720px">
-      <div class="card panel acct"><div class="avatar lg" aria-hidden="true">${esc(initials(a.name))}</div><div><h1>${esc(a.name)}</h1><div class="hint">${a.contact ? esc(a.contact) + '<br>' : ''}${t('accountOn')}, ${t('joined', { d: fmtDate(a.createdAt) }).toLowerCase()}</div></div></div>
+      <div class="card panel acct"><div class="avatar lg" aria-hidden="true">${esc(initials(a.name))}</div><div><h1>${esc(a.name)}</h1><div class="hint">${a.contact ? esc(a.contact) + '<br>' : ''}${t(a.uid ? 'accountOnline' : 'accountOn')}, ${t('joined', { d: fmtDate(a.createdAt) }).toLowerCase()}</div></div></div>
+      ${googleCard()}
       <div class="card panel">${row(t('secWork'), roles.concat(noRole).join(', '), 1)}${row(t('secSkills'), p.skills.join(', '), 3)}${row(t('secAbout'), [lvl ? L(lvl) : '', p.edu == null ? '' : eduShort(p.edu), p.age ? num(p.age) : '', (p.types.length ? p.types.map(typeName).join(' / ') : '')].filter(Boolean).join(', '), 4)}${row(t('secWhere'), (p.locations.length ? p.locations : ['bd']).map(locLabel).join('; ') + (p.minSalary ? ', ' + t('tk', { x: money(p.minSalary) }) + '+' : ''), 5)}${row(t('secAccount'), [a.name, a.contact].filter(Boolean).join(', '), 0)}</div>
       <div class="card panel"><div class="stack-s"><div><span class="lbl">${t('language')}</span>${seg('setlang', [['en', 'English'], ['bn', 'বাংলা']], S.lang)}</div><div><span class="lbl">${t('theme')}</span>${seg('theme', [['auto', t('themeAuto')], ['light', t('themeLight')], ['dark', t('themeDark')]], S.theme)}</div></div></div>
       ${installCard()}
       <div class="card panel"><details><summary>${t('howTitle')}${ic('chevR')}</summary><div class="prose">${t('how').split('|').map(x => `<p>${x}</p>`).join('')}</div></details></div>
-      <div class="card panel"><h2 style="margin-bottom:6px">${t('privacyTitle')}</h2><div class="prose"><p>${t('privacy')}</p>${storageWorks ? '' : `<p class="err">${t('storageOff')}</p>`}</div>
-        <div style="margin-top:12px;display:flex;flex-wrap:wrap;gap:8px;align-items:center">${S.delAsk ? `<span>${t('deleteAsk')}</span><button type="button" class="btn danger" data-a="del-yes">${t('deleteYes')}</button><button type="button" class="btn" data-a="del-no" data-fid="del-no">${t('cancel')}</button>` : `<button type="button" class="btn danger" data-a="del-ask" data-fid="del-ask">${t('deleteAccount')}</button>`}</div></div></div>`;
+      <div class="card panel"><h2 style="margin-bottom:6px">${t('privacyTitle')}</h2><div class="prose"><p>${t('privacy')}</p>${storageWorks ? '' : `<p class="err">${t('storageOff')}</p>`}${FIREBASE_CONFIG.apiKey && (Cloud.status === 'failed' || (a.uid && Store.get('dirty', false) && !navigator.onLine)) ? `<p class="hint">${t('cloudOff')}</p>` : ''}</div>
+        <div style="margin-top:12px;display:flex;flex-wrap:wrap;gap:8px;align-items:center">${S.delReauth ? `<span>${t('delReauth')}</span><button type="button" class="btn danger" data-a="del-google" data-fid="del-google" ${S.busy ? 'disabled' : ''}>${GLOGO}${S.busy === 'delete' ? t('wait') : t('confirmGoogle')}</button><button type="button" class="btn" data-a="del-no" data-fid="del-no">${t('cancel')}</button>` : S.delAsk ? `<span>${t('deleteAsk')}</span><button type="button" class="btn danger" data-a="del-yes" data-fid="del-yes" ${S.busy ? 'disabled' : ''}>${S.busy === 'delete' ? t('wait') : t('deleteYes')}</button><button type="button" class="btn" data-a="del-no" data-fid="del-no">${t('cancel')}</button>` : `<button type="button" class="btn danger" data-a="del-ask" data-fid="del-ask">${t('deleteAccount')}</button>`}</div></div></div>`;
+  }
+  /* Google on the profile page: connect it, or show which Google account this is. */
+  function googleCard() {
+    if (!FIREBASE_CONFIG.apiKey) return '';
+    const a = S.account, u = Cloud.user(), email = (u && u.uid === a.uid && Cloud.googleEmail(u)) || a.google || '';
+    if (email) return `<div class="card panel install-card gcard"><div class="ico">${GLOGO}</div><div><b>${t('googleOn', { e: esc(email) })}</b><div class="hint">${t('googleOnH')}</div></div><button type="button" class="btn quiet" data-a="sign-out" data-fid="sign-out" ${S.busy ? 'disabled' : ''}>${S.busy === 'signout' ? t('wait') : t('signOut')}</button></div>`;
+    return `<div class="card panel install-card gcard"><div class="ico">${GLOGO}</div><div><b>${t('googleTitle')}</b><div class="hint">${t('googleLinkH')}</div></div><button type="button" class="btn" data-a="google-link" data-fid="google-link" ${S.busy ? 'disabled' : ''}>${GLOGO}${S.busy === 'google' ? t('wait') : t('googleBtn')}</button></div>`;
   }
 
   /* ── sheets ── */
@@ -407,10 +439,115 @@
     return '';
   }
 
+  /* ── online account ── */
+  const SILENT = ['auth/popup-closed-by-user', 'auth/cancelled-popup-request', 'auth/user-cancelled'];
+  function cloudError(code) {
+    if (SILENT.includes(code)) return '';
+    if (!navigator.onLine || code === 'offline' || code === 'auth/network-request-failed') return t('errOffline');
+    if (code === 'auth/popup-blocked') return t('errPopup');
+    if (code === 'unavailable' || code === 'timeout') return t('errCloud');
+    if (window.console) console.warn('JobShathi sign-in:', code);
+    return t('errGoogle');
+  }
+  /** The account in Firestore replaces what this browser had. */
+  function applyRemote(data) {
+    S.account = data.account; S.profile = data.profile; S.marks = Object.assign(emptyMarks(), data.marks || {});
+    if (data.lang) S.lang = data.lang; if (data.theme) S.theme = data.theme;
+    SYNCED.forEach(k => keep(k, S[k])); keep('updatedAt', data.updatedAt || Date.now()); keep('dirty', false);
+    recompute();
+  }
+  /** Ties the local account to the signed-in Firebase user. */
+  function markUser(u) {
+    if (!S.account || !u) return;
+    const g = Cloud.googleEmail(u);
+    if (S.account.uid !== u.uid || (S.account.google || '') !== g) { S.account = Object.assign({}, S.account, { uid: u.uid, google: g }); Store.set('account', S.account); }
+  }
+  /** Account found in Firestore → use it, unless this browser has newer changes that never reached it. */
+  async function reconcile(u) {
+    const r = await Cloud.load(u.uid);
+    if (!r.ok) return false;
+    const cloud = r.data && r.data.account && r.data.profile ? r.data : null;
+    const localNewer = S.account && S.profile && S.account.uid === u.uid && Store.get('dirty', false) && Store.get('updatedAt', 0) > ((cloud && cloud.updatedAt) || 0);
+    if (cloud && !localNewer) { if ((cloud.updatedAt || 0) !== Store.get('updatedAt', 0) || Store.get('dirty', false) || !S.account) applyRemote(cloud); markUser(u); }
+    else if (S.account && S.profile) { markUser(u); await Sync.push(); }
+    return true;
+  }
+  /* On start: show this browser's copy at once, then sign in quietly and bring the account up to date. */
+  async function connect() {
+    if (!(await Cloud.start())) { render(); return; }
+    let u = Cloud.user();
+    if (!u && S.account && S.profile) { const r = await Cloud.ensureUser(); u = r.ok ? r.user : null; }
+    if (u) await reconcile(u);
+    resolveRoute(); render();
+  }
+  /* A new account: signed in anonymously in the person's name, no extra step. */
+  async function afterCreate() {
+    if (!(await Cloud.start())) return;
+    const r = await Cloud.ensureUser();
+    if (r.ok) { markUser(r.user); Sync.push(); }
+  }
+  function busy(what) { S.busy = what; render(); }
+  /* "Already have an account?" on the welcome page. */
+  async function googleSignIn() {
+    if (!Cloud.ready()) { toast(t(navigator.onLine ? 'errCloud' : 'errOffline')); Cloud.start().then(connect); return; }
+    busy('google');
+    const r = await Cloud.signInGoogle();
+    if (!r.ok) { S.busy = ''; const m = cloudError(r.code); render(); if (m) toast(m); return; }
+    const got = await Cloud.load(r.user.uid);
+    S.busy = '';
+    if (!got.ok) { render(); toast(cloudError(got.code) || t('errCloud')); return; }
+    if (got.data && got.data.account && got.data.profile) { applyRemote(got.data); markUser(r.user); S.draft = null; S.sheet = null; go('home'); toast(t('tWelcomeBack', { name: esc(S.account.name.split(/\s+/)[0]) })); return; }
+    if (S.account && S.profile) { markUser(r.user); Sync.push(); render(); toast(t('tLinked')); return; }
+    S.draft = blankDraft(); S.draft.name = (r.user.displayName || '').slice(0, 40); S.draft.contact = (r.user.email || '').slice(0, 80);
+    S.editOne = false; S.done = false; S.step = 0; S.err = ''; S.wq = ''; go('setup'); toast(t('tNoAccount'));
+  }
+  /* "Continue with Google" on the profile page: the same account, now with Google. */
+  async function googleLink() {
+    if (!Cloud.ready()) { toast(t(navigator.onLine ? 'errCloud' : 'errOffline')); Cloud.start().then(connect); return; }
+    busy('google');
+    const had = Cloud.user(), r = await Cloud.linkGoogle();
+    if (!r.ok) { S.busy = ''; const m = cloudError(r.code); render(); if (m) toast(m); return; }
+    let msg = t('tLinked');
+    if (r.switched || !had) {
+      const got = await Cloud.load(r.user.uid);
+      if (got.ok && got.data && got.data.account && got.data.profile) { applyRemote(got.data); msg = t('tSwitched'); }
+    }
+    markUser(r.user); await Sync.push();
+    S.busy = ''; render(); toast(msg);
+  }
+  async function signOutHere() {
+    if (Store.get('dirty', false)) { if (!navigator.onLine) { toast(t('errOffline')); return; } busy('signout'); await Promise.race([Sync.push(), new Promise(ok => setTimeout(ok, 8000))]); }
+    Sync.paused = true; clearTimeout(Sync.timer);
+    await Cloud.signOut();
+    const lang = S.lang, theme = S.theme;
+    Store.clear(); keep('lang', lang); keep('theme', theme);
+    S.account = null; S.profile = null; S.marks = emptyMarks(); S.draft = null; S.delAsk = false; S.busy = ''; recompute();
+    Sync.paused = false; go('welcome'); toast(t('tSignedOut'));
+  }
+  /* Deletes users/{uid} and the Firebase user, then this browser's copy. */
+  async function deleteAccount(confirmWithGoogle) {
+    const online = (S.account && S.account.uid) || Cloud.user();
+    if (online) {
+      if (!Cloud.ready()) { toast(t(navigator.onLine ? 'errCloud' : 'errOffline')); Cloud.start().then(connect); return; }
+      Sync.paused = true; clearTimeout(Sync.timer);
+      if (confirmWithGoogle) S.busy = 'delete'; else busy('delete');
+      const r = await Cloud.removeAccount(confirmWithGoogle);
+      Sync.paused = false; S.busy = '';
+      if (!r.ok) {
+        if (r.code === 'auth/requires-recent-login') { S.delReauth = true; render(); return; }
+        const m = cloudError(r.code); render(); if (m) toast(m); return;
+      }
+    }
+    const lang = S.lang, theme = S.theme;
+    Store.clear(); keep('lang', lang); keep('theme', theme);
+    S.account = null; S.profile = null; S.marks = emptyMarks(); S.delAsk = false; S.delReauth = false; S.draft = null; recompute();
+    go('welcome'); toast(t('tDeleted'));
+  }
+
   function onAction(a, v) {
     const d = S.draft;
     switch (a) {
-      case 'go': S.delAsk = false; S.sheet = null; if (v !== 'setup') { S.draft = null; S.done = false; } go(v); return;
+      case 'go': S.delAsk = false; S.delReauth = false; S.sheet = null; if (v !== 'setup') { S.draft = null; S.done = false; } go(v); return;
       case 'lang': S.lang = S.lang === 'bn' ? 'en' : 'bn'; Store.set('lang', S.lang); break;
       case 'setlang': S.lang = v; Store.set('lang', v); break;
       case 'theme': S.theme = v; Store.set('theme', v); break;
@@ -424,7 +561,7 @@
         S.wq = '';
         if (S.editOne) { commitDraft(); S.draft = null; S.editOne = false; go('profile'); toast(t('tProfile')); return; }
         if (S.step < STEPS - 1) { S.step++; window.scrollTo(0, 0); break; }
-        commitDraft(); S.draft = null; S.done = true; S.f = newFilter(); window.scrollTo(0, 0); break;
+        commitDraft(); S.draft = null; S.done = true; S.f = newFilter(); window.scrollTo(0, 0); afterCreate(); break;
       }
       case 'field':
         if (!d.fields.includes(v) && d.fields.length >= 3) { S.err = t('errMax'); break; }
@@ -460,8 +597,12 @@
       case 'view-demo': toast(t('tDemo')); return;
       case 'gap-add': if (!S.profile.skills.includes(v)) { S.profile.skills.push(v); Store.set('profile', S.profile); recompute(); toast(t('tSkill', { s: esc(v) })); } break;
       case 'del-ask': S.delAsk = true; break;
-      case 'del-no': S.delAsk = false; break;
-      case 'del-yes': Store.clear(); S.account = null; S.profile = null; S.marks = emptyMarks(); S.delAsk = false; S.draft = null; recompute(); go('welcome'); return;
+      case 'del-no': S.delAsk = false; S.delReauth = false; break;
+      case 'del-yes': deleteAccount(false); return;
+      case 'del-google': deleteAccount(true); return;
+      case 'google': googleSignIn(); return;
+      case 'google-link': googleLink(); return;
+      case 'sign-out': signOutHere(); return;
       default: return;
     }
     render();
@@ -503,6 +644,19 @@
   }
   if ('serviceWorker' in navigator && location.protocol === 'https:' && !inFrame) navigator.serviceWorker.register('sw.js').catch(() => {});
 
-  recompute(); resolveRoute(); render(); loadLiveJobs();
+  /* back online, or back to this tab: send what is waiting, or pick up changes made on another device */
+  window.addEventListener('online', () => { if (Cloud.status === 'failed') connect(); else if (Store.get('dirty', false)) Sync.push(); });
+  let lastLook = Date.now();
+  document.addEventListener('visibilitychange', async () => {
+    if (document.visibilityState !== 'visible' || Date.now() - lastLook < 30000 || S.busy || S.draft) return;
+    lastLook = Date.now();
+    const u = Cloud.user();
+    if (!u || !S.account || S.account.uid !== u.uid) return;
+    if (Store.get('dirty', false)) { Sync.push(); return; }
+    const r = await Cloud.load(u.uid);
+    if (r.ok && r.data && r.data.account && r.data.profile && (r.data.updatedAt || 0) > Store.get('updatedAt', 0) && !Store.get('dirty', false)) { applyRemote(r.data); resolveRoute(); render(); }
+  });
+
+  recompute(); resolveRoute(); render(); loadLiveJobs(); connect();
 })();
 

@@ -114,3 +114,26 @@ Object.assign(TEXT, {
   today: ['Today', 'আজ'], appliedTag: ['Applied', 'আবেদন করা'], moreInfo: ['Details', 'বিস্তারিত'],
 });
 
+/* ───────── v3: online accounts (Firebase), Google sign-in ───────── */
+Object.assign(TEXT, {
+  haveAccount: ['Already have an account?', 'আগে থেকেই অ্যাকাউন্ট আছে?'], googleBtn: ['Continue with Google', 'Google দিয়ে চালিয়ে যান'], wait: ['Please wait…', 'একটু অপেক্ষা করুন…'],
+  googleTitle: ['Use this account on any device', 'যেকোনো ডিভাইসে এই অ্যাকাউন্ট'], googleLinkH: ['Connect Google once, then open JobShathi on another phone or computer and continue with Google to see the same profile and saved jobs.', 'একবার Google যুক্ত করুন, তারপর অন্য ফোন বা কম্পিউটারে জবসাথী খুলে Google দিয়ে চালিয়ে গেলে একই প্রোফাইল ও সেভ করা চাকরি দেখবেন।'],
+  googleOn: ['Connected to Google: {e}', 'Google যুক্ত: {e}'], googleOnH: ['On another device, open JobShathi and tap “Continue with Google”.', 'অন্য ডিভাইসে জবসাথী খুলে “Google দিয়ে চালিয়ে যান” চাপুন।'],
+  signOut: ['Sign out on this device', 'এই ডিভাইস থেকে সাইন আউট'],
+  accountOnline: ['Account saved online', 'অনলাইনে সেভ করা অ্যাকাউন্ট'],
+  tLinked: ['Google connected. Your account now opens on any device.', 'Google যুক্ত হয়েছে। এখন যেকোনো ডিভাইসে আপনার অ্যাকাউন্ট খুলবে।'],
+  tWelcomeBack: ['Welcome back, {name}', 'আবার স্বাগতম, {name}'],
+  tSwitched: ['This Google account already had a JobShathi account. It is open now.', 'এই Google অ্যাকাউন্টে আগে থেকেই জবসাথী অ্যাকাউন্ট ছিল। সেটি এখন খোলা হয়েছে।'],
+  tNoAccount: ['No JobShathi account with this Google account yet. Answer a few questions to create one.', 'এই Google অ্যাকাউন্টে এখনো জবসাথী অ্যাকাউন্ট নেই। কয়েকটি প্রশ্নের উত্তর দিয়ে খুলে নিন।'],
+  tSignedOut: ['Signed out on this device', 'এই ডিভাইস থেকে সাইন আউট হয়েছে'], tDeleted: ['Your account was deleted', 'আপনার অ্যাকাউন্ট মুছে ফেলা হয়েছে'],
+  errGoogle: ['Could not sign in with Google. Please try again.', 'Google দিয়ে সাইন ইন করা গেল না। আবার চেষ্টা করুন।'],
+  errPopup: ['The Google window was blocked. Allow pop-ups for this site and try again.', 'Google-এর উইন্ডো ব্লক হয়েছে। এই সাইটে পপ-আপ চালু করে আবার চেষ্টা করুন।'],
+  errOffline: ['You are offline. Connect to the internet and try again.', 'আপনি অফলাইনে আছেন। ইন্টারনেটে যুক্ত হয়ে আবার চেষ্টা করুন।'],
+  errCloud: ['Online accounts are not reachable right now. Your data is safe on this device. Try again in a moment.', 'এই মুহূর্তে অনলাইন অ্যাকাউন্টে যুক্ত হওয়া যাচ্ছে না। আপনার তথ্য এই ডিভাইসে নিরাপদ আছে। একটু পরে আবার চেষ্টা করুন।'],
+  cloudOff: ['Online saving is not working right now, so changes are kept on this device and saved to your account when it is back.', 'এই মুহূর্তে অনলাইনে সেভ হচ্ছে না, তাই পরিবর্তন এই ডিভাইসে রাখা হচ্ছে এবং ফিরে এলে আপনার অ্যাকাউন্টে সেভ হবে।'],
+  q4h: ['Used to check each post’s requirements. Only you can see it.', 'প্রতিটি বিজ্ঞপ্তির শর্ত মেলাতে লাগে। শুধু আপনিই দেখতে পারবেন।'],
+  privacy: ['Your account, answers and saved jobs are saved in your JobShathi account, so you can use them on any device. A copy also stays in this browser so the app opens fast and works offline. Only you can see your data.', 'আপনার অ্যাকাউন্ট, উত্তর ও সেভ করা চাকরি আপনার জবসাথী অ্যাকাউন্টে সেভ থাকে, তাই যেকোনো ডিভাইসে ব্যবহার করতে পারবেন। অ্যাপ দ্রুত খোলা ও অফলাইনে চলার জন্য একটি কপি এই ব্রাউজারেও থাকে। আপনার তথ্য শুধু আপনিই দেখতে পারবেন।'],
+  deleteAsk: ['Delete your account, profile, saved jobs and applications? They are removed from every device.', 'অ্যাকাউন্ট, প্রোফাইল, সেভ করা চাকরি ও আবেদনের তথ্য মুছে ফেলবেন? সব ডিভাইস থেকে মুছে যাবে।'],
+  delReauth: ['For your safety, confirm with Google once more to delete the account.', 'নিরাপত্তার জন্য অ্যাকাউন্ট মুছতে আরেকবার Google দিয়ে নিশ্চিত করুন।'], confirmGoogle: ['Confirm with Google', 'Google দিয়ে নিশ্চিত করুন'],
+});
+

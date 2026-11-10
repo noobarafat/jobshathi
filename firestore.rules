@@ -1,0 +1,13 @@
+rules_version = '2';
+
+// JobShathi: each signed-in person can read and write only their own users/{uid} document.
+// Everything else in the database is closed.
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /users/{uid} {
+      allow read, delete: if request.auth != null && request.auth.uid == uid;
+      allow create, update: if request.auth != null && request.auth.uid == uid
+        && request.resource.data.keys().hasOnly(['account', 'profile', 'marks', 'lang', 'theme', 'updatedAt']);
+    }
+  }
+}

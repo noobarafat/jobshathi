@@ -423,3 +423,11 @@ main { padding-bottom: 118px; }
 @media (min-width: 560px) { .sunrise .sub { max-width: 34ch; } }
 @media (min-width: 960px) { .rail .me .avatar { color: var(--brand-ink); font-size: 1rem; } }
 
+/* ───────── Online accounts: Google sign-in ───────── */
+.g-logo { width: 1.15em; height: 1.15em; flex: none; }
+.have { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 10px; color: var(--ink-2); font-size: .95rem; }
+.have .btn { min-height: 40px; padding: 0 14px; border-radius: 12px; font-size: .95rem; }
+.gcard .ico { background: var(--brand-soft); color: var(--brand-strong); }
+.gcard .ico .g-logo { width: 24px; height: 24px; }
+.gcard b { overflow-wrap: anywhere; }
+.btn[disabled] { opacity: .6; pointer-events: none; }
