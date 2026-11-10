@@ -114,6 +114,12 @@ Object.assign(TEXT, {
   today: ['Today', 'আজ'], appliedTag: ['Applied', 'আবেদন করা'], moreInfo: ['Details', 'বিস্তারিত'],
 });
 
+/* ───────── v4: when the job robot last brought new posts ───────── */
+Object.assign(TEXT, {
+  updatedToday: ['Jobs updated today at {t}', 'আজ {t}-এ চাকরি হালনাগাদ হয়েছে'],
+  updatedOn: ['Jobs updated {d} at {t}', '{d} {t}-এ চাকরি হালনাগাদ হয়েছে'],
+});
+
 /* ───────── v3: online accounts (Firebase), Google sign-in ───────── */
 Object.assign(TEXT, {
   haveAccount: ['Already have an account?', 'আগে থেকেই অ্যাকাউন্ট আছে?'], googleBtn: ['Continue with Google', 'Google দিয়ে চালিয়ে যান'], wait: ['Please wait…', 'একটু অপেক্ষা করুন…'],

@@ -1,0 +1,118 @@
+name: Collect jobs
+
+# About 6 AM Bangladesh time (UTC+6), plus a "Run workflow" button.
+on:
+  schedule:
+    - cron: '0 0 * * *'
+  workflow_dispatch:
+    inputs:
+      limit:
+        description: 'New pages to read per source this run'
+        required: false
+        default: '300'
+      only:
+        description: 'Run one source only: nextjobz, alljobs, remote, companies'
+        required: false
+        default: ''
+
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
+concurrency:
+  group: collect-jobs
+  cancel-in-progress: false
+
+jobs:
+  collect:
+    runs-on: ubuntu-latest
+    outputs:
+      changed: ${{ steps.commit.outputs.changed }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: pip
+
+      - name: Install what the robot needs
+        run: pip install -r robot/requirements.txt
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Collect today's jobs
+        run: |
+          python3 robot/run.py \
+            --limit "${{ github.event.inputs.limit || '300' }}" \
+            ${{ github.event.inputs.only && format('--only {0}', github.event.inputs.only) || '' }}
+
+      - name: Check the matching with the site's own engine
+        run: node robot/classify.mjs
+
+      - name: Show the run
+        run: |
+          echo "### Job robot" >> $GITHUB_STEP_SUMMARY
+          python3 - <<'PY' >> $GITHUB_STEP_SUMMARY
+          import json, pathlib
+          r = json.loads(pathlib.Path('robot/report.json').read_text())
+          m = r.get('matching', {})
+          print(f"- posts in jobs.json: **{r['run']['postsInFile']}** "
+                f"({r['run']['fileBytes'] // 1024} KB)")
+          print(f"- new this run: {r['run']['newPostsCollected']}")
+          print(f"- per source: `{r.get('postsInFilePerSource')}`")
+          print(f"- removed: `{r.get('removed')}`")
+          if r.get('sourceFailures'):
+              print(f"- failures: `{r['sourceFailures']}`")
+          if m:
+              print(f"- no field found: {m['noFieldFound']['count']} ({m['noFieldFound']['percent']}%), "
+                    f"no location: {m['noLocationFound']['count']} ({m['noLocationFound']['percent']}%)")
+          PY
+
+      - name: Commit jobs.json and report.json when they changed
+        id: commit
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add jobs.json robot/report.json
+          if git diff --staged --quiet; then
+            echo "nothing changed"
+            echo "changed=false" >> $GITHUB_OUTPUT
+          else
+            git commit -m "Jobs for $(date -u +%Y-%m-%d)"
+            git push
+            echo "changed=true" >> $GITHUB_OUTPUT
+          fi
+
+  # A push made with GITHUB_TOKEN does not start another workflow, so the site is
+  # rebuilt here rather than waiting for pages.yml.
+  publish:
+    needs: collect
+    if: needs.collect.outputs.changed == 'true'
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    concurrency:
+      group: pages
+      cancel-in-progress: false
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Build dist/ (jobs.json is copied in by build.py)
+        run: |
+          python3 build.py
+          test -f dist/jobs.json || { echo "jobs.json missing from dist/"; exit 1; }
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist
+      - id: deployment
+        uses: actions/deploy-pages@v4

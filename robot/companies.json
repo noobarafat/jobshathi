@@ -1,0 +1,19 @@
+{
+  "_readme": [
+    "Company career pages the robot reads. Add as many as you like.",
+    "Required: website. Optional: name, careers (exact careers URL), cat, loc, logo.",
+    "Without 'careers' the robot tries /careers, /career, /jobs and a few more.",
+    "Only pages that publish schema.org JobPosting data are read, so a company that",
+    "publishes nothing structured is skipped and counted in robot/report.json.",
+    "robots.txt is checked for every host before any request."
+  ],
+  "companies": [
+    { "name": "Grameenphone", "website": "https://www.grameenphone.com", "loc": "Dhaka" },
+    { "name": "bKash", "website": "https://www.bkash.com", "loc": "Dhaka" },
+    { "name": "Robi Axiata", "website": "https://www.robi.com.bd", "loc": "Dhaka" },
+    { "name": "BRAC", "website": "https://www.brac.net", "loc": "Dhaka" },
+    { "name": "Walton", "website": "https://waltonbd.com", "loc": "Gazipur" },
+    { "name": "Pathao", "website": "https://pathao.com", "loc": "Dhaka" },
+    { "name": "Chaldal", "website": "https://chaldal.com", "loc": "Dhaka" }
+  ]
+}

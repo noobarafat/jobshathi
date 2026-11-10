@@ -38,7 +38,7 @@
   const S = {
     account: Store.get('account', null), profile: Store.get('profile', null), marks: Object.assign(emptyMarks(), Store.get('marks', {})),
     lang: Store.get('lang', (navigator.language || '').toLowerCase().startsWith('bn') ? 'bn' : 'en'), theme: Store.get('theme', 'auto'),
-    jobs: DEMO_JOBS, results: [], demo: true, route: 'welcome', f: newFilter(), stab: 'saved', draft: null, step: 0, editOne: false, done: false, err: '', wq: '', delAsk: false, delReauth: false, busy: '', sheet: null,
+    jobs: DEMO_JOBS, results: [], demo: true, updatedAt: '', route: 'welcome', f: newFilter(), stab: 'saved', draft: null, step: 0, editOne: false, done: false, err: '', wq: '', delAsk: false, delReauth: false, busy: '', sheet: null,
     installed: (window.matchMedia && matchMedia('(display-mode: standalone)').matches) || navigator.standalone === true,
   };
   if (S.profile && !S.account) { S.account = { id: 'u' + Date.now().toString(36), name: S.profile.name || '', contact: '', createdAt: Date.now() }; Store.set('account', S.account); }
@@ -265,13 +265,27 @@
   }
   const gapsCard = () => { const gaps = Engine.skillGaps(live()); return gaps.length ? `<div class="card panel"><h2 style="margin-bottom:6px">${t('gapsTitle')}</h2>${gaps.map(g => `<div class="gap-item"><span>${t('gapLine', { skill: B(g.skill), n: num(g.n), of: num(g.of) })}</span><div><button type="button" class="btn sm soft" data-a="gap-add" data-v="${esc(g.skill)}" data-fid="gap:${esc(g.skill)}">${t('haveIt')}</button></div></div>`).join('')}</div>` : ''; };
   const installCard = () => (S.installed ? '' : `<div class="card panel install-card"><div class="ico">${ic('download')}</div><div><b>${t('installTitle')}</b><div class="hint">${t('installLead')}</div></div><button type="button" class="btn soft" data-a="install" data-fid="install-card">${t('installApp')}</button></div>`);
+  /** "Jobs updated today at 6:10 AM", from the updatedAt the robot writes into jobs.json. */
+  function freshWords() {
+    if (!S.updatedAt) return '';
+    const d = new Date(S.updatedAt);
+    if (isNaN(d.getTime())) return '';
+    let time;
+    try { time = new Intl.DateTimeFormat(S.lang === 'bn' ? 'bn-BD' : 'en-GB', { hour: 'numeric', minute: '2-digit', hour12: true }).format(d); }
+    catch { time = d.getHours() + ':' + String(d.getMinutes()).padStart(2, '0'); }
+    return new Date().toDateString() === d.toDateString()
+      ? t('updatedToday', { t: time })
+      : t('updatedOn', { d: fmtDate(d.getTime()), t: time });
+  }
+  const freshLine = (cls = '') => { const w = freshWords(); return w ? `<p class="hint ${cls}">${esc(w)}</p>` : ''; };
+
   const demoBanner = () => (S.demo ? `<div class="banner">${ic('info')}<span>${t('demoBanner')}</span></div>` : '');
 
   function pageHome() {
     const m = live(), strong = m.filter(r => r.bucket === 'strong'), h = new Date().getHours();
     const stat = (n, label, icon, a, v, cls) => `<button type="button" class="stat ${cls}" data-a="${a}" data-v="${v}" data-fid="stat:${v}"><span class="sb">${ic(icon)}</span><b>${num(n)}</b><span class="lb">${label}</span></button>`;
     const picks = m.slice(0, 3);
-    return `<div class="greet"><p>${fmtDate(Date.now(), true)}</p><h1>${t(h < 12 ? 'gm' : h < 17 ? 'ga' : 'ge')}, ${esc(S.account.name.split(/\s+/)[0])}</h1></div>
+    return `<div class="greet"><p>${fmtDate(Date.now(), true)}</p><h1>${t(h < 12 ? 'gm' : h < 17 ? 'ga' : 'ge')}, ${esc(S.account.name.split(/\s+/)[0])}</h1>${freshLine()}</div>
       <section class="sunrise"><svg class="sun" viewBox="0 0 200 200" aria-hidden="true"><defs><radialGradient id="sunGlow"><stop offset="0" stop-color="#FFC27A" stop-opacity=".95"/><stop offset=".45" stop-color="#FF8A3D" stop-opacity=".5"/><stop offset="1" stop-color="#FF8A3D" stop-opacity="0"/></radialGradient><linearGradient id="sunCore" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#FFD08A"/><stop offset="1" stop-color="#FF7A45"/></linearGradient></defs><circle cx="100" cy="100" r="100" fill="url(#sunGlow)"/><circle cx="100" cy="100" r="42" fill="url(#sunCore)"/><circle cx="100" cy="100" r="64" fill="none" stroke="#FFD08A" stroke-opacity=".35" stroke-width="1.5"/><circle cx="100" cy="100" r="86" fill="none" stroke="#FFD08A" stroke-opacity=".18" stroke-width="1.5"/></svg>
         <div><div class="big">${num(strong.length)}</div><div class="cap">${t('heroCount')}</div></div><p class="sub">${t('heroSub', { b: num(m.length - strong.length), n: num(S.results.length) })}</p>
         <button type="button" class="btn" data-a="quick-go" data-v="">${t('seeMatches')}</button></section>
@@ -294,7 +308,7 @@
       const s = list.filter(r => r.bucket === 'strong'), p = list.filter(r => r.bucket === 'possible');
       feed = (s.length ? `<div class="sec-head"><h2 class="sec-title">${t('bestH')}</h2></div>${s.map(jobCard).join('')}` : '') + (p.length ? `<div class="sec-head"><div><h2 class="sec-title">${t('possibleH')}</h2><p class="hint">${t('possibleD')}</p></div></div>${p.map(jobCard).join('')}` : '');
     } else feed = list.map(jobCard).join('');
-    return `<div class="page-head"><h1>${t('jobsHead')}</h1><p>${t('summary', { a: num(m.filter(r => r.bucket === 'strong').length), b: num(m.filter(r => r.bucket === 'possible').length), n: num(S.results.length) })}</p></div>
+    return `<div class="page-head"><h1>${t('jobsHead')}</h1><p>${t('summary', { a: num(m.filter(r => r.bucket === 'strong').length), b: num(m.filter(r => r.bucket === 'possible').length), n: num(S.results.length) })}</p>${freshLine()}</div>
       <div class="toolbar">${searchBox('q', 'q', f.q, t('search'))}
         <div class="seg" role="tablist">${segBtn('fit', t('tabForYou'), m.length)}${segBtn('all', t('tabAll'), S.results.length)}</div>
         <div class="scroller" data-keep="quick">${['new', 'soon', 'fresher', 'remote'].map(k => chip('quick', k, f.quick.includes(k), t({ new: 'fNew', soon: 'fSoon', fresher: 'fFresher', remote: 'fRemote' }[k]), 'sm')).join('')}</div></div>
@@ -645,6 +659,7 @@
       if (!res.ok) return;
       const data = await res.json(), list = Array.isArray(data) ? data : data && data.jobs;
       if (!Array.isArray(list) || !list.length) return;
+      S.updatedAt = (data && data.updatedAt) || '';
       S.jobs = Engine.prepareJobs(list); S.demo = false; recompute(); render();
     } catch { /* no jobs.json yet: the examples stay */ }
   }

@@ -213,7 +213,7 @@ const Engine = (() => {
         gender: /only females?|female candidates? only|females? only|শুধুমাত্র নারী|শুধু নারী/.test(g) ? 'female' : (/only males?|male candidates? only|(^|[^e])males? only|শুধুমাত্র পুরুষ|শুধু পুরুষ/.test(g) ? 'male' : null),
         scam: SCAM_PATTERNS.some(re => re.test(raw.req || '') || re.test(raw.title || '') || re.test(raw.salary || '')),
         postedAt, deadline, daysLeft: deadline == null ? null : Math.round((deadline - today) / DAY), isNew: today - postedAt < DAY,
-        alsoOn: [],
+        alsoOn: Array.isArray(raw.alsoOn) ? raw.alsoOn.filter(Boolean) : [], // the robot merges a repeated post and lists its other sources here
       };
       const key = normTitle(raw.title) + '|' + norm(raw.company);
       if (seen.has(key)) { const first = seen.get(key); if (job.source && job.source !== first.source && !first.alsoOn.includes(job.source)) first.alsoOn.push(job.source); continue; }
