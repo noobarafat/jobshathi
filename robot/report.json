@@ -52,64 +52,64 @@
    "Remote OK": 3
   },
   "classifiedHow": {
-   "none": 165,
-   "title": 285,
-   "spelling": 35,
-   "category": 109
+   "category": 204,
+   "title": 331,
+   "spelling": 36,
+   "none": 23
   },
   "noFieldFound": {
-   "count": 165,
-   "percent": 28,
+   "count": 23,
+   "percent": 4,
    "examples": [
-    {
-     "title": "Veterinary Officer",
-     "company": "Dhaka South City Corporation (DSCC)",
-     "source": "Alljobs (Teletalk)"
-    },
-    {
-     "title": "Dental Surgeon",
-     "company": "Dhaka South City Corporation (DSCC)",
-     "source": "Alljobs (Teletalk)"
-    },
-    {
-     "title": "Pest Control Officer",
-     "company": "Dhaka South City Corporation (DSCC)",
-     "source": "Alljobs (Teletalk)"
-    },
     {
      "title": "Optic Shop Assistant",
      "company": "Ispahani Islamia Eye Institute & Hospital",
      "source": "NextJobz"
     },
     {
-     "title": "Machinist",
-     "company": "Office of the Director General, Bangladesh Post Office (DGBPO)",
-     "source": "Alljobs (Teletalk)"
+     "title": "Deputy Manager / Manager, Labaid Printing & Packaging",
+     "company": "Labaid Limited (Diagnostics)",
+     "source": "NextJobz"
     },
     {
-     "title": "Sanitation Worker (Formerly Cleaner)",
-     "company": "Office of the Director General, Bangladesh Post Office (DGBPO)",
-     "source": "Alljobs (Teletalk)"
+     "title": "Lead, Agriculture (Agriculture Resilience & Portfolio Transformation)",
+     "company": "SAJIDA FOUNDATION",
+     "source": "NextJobz"
     },
     {
-     "title": "Assistant Machineman",
-     "company": "Office of the Director General, Bangladesh Post Office (DGBPO)",
-     "source": "Alljobs (Teletalk)"
+     "title": "Lab Assistant (EEE Lab)",
+     "company": "Uttara University",
+     "source": "NextJobz"
     },
     {
-     "title": "Junior Proofreader",
-     "company": "Office of the Director General, Bangladesh Post Office (DGBPO)",
-     "source": "Alljobs (Teletalk)"
+     "title": "Patient Care Attendant (PCA)- Nursing",
+     "company": "Asgar Ali Hospital",
+     "source": "NextJobz"
     },
     {
-     "title": "Packer",
-     "company": "Office of the Director General, Bangladesh Post Office (DGBPO)",
-     "source": "Alljobs (Teletalk)"
+     "title": "Assistant Manager, Quality Assurance",
+     "company": "Standard Finis Oil Co.",
+     "source": "NextJobz"
     },
     {
-     "title": "Assistant Photo Compositor",
-     "company": "Office of the Director General, Bangladesh Post Office (DGBPO)",
-     "source": "Alljobs (Teletalk)"
+     "title": "Fire Safety Officer",
+     "company": "Divine Mercy Hospital Ltd.",
+     "source": "NextJobz"
+    },
+    {
+     "title": "Manager – Operations, Ghoshinga Project",
+     "company": "AKIJBASHIR GROUP",
+     "source": "NextJobz"
+    },
+    {
+     "title": "Executive – New Product Development (Fan Product)",
+     "company": "SSG (Super Star Group)",
+     "source": "NextJobz"
+    },
+    {
+     "title": "Warehouse Supervisor",
+     "company": "JSK Group",
+     "source": "NextJobz"
     }
    ]
   },
@@ -189,204 +189,6 @@
   },
   "topUnclassifiedTitles": [
    {
-    "title": "Upper Division Assistant",
-    "count": 6,
-    "sources": [
-     "Alljobs (Teletalk)"
-    ],
-    "portalCategory": [
-     "Government"
-    ],
-    "suggestion": "add \"upper division assistant\" to syn of role \"pa\" (Executive / Personal Assistant) in src/taxonomy.js"
-   },
-   {
-    "title": "Cleaner",
-    "count": 5,
-    "sources": [
-     "Alljobs (Teletalk)"
-    ],
-    "portalCategory": [
-     "Government"
-    ],
-    "suggestion": "no close role; may need a new role in src/taxonomy.js"
-   },
-   {
-    "title": "Certificate Assistant",
-    "count": 5,
-    "sources": [
-     "Alljobs (Teletalk)"
-    ],
-    "portalCategory": [
-     "Government"
-    ],
-    "suggestion": "add \"certificate assistant\" to syn of role \"pa\" (Executive / Personal Assistant) in src/taxonomy.js"
-   },
-   {
-    "title": "Head Assistant",
-    "count": 4,
-    "sources": [
-     "Alljobs (Teletalk)"
-    ],
-    "portalCategory": [
-     "Government"
-    ],
-    "suggestion": "add \"head assistant\" to syn of role \"pa\" (Executive / Personal Assistant) in src/taxonomy.js"
-   },
-   {
-    "title": "Assistant Engineer (Electrical)",
-    "count": 4,
-    "sources": [
-     "Alljobs (Teletalk)"
-    ],
-    "portalCategory": [
-     "Government"
-    ],
-    "suggestion": "add \"assistant engineer (electrical)\" to syn of role \"electrical\" (Electrical / Electronics Engineer) in src/taxonomy.js"
-   },
-   {
-    "title": "Assistant Engineer (Mechanical)",
-    "count": 4,
-    "sources": [
-     "Alljobs (Teletalk)"
-    ],
-    "portalCategory": [
-     "Government"
-    ],
-    "suggestion": "add \"assistant engineer (mechanical)\" to syn of role \"mechanical\" (Mechanical / Maintenance Engineer) in src/taxonomy.js"
-   },
-   {
-    "title": "Assistant Engineer (Civil)",
-    "count": 2,
-    "sources": [
-     "Alljobs (Teletalk)"
-    ],
-    "portalCategory": [
-     "Government"
-    ],
-    "suggestion": "add \"assistant engineer (civil)\" to syn of role \"civil\" (Civil Engineer) in src/taxonomy.js"
-   },
-   {
-    "title": "Machine Operator",
-    "count": 2,
-    "sources": [
-     "Alljobs (Teletalk)"
-    ],
-    "portalCategory": [
-     "Government"
-    ],
-    "suggestion": "add \"machine operator\" to syn of role \"data-entry\" (Data Entry / Computer Operator) in src/taxonomy.js"
-   },
-   {
-    "title": "Assistant Manager (Security)",
-    "count": 2,
-    "sources": [
-     "Alljobs (Teletalk)"
-    ],
-    "portalCategory": [
-     "Government"
-    ],
-    "suggestion": "add \"assistant manager (security)\" to syn of role \"cyber\" (Cyber Security) in src/taxonomy.js"
-   },
-   {
-    "title": "Certificate Peshkar",
-    "count": 2,
-    "sources": [
-     "Alljobs (Teletalk)"
-    ],
-    "portalCategory": [
-     "Government"
-    ],
-    "suggestion": "no close role; may need a new role in src/taxonomy.js"
-   },
-   {
-    "title": "Credit Checking Cum-Sayrat Assistant",
-    "count": 2,
-    "sources": [
-     "Alljobs (Teletalk)"
-    ],
-    "portalCategory": [
-     "Government"
-    ],
-    "suggestion": "add \"credit checking cum-sayrat assistant\" to syn of role \"credit\" (Credit / Loan Officer) in src/taxonomy.js"
-   },
-   {
-    "title": "Mutation Cum Certificate Assistant",
-    "count": 2,
-    "sources": [
-     "Alljobs (Teletalk)"
-    ],
-    "portalCategory": [
-     "Government"
-    ],
-    "suggestion": "add \"mutation cum certificate assistant\" to syn of role \"pa\" (Executive / Personal Assistant) in src/taxonomy.js"
-   },
-   {
-    "title": "Gardener",
-    "count": 2,
-    "sources": [
-     "Alljobs (Teletalk)"
-    ],
-    "portalCategory": [
-     "Government"
-    ],
-    "suggestion": "no close role; may need a new role in src/taxonomy.js"
-   },
-   {
-    "title": "Library Assistant",
-    "count": 2,
-    "sources": [
-     "Alljobs (Teletalk)"
-    ],
-    "portalCategory": [
-     "Government"
-    ],
-    "suggestion": "add \"library assistant\" to syn of role \"pa\" (Executive / Personal Assistant) in src/taxonomy.js"
-   },
-   {
-    "title": "Fireman",
-    "count": 2,
-    "sources": [
-     "Alljobs (Teletalk)"
-    ],
-    "portalCategory": [
-     "Government"
-    ],
-    "suggestion": "no close role; may need a new role in src/taxonomy.js"
-   },
-   {
-    "title": "Veterinary Officer",
-    "count": 1,
-    "sources": [
-     "Alljobs (Teletalk)"
-    ],
-    "portalCategory": [
-     "Government"
-    ],
-    "suggestion": "add \"veterinary officer\" to syn of role \"bank-officer\" (Bank Officer / Trainee Officer) in src/taxonomy.js"
-   },
-   {
-    "title": "Dental Surgeon",
-    "count": 1,
-    "sources": [
-     "Alljobs (Teletalk)"
-    ],
-    "portalCategory": [
-     "Government"
-    ],
-    "suggestion": "no close role; may need a new role in src/taxonomy.js"
-   },
-   {
-    "title": "Pest Control Officer",
-    "count": 1,
-    "sources": [
-     "Alljobs (Teletalk)"
-    ],
-    "portalCategory": [
-     "Government"
-    ],
-    "suggestion": "add \"pest control officer\" to syn of role \"bank-officer\" (Bank Officer / Trainee Officer) in src/taxonomy.js"
-   },
-   {
     "title": "Optic Shop Assistant",
     "count": 1,
     "sources": [
@@ -396,325 +198,6 @@
      "Showroom Assistant/Salesman"
     ],
     "suggestion": "add \"optic shop assistant\" to syn of role \"pa\" (Executive / Personal Assistant) in src/taxonomy.js"
-   },
-   {
-    "title": "Machinist",
-    "count": 1,
-    "sources": [
-     "Alljobs (Teletalk)"
-    ],
-    "portalCategory": [
-     "Government"
-    ],
-    "suggestion": "no close role; may need a new role in src/taxonomy.js"
-   },
-   {
-    "title": "Sanitation Worker (Formerly Cleaner)",
-    "count": 1,
-    "sources": [
-     "Alljobs (Teletalk)"
-    ],
-    "portalCategory": [
-     "Government"
-    ],
-    "suggestion": "no close role; may need a new role in src/taxonomy.js"
-   },
-   {
-    "title": "Assistant Machineman",
-    "count": 1,
-    "sources": [
-     "Alljobs (Teletalk)"
-    ],
-    "portalCategory": [
-     "Government"
-    ],
-    "suggestion": "add \"assistant machineman\" to syn of role \"pa\" (Executive / Personal Assistant) in src/taxonomy.js"
-   },
-   {
-    "title": "Junior Proofreader",
-    "count": 1,
-    "sources": [
-     "Alljobs (Teletalk)"
-    ],
-    "portalCategory": [
-     "Government"
-    ],
-    "suggestion": "no close role; may need a new role in src/taxonomy.js"
-   },
-   {
-    "title": "Packer",
-    "count": 1,
-    "sources": [
-     "Alljobs (Teletalk)"
-    ],
-    "portalCategory": [
-     "Government"
-    ],
-    "suggestion": "no close role; may need a new role in src/taxonomy.js"
-   },
-   {
-    "title": "Assistant Photo Compositor",
-    "count": 1,
-    "sources": [
-     "Alljobs (Teletalk)"
-    ],
-    "portalCategory": [
-     "Government"
-    ],
-    "suggestion": "add \"assistant photo compositor\" to syn of role \"pa\" (Executive / Personal Assistant) in src/taxonomy.js"
-   },
-   {
-    "title": "Sanitation Worker (Sweeper)",
-    "count": 1,
-    "sources": [
-     "Alljobs (Teletalk)"
-    ],
-    "portalCategory": [
-     "Government"
-    ],
-    "suggestion": "no close role; may need a new role in src/taxonomy.js"
-   },
-   {
-    "title": "Assistant Plate Maker",
-    "count": 1,
-    "sources": [
-     "Alljobs (Teletalk)"
-    ],
-    "portalCategory": [
-     "Government"
-    ],
-    "suggestion": "add \"assistant plate maker\" to syn of role \"pa\" (Executive / Personal Assistant) in src/taxonomy.js"
-   },
-   {
-    "title": "Upazila Postmaster",
-    "count": 1,
-    "sources": [
-     "Alljobs (Teletalk)"
-    ],
-    "portalCategory": [
-     "Government"
-    ],
-    "suggestion": "no close role; may need a new role in src/taxonomy.js"
-   },
-   {
-    "title": "Carpenter",
-    "count": 1,
-    "sources": [
-     "Alljobs (Teletalk)"
-    ],
-    "portalCategory": [
-     "Government"
-    ],
-    "suggestion": "no close role; may need a new role in src/taxonomy.js"
-   },
-   {
-    "title": "Monotype Caster Operator",
-    "count": 1,
-    "sources": [
-     "Alljobs (Teletalk)"
-    ],
-    "portalCategory": [
-     "Government"
-    ],
-    "suggestion": "add \"monotype caster operator\" to syn of role \"data-entry\" (Data Entry / Computer Operator) in src/taxonomy.js"
-   },
-   {
-    "title": "Assistant Inspector",
-    "count": 1,
-    "sources": [
-     "Alljobs (Teletalk)"
-    ],
-    "portalCategory": [
-     "Government"
-    ],
-    "suggestion": "add \"assistant inspector\" to syn of role \"pa\" (Executive / Personal Assistant) in src/taxonomy.js"
-   },
-   {
-    "title": "Wireman",
-    "count": 1,
-    "sources": [
-     "Alljobs (Teletalk)"
-    ],
-    "portalCategory": [
-     "Government"
-    ],
-    "suggestion": "no close role; may need a new role in src/taxonomy.js"
-   },
-   {
-    "title": "Inkman",
-    "count": 1,
-    "sources": [
-     "Alljobs (Teletalk)"
-    ],
-    "portalCategory": [
-     "Government"
-    ],
-    "suggestion": "no close role; may need a new role in src/taxonomy.js"
-   },
-   {
-    "title": "Checker",
-    "count": 1,
-    "sources": [
-     "Alljobs (Teletalk)"
-    ],
-    "portalCategory": [
-     "Government"
-    ],
-    "suggestion": "no close role; may need a new role in src/taxonomy.js"
-   },
-   {
-    "title": "Coolie",
-    "count": 1,
-    "sources": [
-     "Alljobs (Teletalk)"
-    ],
-    "portalCategory": [
-     "Government"
-    ],
-    "suggestion": "no close role; may need a new role in src/taxonomy.js"
-   },
-   {
-    "title": "Compositor",
-    "count": 1,
-    "sources": [
-     "Alljobs (Teletalk)"
-    ],
-    "portalCategory": [
-     "Government"
-    ],
-    "suggestion": "no close role; may need a new role in src/taxonomy.js"
-   },
-   {
-    "title": "Machineman (Offset Printing/Laser Printing)",
-    "count": 1,
-    "sources": [
-     "Alljobs (Teletalk)"
-    ],
-    "portalCategory": [
-     "Government"
-    ],
-    "suggestion": "no close role; may need a new role in src/taxonomy.js"
-   },
-   {
-    "title": "Assistant Graining Machineman",
-    "count": 1,
-    "sources": [
-     "Alljobs (Teletalk)"
-    ],
-    "portalCategory": [
-     "Government"
-    ],
-    "suggestion": "add \"assistant graining machineman\" to syn of role \"pa\" (Executive / Personal Assistant) in src/taxonomy.js"
-   },
-   {
-    "title": "Assistant (Directorate of Posts)",
-    "count": 1,
-    "sources": [
-     "Alljobs (Teletalk)"
-    ],
-    "portalCategory": [
-     "Government"
-    ],
-    "suggestion": "add \"assistant (directorate of posts)\" to syn of role \"pa\" (Executive / Personal Assistant) in src/taxonomy.js"
-   },
-   {
-    "title": "Porter",
-    "count": 1,
-    "sources": [
-     "Alljobs (Teletalk)"
-    ],
-    "portalCategory": [
-     "Government"
-    ],
-    "suggestion": "no close role; may need a new role in src/taxonomy.js"
-   },
-   {
-    "title": "Counter",
-    "count": 1,
-    "sources": [
-     "Alljobs (Teletalk)"
-    ],
-    "portalCategory": [
-     "Government"
-    ],
-    "suggestion": "no close role; may need a new role in src/taxonomy.js"
-   },
-   {
-    "title": "Postal Operator",
-    "count": 1,
-    "sources": [
-     "Alljobs (Teletalk)"
-    ],
-    "portalCategory": [
-     "Government"
-    ],
-    "suggestion": "add \"postal operator\" to syn of role \"data-entry\" (Data Entry / Computer Operator) in src/taxonomy.js"
-   },
-   {
-    "title": "Calligraphist",
-    "count": 1,
-    "sources": [
-     "Alljobs (Teletalk)"
-    ],
-    "portalCategory": [
-     "Government"
-    ],
-    "suggestion": "no close role; may need a new role in src/taxonomy.js"
-   },
-   {
-    "title": "Assistant Exhibit Specialist",
-    "count": 1,
-    "sources": [
-     "Alljobs (Teletalk)"
-    ],
-    "portalCategory": [
-     "Government"
-    ],
-    "suggestion": "add \"assistant exhibit specialist\" to syn of role \"seo\" (SEO Specialist) in src/taxonomy.js"
-   },
-   {
-    "title": "Offset Printer",
-    "count": 1,
-    "sources": [
-     "Alljobs (Teletalk)"
-    ],
-    "portalCategory": [
-     "Government"
-    ],
-    "suggestion": "no close role; may need a new role in src/taxonomy.js"
-   },
-   {
-    "title": "Audio-Visual Unit Operator",
-    "count": 1,
-    "sources": [
-     "Alljobs (Teletalk)"
-    ],
-    "portalCategory": [
-     "Government"
-    ],
-    "suggestion": "add \"audio-visual unit operator\" to syn of role \"data-entry\" (Data Entry / Computer Operator) in src/taxonomy.js"
-   },
-   {
-    "title": "Librarian",
-    "count": 1,
-    "sources": [
-     "Alljobs (Teletalk)"
-    ],
-    "portalCategory": [
-     "Government"
-    ],
-    "suggestion": "no close role; may need a new role in src/taxonomy.js"
-   },
-   {
-    "title": "Scientific Officer",
-    "count": 1,
-    "sources": [
-     "Alljobs (Teletalk)"
-    ],
-    "portalCategory": [
-     "Government"
-    ],
-    "suggestion": "add \"scientific officer\" to syn of role \"bank-officer\" (Bank Officer / Trainee Officer) in src/taxonomy.js"
    },
    {
     "title": "Deputy Manager / Manager, Labaid Printing & Packaging",
@@ -735,6 +218,226 @@
     ],
     "portalCategory": [
      "Agriculture / Environment / Forestry"
+    ],
+    "suggestion": "no close role; may need a new role in src/taxonomy.js"
+   },
+   {
+    "title": "Lab Assistant (EEE Lab)",
+    "count": 1,
+    "sources": [
+     "NextJobz"
+    ],
+    "portalCategory": [
+     "Pathologist/ Lab Assistant"
+    ],
+    "suggestion": "add \"lab assistant (eee lab)\" to syn of role \"pa\" (Executive / Personal Assistant) in src/taxonomy.js"
+   },
+   {
+    "title": "Patient Care Attendant (PCA)- Nursing",
+    "count": 1,
+    "sources": [
+     "NextJobz"
+    ],
+    "portalCategory": [
+     "Nurse"
+    ],
+    "suggestion": "no close role; may need a new role in src/taxonomy.js"
+   },
+   {
+    "title": "Assistant Manager, Quality Assurance",
+    "count": 1,
+    "sources": [
+     "NextJobz"
+    ],
+    "portalCategory": [
+     "Production / Operation / Quality Control"
+    ],
+    "suggestion": "add \"assistant manager, quality assurance\" to syn of role \"social\" (Social Media Manager) in src/taxonomy.js"
+   },
+   {
+    "title": "Fire Safety Officer",
+    "count": 1,
+    "sources": [
+     "NextJobz"
+    ],
+    "portalCategory": [
+     "Fire Safety/ Firefighter"
+    ],
+    "suggestion": "add \"fire safety officer\" to syn of role \"bank-officer\" (Bank Officer / Trainee Officer) in src/taxonomy.js"
+   },
+   {
+    "title": "Manager – Operations, Ghoshinga Project",
+    "count": 1,
+    "sources": [
+     "NextJobz"
+    ],
+    "portalCategory": [
+     "Production / Operation / Quality Control"
+    ],
+    "suggestion": "add \"manager – operations, ghoshinga project\" to syn of role \"social\" (Social Media Manager) in src/taxonomy.js"
+   },
+   {
+    "title": "Executive – New Product Development (Fan Product)",
+    "count": 1,
+    "sources": [
+     "NextJobz"
+    ],
+    "portalCategory": [
+     "Production / Operation / Quality Control"
+    ],
+    "suggestion": "add \"executive – new product development (fan product)\" to syn of role \"bde\" (Business Development Executive) in src/taxonomy.js"
+   },
+   {
+    "title": "Warehouse Supervisor",
+    "count": 1,
+    "sources": [
+     "NextJobz"
+    ],
+    "portalCategory": [
+     "Deliveryman/Rider/Picker/Load-Unloader"
+    ],
+    "suggestion": "add \"warehouse supervisor\" to syn of role \"store\" (Store / Warehouse) in src/taxonomy.js"
+   },
+   {
+    "title": "Operations Manager",
+    "count": 1,
+    "sources": [
+     "NextJobz"
+    ],
+    "portalCategory": [
+     "Production / Operation / Quality Control"
+    ],
+    "suggestion": "add \"operations manager\" to syn of role \"social\" (Social Media Manager) in src/taxonomy.js"
+   },
+   {
+    "title": "Assistant Manager / Manager - Fire & Safety",
+    "count": 1,
+    "sources": [
+     "NextJobz"
+    ],
+    "portalCategory": [
+     "Fire Safety/ Firefighter"
+    ],
+    "suggestion": "add \"assistant manager / manager - fire & safety\" to syn of role \"social\" (Social Media Manager) in src/taxonomy.js"
+   },
+   {
+    "title": "Warehouse Assistant (OPPO Brand)",
+    "count": 1,
+    "sources": [
+     "NextJobz"
+    ],
+    "portalCategory": [
+     "Deliveryman/Rider/Picker/Load-Unloader"
+    ],
+    "suggestion": "add \"warehouse assistant (oppo brand)\" to syn of role \"brand\" (Brand Executive) in src/taxonomy.js"
+   },
+   {
+    "title": "Deputy Manager - Quality Assurance (Gazipur Factory)",
+    "count": 1,
+    "sources": [
+     "NextJobz"
+    ],
+    "portalCategory": [
+     "Production / Operation / Quality Control"
+    ],
+    "suggestion": "add \"deputy manager - quality assurance (gazipur factory)\" to syn of role \"social\" (Social Media Manager) in src/taxonomy.js"
+   },
+   {
+    "title": "Head of Program (Solar)",
+    "count": 1,
+    "sources": [
+     "NextJobz"
+    ],
+    "portalCategory": [
+     "Project / Research / Consultancy"
+    ],
+    "suggestion": "add \"head of program (solar)\" to syn of role \"program-officer\" (Program / Project Officer) in src/taxonomy.js"
+   },
+   {
+    "title": "Medical Content Specialist",
+    "count": 1,
+    "sources": [
+     "NextJobz"
+    ],
+    "portalCategory": [
+     "Journalism / Content Writing / Editing"
+    ],
+    "suggestion": "add \"medical content specialist\" to syn of role \"seo\" (SEO Specialist) in src/taxonomy.js"
+   },
+   {
+    "title": "Manager-Planning",
+    "count": 1,
+    "sources": [
+     "NextJobz"
+    ],
+    "portalCategory": [
+     "Production / Operation / Quality Control"
+    ],
+    "suggestion": "add \"manager-planning\" to syn of role \"social\" (Social Media Manager) in src/taxonomy.js"
+   },
+   {
+    "title": "Sr. Consultant - Cardiology",
+    "count": 1,
+    "sources": [
+     "NextJobz"
+    ],
+    "portalCategory": [
+     "Pathologist/ Lab Assistant"
+    ],
+    "suggestion": "no close role; may need a new role in src/taxonomy.js"
+   },
+   {
+    "title": "Sr. Consultant - Endocrinology",
+    "count": 1,
+    "sources": [
+     "NextJobz"
+    ],
+    "portalCategory": [
+     "Project / Research / Consultancy"
+    ],
+    "suggestion": "no close role; may need a new role in src/taxonomy.js"
+   },
+   {
+    "title": "Officer - Legal",
+    "count": 1,
+    "sources": [
+     "NextJobz"
+    ],
+    "portalCategory": [
+     "Legal / Law"
+    ],
+    "suggestion": "add \"officer - legal\" to syn of role \"bank-officer\" (Bank Officer / Trainee Officer) in src/taxonomy.js"
+   },
+   {
+    "title": "Legal Intern (Female)",
+    "count": 1,
+    "sources": [
+     "NextJobz"
+    ],
+    "portalCategory": [
+     "Legal / Law"
+    ],
+    "suggestion": "no close role; may need a new role in src/taxonomy.js"
+   },
+   {
+    "title": "Manager - International Fresh Produce Export",
+    "count": 1,
+    "sources": [
+     "NextJobz"
+    ],
+    "portalCategory": [
+     "Agro (Plant / Animal / Fisheries)"
+    ],
+    "suggestion": "add \"manager - international fresh produce export\" to syn of role \"social\" (Social Media Manager) in src/taxonomy.js"
+   },
+   {
+    "title": "OT In-Charge",
+    "count": 1,
+    "sources": [
+     "NextJobz"
+    ],
+    "portalCategory": [
+     "Production / Operation / Quality Control"
     ],
     "suggestion": "no close role; may need a new role in src/taxonomy.js"
    }

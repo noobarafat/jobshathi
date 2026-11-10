@@ -87,9 +87,9 @@ const FIELDS = [
 
   { id: 'engineering', en: 'Engineering & Technical', bn: 'প্রকৌশল ও কারিগরি', cats: ['engineer', 'architect', 'engineering', 'technical'],
     roles: [
-      { id: 'civil', en: 'Civil Engineer', syn: ['civil engineer', 'site engineer', 'project engineer', 'sub assistant engineer (civil)', 'sub-assistant engineer civil', 'diploma engineer civil', 'quantity surveyor', 'সিভিল ইঞ্জিনিয়ার'] },
-      { id: 'electrical', en: 'Electrical / Electronics Engineer', syn: ['electrical engineer', 'eee engineer', 'electronics engineer', 'sub assistant engineer (electrical)', 'diploma engineer electrical', 'power engineer', 'ইলেকট্রিক্যাল ইঞ্জিনিয়ার'] },
-      { id: 'mechanical', en: 'Mechanical / Maintenance Engineer', syn: ['mechanical engineer', 'maintenance engineer', 'sub assistant engineer (mechanical)', 'utility engineer', 'service engineer', 'plant engineer'] },
+      { id: 'civil', en: 'Civil Engineer', syn: ['civil engineer', 'site engineer', 'project engineer', 'sub assistant engineer (civil)', 'sub-assistant engineer civil', 'assistant engineer (civil)', 'assistant engineer civil', 'উপসহকারী প্রকৌশলী (পুর)', 'সহকারী প্রকৌশলী (পুর)', 'diploma engineer civil', 'quantity surveyor', 'সিভিল ইঞ্জিনিয়ার'] },
+      { id: 'electrical', en: 'Electrical / Electronics Engineer', syn: ['electrical engineer', 'eee engineer', 'electronics engineer', 'sub assistant engineer (electrical)', 'assistant engineer (electrical)', 'assistant engineer electrical', 'উপসহকারী প্রকৌশলী (বিদ্যুৎ)', 'সহকারী প্রকৌশলী (বিদ্যুৎ)', 'diploma engineer electrical', 'power engineer', 'ইলেকট্রিক্যাল ইঞ্জিনিয়ার'] },
+      { id: 'mechanical', en: 'Mechanical / Maintenance Engineer', syn: ['mechanical engineer', 'maintenance engineer', 'sub assistant engineer (mechanical)', 'assistant engineer (mechanical)', 'assistant engineer mechanical', 'machine operator', 'উপসহকারী প্রকৌশলী (যান্ত্রিক)', 'সহকারী প্রকৌশলী (যান্ত্রিক)', 'utility engineer', 'service engineer', 'plant engineer'] },
       { id: 'draftsman', en: 'AutoCAD / Draftsman', syn: ['autocad operator', 'draftsman', 'cad operator', 'auto cad designer', 'junior architect', 'architect', 'interior designer'] },
       { id: 'technician', en: 'Technician / Electrician', syn: ['technician', 'electrician', 'ac technician', 'service technician', 'mechanic', 'generator operator', 'plumber', 'welder', 'ইলেকট্রিশিয়ান', 'টেকনিশিয়ান'] },
     ],
@@ -154,9 +154,20 @@ const FIELDS = [
       { id: 'guard', en: 'Security Guard', syn: ['security guard', 'security supervisor', 'security officer', 'guard', 'সিকিউরিটি গার্ড', 'নিরাপত্তা প্রহরী'] },
       { id: 'chef', en: 'Chef / Cook', syn: ['chef', 'cook', 'commis', 'kitchen helper', 'baker', 'barista', 'বাবুর্চি', 'শেফ'] },
       { id: 'hotel', en: 'Hotel & Restaurant Service', syn: ['waiter', 'waitress', 'steward', 'restaurant manager', 'front office assistant (hotel)', 'housekeeping', 'room attendant', 'guest relation officer', 'ওয়েটার'] },
+      { id: 'cleaning', en: 'Cleaner / Housekeeping Staff', syn: ['cleaner', 'sweeper', 'cleaning staff', 'janitor', 'caretaker', 'housekeeping staff', 'পরিচ্ছন্নতাকর্মী', 'ক্লিনার', 'ঝাড়ুদার'] },
       { id: 'travel', en: 'Travel & Ticketing', syn: ['ticketing executive', 'reservation officer', 'travel consultant', 'tour executive', 'visa processing officer'] },
     ],
     skills: ['Driving Licence', 'Motorcycle Driving', 'Customer Service', 'Cooking', 'Food Safety', 'Communication', 'Ticketing', 'Smartphone Use'] },
+
+  { id: 'govt', en: 'Government & Public Service', bn: 'সরকারি ও জনসেবা', cats: ['government', 'govt', 'public service', 'ministry', 'directorate', 'autonomous'],
+    roles: [
+      { id: 'govt-assistant', en: 'Office Assistant (Government)', syn: ['upper division assistant', 'lower division assistant', 'uda', 'lda', 'head assistant', 'certificate assistant', 'certificate peshkar', 'peshkar', 'sayrat assistant', 'mutation assistant', 'record keeper', 'store keeper cum assistant', 'উচ্চমান সহকারী', 'নিম্নমান সহকারী', 'প্রধান সহকারী', 'সার্টিফিকেট সহকারী'] },
+      { id: 'govt-officer', en: 'Government Officer', syn: ['administrative officer', 'assistant administrative officer', 'assistant director', 'upazila officer', 'field officer', 'programme officer', 'project officer', 'research officer', 'estimator', 'প্রশাসনিক কর্মকর্তা', 'সহকারী পরিচালক', 'উপজেলা কর্মকর্তা'] },
+      { id: 'govt-support', en: 'Support Staff (Government)', syn: ['office sohayok', 'office sahayok', 'mlss', 'pump operator', 'process server', 'অফিস সহায়ক', 'পাম্প অপারেটর'] },
+      { id: 'govt-surveyor', en: 'Surveyor / Amin', syn: ['surveyor', 'amin', 'draftsman', 'tracer', 'work assistant', 'সার্ভেয়ার', 'আমিন', 'নকশাকার'] },
+      { id: 'govt-uniform', en: 'Uniformed Service', syn: ['sub inspector', 'constable', 'ansar', 'fire fighter', 'firefighter', 'cadet', 'sepoy', 'কনস্টেবল', 'সাব ইন্সপেক্টর', 'আনসার'] },
+    ],
+    skills: ['Typing', 'Bangla Typing', 'MS Office', 'Excel', 'MS Word', 'Communication', 'Filing', 'Record Keeping'] },
 ];
 
 /* Other ways a skill is written in posts (all lower case). */
