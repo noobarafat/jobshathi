@@ -24,6 +24,7 @@
       const stamp = Store.get('updatedAt', Date.now());
       const r = await Cloud.save(u.uid, { account: S.account, profile: S.profile, marks: S.marks, lang: S.lang, theme: S.theme, updatedAt: stamp });
       this.busy = false;
+      if (r.ok) keep('syncedUid', u.uid);
       if (r.ok && Store.get('updatedAt', 0) === stamp) keep('dirty', false);
       if (this.again) { this.again = false; this.push(); }
       return r.ok;
@@ -467,6 +468,7 @@
     const r = await Cloud.load(u.uid);
     if (!r.ok) return false;
     const cloud = r.data && r.data.account && r.data.profile ? r.data : null;
+    if (!cloud && S.account && Store.get('syncedUid', '') === u.uid) { await forgetHere(); toast(t('tGone')); return true; }
     const localNewer = S.account && S.profile && S.account.uid === u.uid && Store.get('dirty', false) && Store.get('updatedAt', 0) > ((cloud && cloud.updatedAt) || 0);
     if (cloud && !localNewer) { if ((cloud.updatedAt || 0) !== Store.get('updatedAt', 0) || Store.get('dirty', false) || !S.account) applyRemote(cloud); markUser(u); }
     else if (S.account && S.profile) { markUser(u); await Sync.push(); }
@@ -517,12 +519,16 @@
   }
   async function signOutHere() {
     if (Store.get('dirty', false)) { if (!navigator.onLine) { toast(t('errOffline')); return; } busy('signout'); await Promise.race([Sync.push(), new Promise(ok => setTimeout(ok, 8000))]); }
+    await forgetHere(); toast(t('tSignedOut'));
+  }
+  /** Signs out and removes this browser's copy (the online account stays as it is). */
+  async function forgetHere() {
     Sync.paused = true; clearTimeout(Sync.timer);
     await Cloud.signOut();
     const lang = S.lang, theme = S.theme;
     Store.clear(); keep('lang', lang); keep('theme', theme);
-    S.account = null; S.profile = null; S.marks = emptyMarks(); S.draft = null; S.delAsk = false; S.busy = ''; recompute();
-    Sync.paused = false; go('welcome'); toast(t('tSignedOut'));
+    S.account = null; S.profile = null; S.marks = emptyMarks(); S.draft = null; S.delAsk = false; S.delReauth = false; S.busy = ''; S.sheet = null; recompute();
+    Sync.paused = false; go('welcome');
   }
   /* Deletes users/{uid} and the Firebase user, then this browser's copy. */
   async function deleteAccount(confirmWithGoogle) {
@@ -654,6 +660,7 @@
     if (!u || !S.account || S.account.uid !== u.uid) return;
     if (Store.get('dirty', false)) { Sync.push(); return; }
     const r = await Cloud.load(u.uid);
+    if (r.ok && !r.data && Store.get('syncedUid', '') === u.uid) { await forgetHere(); toast(t('tGone')); return; }
     if (r.ok && r.data && r.data.account && r.data.profile && (r.data.updatedAt || 0) > Store.get('updatedAt', 0) && !Store.get('dirty', false)) { applyRemote(r.data); resolveRoute(); render(); }
   });
 

@@ -125,7 +125,7 @@ Object.assign(TEXT, {
   tWelcomeBack: ['Welcome back, {name}', 'আবার স্বাগতম, {name}'],
   tSwitched: ['This Google account already had a JobShathi account. It is open now.', 'এই Google অ্যাকাউন্টে আগে থেকেই জবসাথী অ্যাকাউন্ট ছিল। সেটি এখন খোলা হয়েছে।'],
   tNoAccount: ['No JobShathi account with this Google account yet. Answer a few questions to create one.', 'এই Google অ্যাকাউন্টে এখনো জবসাথী অ্যাকাউন্ট নেই। কয়েকটি প্রশ্নের উত্তর দিয়ে খুলে নিন।'],
-  tSignedOut: ['Signed out on this device', 'এই ডিভাইস থেকে সাইন আউট হয়েছে'], tDeleted: ['Your account was deleted', 'আপনার অ্যাকাউন্ট মুছে ফেলা হয়েছে'],
+  tSignedOut: ['Signed out on this device', 'এই ডিভাইস থেকে সাইন আউট হয়েছে'], tGone: ['This account was deleted on another device.', 'এই অ্যাকাউন্টটি অন্য ডিভাইস থেকে মুছে ফেলা হয়েছে।'], tDeleted: ['Your account was deleted', 'আপনার অ্যাকাউন্ট মুছে ফেলা হয়েছে'],
   errGoogle: ['Could not sign in with Google. Please try again.', 'Google দিয়ে সাইন ইন করা গেল না। আবার চেষ্টা করুন।'],
   errPopup: ['The Google window was blocked. Allow pop-ups for this site and try again.', 'Google-এর উইন্ডো ব্লক হয়েছে। এই সাইটে পপ-আপ চালু করে আবার চেষ্টা করুন।'],
   errOffline: ['You are offline. Connect to the internet and try again.', 'আপনি অফলাইনে আছেন। ইন্টারনেটে যুক্ত হয়ে আবার চেষ্টা করুন।'],
