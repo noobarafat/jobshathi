@@ -127,4 +127,4 @@ Every host's robots.txt is read again at run time and any disallowed path is ski
 
 ### Daily run
 
-`.github/workflows/jobs.yml` runs at 00:00 UTC (about 6 AM in Dhaka) and has a **Run workflow** button. It commits `jobs.json` and `robot/report.json` only when they changed, then rebuilds and publishes the site, because a push made with `GITHUB_TOKEN` does not start another workflow. It uses no secrets beyond the built-in `GITHUB_TOKEN`.
+`.github/workflows/jobs.yml` runs at 23:37 UTC (about 5:37 AM in Dhaka; an odd minute off the hour, because GitHub queues scheduled runs and the top of the hour is busiest) and has a **Run workflow** button. It commits `jobs.json` and `robot/report.json` only when they changed, then rebuilds and publishes the site, because a push made with `GITHUB_TOKEN` does not start another workflow. It uses no secrets beyond the built-in `GITHUB_TOKEN`.

@@ -1,9 +1,12 @@
 name: Collect jobs
 
 # About 6 AM Bangladesh time (UTC+6), plus a "Run workflow" button.
+# 23:37 UTC rather than 00:00: GitHub queues scheduled runs, and the top of the
+# hour (midnight UTC most of all) is when everyone else schedules theirs. The
+# first run at '0 0 * * *' landed five hours late.
 on:
   schedule:
-    - cron: '0 0 * * *'
+    - cron: '37 23 * * *'
   workflow_dispatch:
     inputs:
       limit:
