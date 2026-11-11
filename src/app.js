@@ -270,7 +270,8 @@
   /* Who made this. */
   const MAKER = { name: 'K. M. Arafat Islam', linkedin: 'https://www.linkedin.com/in/kmarafatislam/' };
   const linkedInBtn = (cls = 'btn soft') => `<a class="${cls}" href="${MAKER.linkedin}" target="_blank" rel="noopener noreferrer" data-fid="linkedin">${t('creditBtn')} ${ic('ext')}</a>`;
-  const creditCard = () => `<div class="card panel install-card credit"><div class="avatar" aria-hidden="true">${esc(initials(MAKER.name))}</div><div><span class="lbl">${t('creditTitle')}</span><b>${t('creditName')}</b><div class="hint">${t('creditRole')}</div></div>${linkedInBtn()}</div>`;
+  // MAKER_PHOTO is a data URI built into the page, so it cannot fail to load.
+  const creditCard = () => `<div class="card panel install-card credit"><span class="avatar shot"><img src="${MAKER_PHOTO}" alt="${t('creditName')}" width="48" height="48" decoding="async"></span><div><span class="lbl">${t('creditTitle')}</span><b>${t('creditName')}</b><div class="hint">${t('creditRole')}</div></div>${linkedInBtn()}</div>`;
 
   /** "Jobs updated today at 6:10 AM", from the updatedAt the robot writes into jobs.json. */
   function freshWords() {

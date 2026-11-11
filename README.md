@@ -18,6 +18,7 @@ src/locations.js        8 divisions, 64 districts, areas of the big cities
 src/i18n.js             all interface text, English and বাংলা: TEXT.key = ['English', 'বাংলা']
 src/jobs-sample.js      example posts shown until jobs.json exists
 src/engine.js           the matching engine
+src/maker-photo.js      the maker's photo as a data URI, so the build stays one file
 src/firebase-config.js  Firebase web app settings (public values)
 src/cloud.js            Firebase sign-in and the users/{uid} document
 src/app.js              the app: Store, pages, actions
