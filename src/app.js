@@ -193,7 +193,8 @@
       ${!S.account && cloudOn() ? `<div class="have"><span>${t('haveAccount')}</span><button type="button" class="btn" data-a="google" data-fid="google" ${S.busy === 'google' ? 'disabled' : ''}>${GLOGO}${S.busy === 'google' ? t('wait') : t('googleBtn')}</button></div>` : ''}
       <div class="trust"><span>${ic('check')}${t('trust1')}</span><span>${ic('check')}${t('trust2')}</span><span>${ic('check')}${t('trust3')}</span></div></div></div>
       <div>${demo}</div></section>
-      <ol class="steps"><li><div><b>${t('how1')}</b><span>${t('how1d')}</span></div></li><li><div><b>${t('how2')}</b><span>${t('how2d')}</span></div></li><li><div><b>${t('how3')}</b><span>${t('how3d')}</span></div></li></ol>`;
+      <ol class="steps"><li><div><b>${t('how1')}</b><span>${t('how1d')}</span></div></li><li><div><b>${t('how2')}</b><span>${t('how2d')}</span></div></li><li><div><b>${t('how3')}</b><span>${t('how3d')}</span></div></li></ol>
+      <p class="made">${t('creditFoot', { n: `<a href="${MAKER.linkedin}" target="_blank" rel="noopener noreferrer">${t('creditName')}</a>` })}</p>`;
   }
 
   function tokens(key, placeholder) {
@@ -266,6 +267,11 @@
   }
   const gapsCard = () => { const gaps = Engine.skillGaps(live()); return gaps.length ? `<div class="card panel"><h2 style="margin-bottom:6px">${t('gapsTitle')}</h2>${gaps.map(g => `<div class="gap-item"><span>${t('gapLine', { skill: B(g.skill), n: num(g.n), of: num(g.of) })}</span><div><button type="button" class="btn sm soft" data-a="gap-add" data-v="${esc(g.skill)}" data-fid="gap:${esc(g.skill)}">${t('haveIt')}</button></div></div>`).join('')}</div>` : ''; };
   const installCard = () => (S.installed ? '' : `<div class="card panel install-card"><div class="ico">${ic('download')}</div><div><b>${t('installTitle')}</b><div class="hint">${t('installLead')}</div></div><button type="button" class="btn soft" data-a="install" data-fid="install-card">${t('installApp')}</button></div>`);
+  /* Who made this. */
+  const MAKER = { name: 'K. M. Arafat Islam', linkedin: 'https://www.linkedin.com/in/kmarafatislam/' };
+  const linkedInBtn = (cls = 'btn soft') => `<a class="${cls}" href="${MAKER.linkedin}" target="_blank" rel="noopener noreferrer" data-fid="linkedin">${t('creditBtn')} ${ic('ext')}</a>`;
+  const creditCard = () => `<div class="card panel install-card credit"><div class="avatar" aria-hidden="true">${esc(initials(MAKER.name))}</div><div><span class="lbl">${t('creditTitle')}</span><b>${t('creditName')}</b><div class="hint">${t('creditRole')}</div></div>${linkedInBtn()}</div>`;
+
   /** "Jobs updated today at 6:10 AM", from the updatedAt the robot writes into jobs.json. */
   function freshWords() {
     if (!S.updatedAt) return '';
@@ -348,7 +354,8 @@
       ${installCard()}
       <div class="card panel"><details><summary>${t('howTitle')}${ic('chevR')}</summary><div class="prose">${t('how').split('|').map(x => `<p>${x}</p>`).join('')}</div></details></div>
       <div class="card panel"><h2 style="margin-bottom:6px">${t('privacyTitle')}</h2><div class="prose"><p>${t('privacy')}</p>${storageWorks ? '' : `<p class="err">${t('storageOff')}</p>`}${FIREBASE_CONFIG.apiKey && (Cloud.status === 'failed' || (a.uid && Store.get('dirty', false) && !navigator.onLine)) ? `<p class="hint">${t('cloudOff')}</p>` : ''}</div>
-        <div style="margin-top:12px;display:flex;flex-wrap:wrap;gap:8px;align-items:center">${S.delReauth ? `<span>${t('delReauth')}</span><button type="button" class="btn danger" data-a="del-google" data-fid="del-google" ${S.busy ? 'disabled' : ''}>${GLOGO}${S.busy === 'delete' ? t('wait') : t('confirmGoogle')}</button><button type="button" class="btn" data-a="del-no" data-fid="del-no">${t('cancel')}</button>` : S.delAsk ? `<span>${t('deleteAsk')}</span><button type="button" class="btn danger" data-a="del-yes" data-fid="del-yes" ${S.busy ? 'disabled' : ''}>${S.busy === 'delete' ? t('wait') : t('deleteYes')}</button><button type="button" class="btn" data-a="del-no" data-fid="del-no">${t('cancel')}</button>` : `<button type="button" class="btn danger" data-a="del-ask" data-fid="del-ask">${t('deleteAccount')}</button>`}</div></div></div>`;
+        <div style="margin-top:12px;display:flex;flex-wrap:wrap;gap:8px;align-items:center">${S.delReauth ? `<span>${t('delReauth')}</span><button type="button" class="btn danger" data-a="del-google" data-fid="del-google" ${S.busy ? 'disabled' : ''}>${GLOGO}${S.busy === 'delete' ? t('wait') : t('confirmGoogle')}</button><button type="button" class="btn" data-a="del-no" data-fid="del-no">${t('cancel')}</button>` : S.delAsk ? `<span>${t('deleteAsk')}</span><button type="button" class="btn danger" data-a="del-yes" data-fid="del-yes" ${S.busy ? 'disabled' : ''}>${S.busy === 'delete' ? t('wait') : t('deleteYes')}</button><button type="button" class="btn" data-a="del-no" data-fid="del-no">${t('cancel')}</button>` : `<button type="button" class="btn danger" data-a="del-ask" data-fid="del-ask">${t('deleteAccount')}</button>`}</div></div>
+      ${creditCard()}</div>`;
   }
   /* Google on the profile page: connect it, or show which Google account this is. */
   function googleCard() {

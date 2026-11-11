@@ -431,3 +431,10 @@ main { padding-bottom: 118px; }
 .gcard .ico .g-logo { width: 24px; height: 24px; }
 .gcard b { overflow-wrap: anywhere; }
 .btn[disabled] { opacity: .6; pointer-events: none; }
+/* ───────── who built it ───────── */
+.credit .avatar { width: 48px; height: 48px; font-size: 1rem; }
+.credit .lbl { display: block; margin-bottom: 2px; }
+.credit b { display: block; font-size: 1.05rem; }
+.made { margin: 22px 0 4px; text-align: center; color: var(--ink-2); font-size: .92rem; }
+.made a { color: var(--brand-strong); font-weight: 600; text-decoration: none; }
+.made a:hover { text-decoration: underline; }

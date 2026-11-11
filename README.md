@@ -4,6 +4,8 @@ A free job-matching web app for job seekers in Bangladesh. People answer a few s
 
 Live: https://noobarafat.github.io/jobshathi/
 
+Built by **K. M. Arafat Islam**, founder and developer of JobShathi. [LinkedIn](https://www.linkedin.com/in/kmarafatislam/)
+
 Plain HTML, CSS and JavaScript. No framework, no npm install.
 
 ## Files

@@ -114,6 +114,15 @@ Object.assign(TEXT, {
   today: ['Today', 'আজ'], appliedTag: ['Applied', 'আবেদন করা'], moreInfo: ['Details', 'বিস্তারিত'],
 });
 
+/* ───────── v5: who built JobShathi ───────── */
+Object.assign(TEXT, {
+  creditTitle: ['Built by', 'তৈরি করেছেন'],
+  creditName: ['K. M. Arafat Islam', 'কে. এম. আরাফাত ইসলাম'],
+  creditRole: ['Founder and developer of JobShathi', 'জবসাথীর প্রতিষ্ঠাতা ও ডেভেলপার'],
+  creditBtn: ['Connect on LinkedIn', 'LinkedIn-এ যুক্ত হোন'],
+  creditFoot: ['Built by {n}', 'তৈরি করেছেন {n}'],
+});
+
 /* ───────── v4: when the job robot last brought new posts ───────── */
 Object.assign(TEXT, {
   updatedToday: ['Jobs updated today at {t}', 'আজ {t}-এ চাকরি হালনাগাদ হয়েছে'],
