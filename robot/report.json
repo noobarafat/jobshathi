@@ -1,35 +1,35 @@
 {
  "run": {
-  "startedAt": "2026-11-10T17:36:13+06:00",
-  "finishedAt": "2026-11-10T17:58:27+06:00",
-  "newPostsCollected": 601,
-  "postsInFile": 594,
-  "fileBytes": 406631
+  "startedAt": "2026-11-11T11:11:46+06:00",
+  "finishedAt": "2026-11-11T11:25:44+06:00",
+  "newPostsCollected": 336,
+  "postsInFile": 915,
+  "fileBytes": 682177
  },
  "collectedPerSource": {
   "nextjobz": 299,
-  "alljobs": 296,
-  "remote": 6,
+  "alljobs": 32,
+  "remote": 5,
   "companies": 0
  },
  "postsInFilePerSource": {
-  "Alljobs (Teletalk)": 295,
-  "NextJobz": 295,
+  "Alljobs (Teletalk)": 326,
+  "NextJobz": 585,
   "Jobicy": 1,
   "Remote OK": 3
  },
  "removed": {
-  "expired": 0,
-  "too_old": 5,
+  "expired": 1,
+  "too_old": 7,
   "asks_for_money": 0,
-  "merged": 2,
+  "merged": 7,
   "no_title": 0,
   "over_size_limit": 0
  },
  "sourceFailures": {},
  "pagesRead": {
   "nextjobz.com.bd": 301,
-  "alljobs.teletalk.com.bd": 298,
+  "alljobs.teletalk.com.bd": 34,
   "jobicy.com": 1,
   "remoteok.com": 1,
   "himalayas.app": 1,
@@ -44,26 +44,57 @@
  "blockedByRobotsTxt": [],
  "requestsFailed": [],
  "matching": {
-  "postsRead": 594,
+  "postsRead": 915,
   "postsPerSource": {
-   "Alljobs (Teletalk)": 295,
-   "NextJobz": 295,
+   "Alljobs (Teletalk)": 326,
+   "NextJobz": 585,
    "Jobicy": 1,
    "Remote OK": 3
   },
   "classifiedHow": {
-   "category": 204,
-   "title": 331,
-   "spelling": 36,
-   "none": 23
+   "title": 494,
+   "category": 314,
+   "spelling": 59,
+   "none": 46,
+   "skills": 2
   },
   "noFieldFound": {
-   "count": 23,
-   "percent": 4,
+   "count": 46,
+   "percent": 5,
    "examples": [
     {
      "title": "Optic Shop Assistant",
      "company": "Ispahani Islamia Eye Institute & Hospital",
+     "source": "NextJobz"
+    },
+    {
+     "title": "GM - Sample & Technical",
+     "company": "A reputed Multinational Company",
+     "source": "NextJobz"
+    },
+    {
+     "title": "STP / ETP Operator",
+     "company": "Apollo Imperial Hospitals",
+     "source": "NextJobz"
+    },
+    {
+     "title": "Officer - Wastage Management",
+     "company": "Masco Group",
+     "source": "NextJobz"
+    },
+    {
+     "title": "Assistant Manager – Quality Assurance",
+     "company": "Fakir Apparels Ltd.",
+     "source": "NextJobz"
+    },
+    {
+     "title": "R&D Chemist - Hygiene Glue",
+     "company": "Redmin Industries Limited",
+     "source": "NextJobz"
+    },
+    {
+     "title": "Senior Executive Shipping Operation",
+     "company": "Akij Resources",
      "source": "NextJobz"
     },
     {
@@ -80,100 +111,70 @@
      "title": "Lab Assistant (EEE Lab)",
      "company": "Uttara University",
      "source": "NextJobz"
-    },
-    {
-     "title": "Patient Care Attendant (PCA)- Nursing",
-     "company": "Asgar Ali Hospital",
-     "source": "NextJobz"
-    },
-    {
-     "title": "Assistant Manager, Quality Assurance",
-     "company": "Standard Finis Oil Co.",
-     "source": "NextJobz"
-    },
-    {
-     "title": "Fire Safety Officer",
-     "company": "Divine Mercy Hospital Ltd.",
-     "source": "NextJobz"
-    },
-    {
-     "title": "Manager – Operations, Ghoshinga Project",
-     "company": "AKIJBASHIR GROUP",
-     "source": "NextJobz"
-    },
-    {
-     "title": "Executive – New Product Development (Fan Product)",
-     "company": "SSG (Super Star Group)",
-     "source": "NextJobz"
-    },
-    {
-     "title": "Warehouse Supervisor",
-     "company": "JSK Group",
-     "source": "NextJobz"
     }
    ]
   },
   "noLocationFound": {
-   "count": 186,
-   "percent": 31,
+   "count": 219,
+   "percent": 24,
    "examples": [
     {
-     "title": "Machinist",
-     "company": "Office of the Director General, Bangladesh Post Office (DGBPO)",
+     "title": "Steno-Typist Cum Computer Operator",
+     "company": "Ministry of Defence (MOD)",
      "loc": "",
      "source": "Alljobs (Teletalk)"
     },
     {
-     "title": "Sanitation Worker (Formerly Cleaner)",
-     "company": "Office of the Director General, Bangladesh Post Office (DGBPO)",
+     "title": "Office Assistant Cum Computer Typist",
+     "company": "Ministry of Defence (MOD)",
      "loc": "",
      "source": "Alljobs (Teletalk)"
     },
     {
-     "title": "Assistant Machineman",
-     "company": "Office of the Director General, Bangladesh Post Office (DGBPO)",
+     "title": "Office Support Staff",
+     "company": "Ministry of Defence (MOD)",
      "loc": "",
      "source": "Alljobs (Teletalk)"
     },
     {
-     "title": "Stenotypist-cum-Computer Operator (Stenotypist)",
-     "company": "Office of the Director General, Bangladesh Post Office (DGBPO)",
+     "title": "Cataloger",
+     "company": "Bangladesh Parliament Secretariat(BPS)",
      "loc": "",
      "source": "Alljobs (Teletalk)"
     },
     {
-     "title": "Junior Proofreader",
-     "company": "Office of the Director General, Bangladesh Post Office (DGBPO)",
+     "title": "Legislative Assistant",
+     "company": "Bangladesh Parliament Secretariat(BPS)",
      "loc": "",
      "source": "Alljobs (Teletalk)"
     },
     {
-     "title": "Packer",
-     "company": "Office of the Director General, Bangladesh Post Office (DGBPO)",
+     "title": "Photographer Still",
+     "company": "Bangladesh Parliament Secretariat(BPS)",
      "loc": "",
      "source": "Alljobs (Teletalk)"
     },
     {
-     "title": "Assistant Photo Compositor",
-     "company": "Office of the Director General, Bangladesh Post Office (DGBPO)",
+     "title": "Technician (Network)",
+     "company": "Bangladesh Parliament Secretariat(BPS)",
      "loc": "",
      "source": "Alljobs (Teletalk)"
     },
     {
-     "title": "Sanitation Worker (Sweeper)",
-     "company": "Office of the Director General, Bangladesh Post Office (DGBPO)",
+     "title": "TV Technician",
+     "company": "Bangladesh Parliament Secretariat(BPS)",
      "loc": "",
      "source": "Alljobs (Teletalk)"
     },
     {
-     "title": "Assistant Plate Maker",
-     "company": "Office of the Director General, Bangladesh Post Office (DGBPO)",
+     "title": "Steno-Typist cum-Computer Operator",
+     "company": "Bangladesh Parliament Secretariat(BPS)",
      "loc": "",
      "source": "Alljobs (Teletalk)"
     },
     {
-     "title": "Mechanic",
-     "company": "Office of the Director General, Bangladesh Post Office (DGBPO)",
+     "title": "Data Entry/Control Operator",
+     "company": "Bangladesh Parliament Secretariat(BPS)",
      "loc": "",
      "source": "Alljobs (Teletalk)"
     }
@@ -181,11 +182,11 @@
   },
   "noDeadline": {
    "count": 4,
-   "percent": 1
+   "percent": 0
   },
   "noSalary": {
-   "count": 567,
-   "percent": 95
+   "count": 879,
+   "percent": 96
   },
   "topUnclassifiedTitles": [
    {
@@ -198,6 +199,72 @@
      "Showroom Assistant/Salesman"
     ],
     "suggestion": "add \"optic shop assistant\" to syn of role \"pa\" (Executive / Personal Assistant) in src/taxonomy.js"
+   },
+   {
+    "title": "GM - Sample & Technical",
+    "count": 1,
+    "sources": [
+     "NextJobz"
+    ],
+    "portalCategory": [
+     "Production / Operation / Quality Control"
+    ],
+    "suggestion": "no close role; may need a new role in src/taxonomy.js"
+   },
+   {
+    "title": "STP / ETP Operator",
+    "count": 1,
+    "sources": [
+     "NextJobz"
+    ],
+    "portalCategory": [
+     "Production / Operation / Quality Control"
+    ],
+    "suggestion": "add \"stp / etp operator\" to syn of role \"data-entry\" (Data Entry / Computer Operator) in src/taxonomy.js"
+   },
+   {
+    "title": "Officer - Wastage Management",
+    "count": 1,
+    "sources": [
+     "NextJobz"
+    ],
+    "portalCategory": [
+     "Production / Operation / Quality Control"
+    ],
+    "suggestion": "add \"officer - wastage management\" to syn of role \"bank-officer\" (Bank Officer / Trainee Officer) in src/taxonomy.js"
+   },
+   {
+    "title": "Assistant Manager – Quality Assurance",
+    "count": 1,
+    "sources": [
+     "NextJobz"
+    ],
+    "portalCategory": [
+     "Production / Operation / Quality Control"
+    ],
+    "suggestion": "add \"assistant manager – quality assurance\" to syn of role \"social\" (Social Media Manager) in src/taxonomy.js"
+   },
+   {
+    "title": "R&D Chemist - Hygiene Glue",
+    "count": 1,
+    "sources": [
+     "NextJobz"
+    ],
+    "portalCategory": [
+     "Pharmaceutical / Biotech / Lab"
+    ],
+    "suggestion": "no close role; may need a new role in src/taxonomy.js"
+   },
+   {
+    "title": "Senior Executive Shipping Operation",
+    "count": 1,
+    "sources": [
+     "NextJobz"
+    ],
+    "portalCategory": [
+     "Production / Operation / Quality Control"
+    ],
+    "suggestion": "add \"senior executive shipping operation\" to syn of role \"finance\" (Finance Executive / Analyst) in src/taxonomy.js"
    },
    {
     "title": "Deputy Manager / Manager, Labaid Printing & Packaging",
@@ -440,6 +507,193 @@
      "Production / Operation / Quality Control"
     ],
     "suggestion": "no close role; may need a new role in src/taxonomy.js"
+   },
+   {
+    "title": "X-Ray In-charge",
+    "count": 1,
+    "sources": [
+     "NextJobz"
+    ],
+    "portalCategory": [
+     "Pathologist/ Lab Assistant"
+    ],
+    "suggestion": "no close role; may need a new role in src/taxonomy.js"
+   },
+   {
+    "title": "RSM/TSM (Bright)",
+    "count": 1,
+    "sources": [
+     "NextJobz"
+    ],
+    "portalCategory": [
+     "Others"
+    ],
+    "suggestion": "no close role; may need a new role in src/taxonomy.js"
+   },
+   {
+    "title": "Manager / Senior Manager - Quality Assurance & Training",
+    "count": 1,
+    "sources": [
+     "NextJobz"
+    ],
+    "portalCategory": [
+     "Production / Operation / Quality Control"
+    ],
+    "suggestion": "add \"manager / senior manager - quality assurance & training\" to syn of role \"social\" (Social Media Manager) in src/taxonomy.js"
+   },
+   {
+    "title": "Phlebotomist (Contractual)",
+    "count": 1,
+    "sources": [
+     "NextJobz"
+    ],
+    "portalCategory": [
+     "Pharmaceutical / Biotech / Lab"
+    ],
+    "suggestion": "no close role; may need a new role in src/taxonomy.js"
+   },
+   {
+    "title": "GM - Quality Control (Garments)",
+    "count": 1,
+    "sources": [
+     "NextJobz"
+    ],
+    "portalCategory": [
+     "Production / Operation / Quality Control"
+    ],
+    "suggestion": "add \"gm - quality control (garments)\" to syn of role \"audit\" (Audit / Internal Control) in src/taxonomy.js"
+   },
+   {
+    "title": "Pathologist (Part Time)",
+    "count": 1,
+    "sources": [
+     "NextJobz"
+    ],
+    "portalCategory": [
+     "Pathologist/ Lab Assistant"
+    ],
+    "suggestion": "no close role; may need a new role in src/taxonomy.js"
+   },
+   {
+    "title": "Assistant Manager - Quality Assurance",
+    "count": 1,
+    "sources": [
+     "NextJobz"
+    ],
+    "portalCategory": [
+     "Production / Operation / Quality Control"
+    ],
+    "suggestion": "add \"assistant manager - quality assurance\" to syn of role \"social\" (Social Media Manager) in src/taxonomy.js"
+   },
+   {
+    "title": "Manager-Monitoring Evaluation Accountability and Learning (MEAL)",
+    "count": 1,
+    "sources": [
+     "NextJobz"
+    ],
+    "portalCategory": [
+     "Project / Research / Consultancy"
+    ],
+    "suggestion": "add \"manager-monitoring evaluation accountability and learning (meal)\" to syn of role \"me\" (Monitoring & Evaluation) in src/taxonomy.js"
+   },
+   {
+    "title": "Business Assistant Cum PA (Female)",
+    "count": 1,
+    "sources": [
+     "NextJobz"
+    ],
+    "portalCategory": [
+     "Showroom Assistant/Salesman"
+    ],
+    "suggestion": "add \"business assistant cum pa (female)\" to syn of role \"bde\" (Business Development Executive) in src/taxonomy.js"
+   },
+   {
+    "title": "Senior Executive - Production (Savar, EPZ)",
+    "count": 1,
+    "sources": [
+     "NextJobz"
+    ],
+    "portalCategory": [
+     "Production / Operation / Quality Control"
+    ],
+    "suggestion": "add \"senior executive - production (savar, epz)\" to syn of role \"finance\" (Finance Executive / Analyst) in src/taxonomy.js"
+   },
+   {
+    "title": "Manager Environment and Climate Action",
+    "count": 1,
+    "sources": [
+     "NextJobz"
+    ],
+    "portalCategory": [
+     "Agriculture / Environment / Forestry"
+    ],
+    "suggestion": "add \"manager environment and climate action\" to syn of role \"social\" (Social Media Manager) in src/taxonomy.js"
+   },
+   {
+    "title": "Manager Assets Property and Legal Affairs",
+    "count": 1,
+    "sources": [
+     "NextJobz"
+    ],
+    "portalCategory": [
+     "Legal / Law"
+    ],
+    "suggestion": "add \"manager assets property and legal affairs\" to syn of role \"social\" (Social Media Manager) in src/taxonomy.js"
+   },
+   {
+    "title": "Chief Business Officer- Skin Care",
+    "count": 1,
+    "sources": [
+     "NextJobz"
+    ],
+    "portalCategory": [
+     "Beauty / Salon / Lifestyle"
+    ],
+    "suggestion": "add \"chief business officer- skin care\" to syn of role \"bank-officer\" (Bank Officer / Trainee Officer) in src/taxonomy.js"
+   },
+   {
+    "title": "Visa Consultant",
+    "count": 1,
+    "sources": [
+     "NextJobz"
+    ],
+    "portalCategory": [
+     "Project / Research / Consultancy"
+    ],
+    "suggestion": "no close role; may need a new role in src/taxonomy.js"
+   },
+   {
+    "title": "Contract Project Lead, Customer Implementation",
+    "count": 1,
+    "sources": [
+     "NextJobz"
+    ],
+    "portalCategory": [
+     "Project / Research / Consultancy"
+    ],
+    "suggestion": "add \"contract project lead, customer implementation\" to syn of role \"cs-exec\" (Customer Support Executive) in src/taxonomy.js"
+   },
+   {
+    "title": "Officer- Planning",
+    "count": 1,
+    "sources": [
+     "NextJobz"
+    ],
+    "portalCategory": [
+     "Production / Operation / Quality Control"
+    ],
+    "suggestion": "add \"officer- planning\" to syn of role \"bank-officer\" (Bank Officer / Trainee Officer) in src/taxonomy.js"
+   },
+   {
+    "title": "Manager - Quality (Goodrich Sweater Ltd)",
+    "count": 1,
+    "sources": [
+     "NextJobz"
+    ],
+    "portalCategory": [
+     "Production / Operation / Quality Control"
+    ],
+    "suggestion": "add \"manager - quality (goodrich sweater ltd)\" to syn of role \"social\" (Social Media Manager) in src/taxonomy.js"
    }
   ],
   "note": "suggestion lines are proposals only; src/taxonomy.js is never changed by the robot"
