@@ -1,35 +1,35 @@
 {
  "run": {
-  "startedAt": "2026-11-11T11:11:46+06:00",
-  "finishedAt": "2026-11-11T11:25:44+06:00",
-  "newPostsCollected": 336,
-  "postsInFile": 915,
-  "fileBytes": 682177
+  "startedAt": "2026-11-12T10:06:08+06:00",
+  "finishedAt": "2026-11-12T10:18:59+06:00",
+  "newPostsCollected": 315,
+  "postsInFile": 1212,
+  "fileBytes": 931221
  },
  "collectedPerSource": {
   "nextjobz": 299,
-  "alljobs": 32,
+  "alljobs": 11,
   "remote": 5,
   "companies": 0
  },
  "postsInFilePerSource": {
-  "Alljobs (Teletalk)": 326,
-  "NextJobz": 585,
+  "Alljobs (Teletalk)": 336,
+  "NextJobz": 872,
   "Jobicy": 1,
   "Remote OK": 3
  },
  "removed": {
-  "expired": 1,
-  "too_old": 7,
+  "expired": 0,
+  "too_old": 8,
   "asks_for_money": 0,
-  "merged": 7,
+  "merged": 10,
   "no_title": 0,
   "over_size_limit": 0
  },
  "sourceFailures": {},
  "pagesRead": {
   "nextjobz.com.bd": 301,
-  "alljobs.teletalk.com.bd": 34,
+  "alljobs.teletalk.com.bd": 14,
   "jobicy.com": 1,
   "remoteok.com": 1,
   "himalayas.app": 1,
@@ -44,24 +44,34 @@
  "blockedByRobotsTxt": [],
  "requestsFailed": [],
  "matching": {
-  "postsRead": 915,
+  "postsRead": 1212,
   "postsPerSource": {
-   "Alljobs (Teletalk)": 326,
-   "NextJobz": 585,
+   "Alljobs (Teletalk)": 336,
+   "NextJobz": 872,
    "Jobicy": 1,
    "Remote OK": 3
   },
   "classifiedHow": {
-   "title": 494,
-   "category": 314,
-   "spelling": 59,
-   "none": 46,
-   "skills": 2
+   "title": 630,
+   "category": 421,
+   "spelling": 87,
+   "none": 71,
+   "skills": 3
   },
   "noFieldFound": {
-   "count": 46,
-   "percent": 5,
+   "count": 71,
+   "percent": 6,
    "examples": [
+    {
+     "title": "Assistant Manager (BOQ & Estimate Audit)",
+     "company": "Building technology & Ideas Ltd.",
+     "source": "NextJobz"
+    },
+    {
+     "title": "AGM - Quality",
+     "company": "A reputed Multinational Company",
+     "source": "NextJobz"
+    },
     {
      "title": "Optic Shop Assistant",
      "company": "Ispahani Islamia Eye Institute & Hospital",
@@ -101,22 +111,12 @@
      "title": "Deputy Manager / Manager, Labaid Printing & Packaging",
      "company": "Labaid Limited (Diagnostics)",
      "source": "NextJobz"
-    },
-    {
-     "title": "Lead, Agriculture (Agriculture Resilience & Portfolio Transformation)",
-     "company": "SAJIDA FOUNDATION",
-     "source": "NextJobz"
-    },
-    {
-     "title": "Lab Assistant (EEE Lab)",
-     "company": "Uttara University",
-     "source": "NextJobz"
     }
    ]
   },
   "noLocationFound": {
-   "count": 219,
-   "percent": 24,
+   "count": 220,
+   "percent": 18,
    "examples": [
     {
      "title": "Steno-Typist Cum Computer Operator",
@@ -185,10 +185,43 @@
    "percent": 0
   },
   "noSalary": {
-   "count": 879,
+   "count": 1160,
    "percent": 96
   },
   "topUnclassifiedTitles": [
+   {
+    "title": "Store Assistant",
+    "count": 2,
+    "sources": [
+     "NextJobz"
+    ],
+    "portalCategory": [
+     "Showroom Assistant/Salesman"
+    ],
+    "suggestion": "add \"store assistant\" to syn of role \"pa\" (Executive / Personal Assistant) in src/taxonomy.js"
+   },
+   {
+    "title": "Assistant Manager (BOQ & Estimate Audit)",
+    "count": 1,
+    "sources": [
+     "NextJobz"
+    ],
+    "portalCategory": [
+     "Production / Operation / Quality Control"
+    ],
+    "suggestion": "add \"assistant manager (boq & estimate audit)\" to syn of role \"audit\" (Audit / Internal Control) in src/taxonomy.js"
+   },
+   {
+    "title": "AGM - Quality",
+    "count": 1,
+    "sources": [
+     "NextJobz"
+    ],
+    "portalCategory": [
+     "Production / Operation / Quality Control"
+    ],
+    "suggestion": "add \"agm - quality\" to syn of role \"garments-quality\" (Quality (QC / QA)) in src/taxonomy.js"
+   },
    {
     "title": "Optic Shop Assistant",
     "count": 1,
@@ -694,6 +727,17 @@
      "Production / Operation / Quality Control"
     ],
     "suggestion": "add \"manager - quality (goodrich sweater ltd)\" to syn of role \"social\" (Social Media Manager) in src/taxonomy.js"
+   },
+   {
+    "title": "Manager, Quality Assurance",
+    "count": 1,
+    "sources": [
+     "NextJobz"
+    ],
+    "portalCategory": [
+     "Production / Operation / Quality Control"
+    ],
+    "suggestion": "add \"manager, quality assurance\" to syn of role \"social\" (Social Media Manager) in src/taxonomy.js"
    }
   ],
   "note": "suggestion lines are proposals only; src/taxonomy.js is never changed by the robot"
