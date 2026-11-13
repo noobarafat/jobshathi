@@ -1,35 +1,35 @@
 {
  "run": {
-  "startedAt": "2026-11-12T10:06:08+06:00",
-  "finishedAt": "2026-11-12T10:18:59+06:00",
-  "newPostsCollected": 315,
-  "postsInFile": 1212,
-  "fileBytes": 931221
+  "startedAt": "2026-11-13T09:33:18+06:00",
+  "finishedAt": "2026-11-13T09:46:13+06:00",
+  "newPostsCollected": 320,
+  "postsInFile": 1484,
+  "fileBytes": 1151683
  },
  "collectedPerSource": {
   "nextjobz": 299,
-  "alljobs": 11,
+  "alljobs": 16,
   "remote": 5,
   "companies": 0
  },
  "postsInFilePerSource": {
-  "Alljobs (Teletalk)": 336,
-  "NextJobz": 872,
+  "Alljobs (Teletalk)": 331,
+  "NextJobz": 1149,
   "Jobicy": 1,
   "Remote OK": 3
  },
  "removed": {
-  "expired": 0,
-  "too_old": 8,
+  "expired": 21,
+  "too_old": 9,
   "asks_for_money": 0,
-  "merged": 10,
+  "merged": 18,
   "no_title": 0,
   "over_size_limit": 0
  },
  "sourceFailures": {},
  "pagesRead": {
   "nextjobz.com.bd": 301,
-  "alljobs.teletalk.com.bd": 14,
+  "alljobs.teletalk.com.bd": 19,
   "jobicy.com": 1,
   "remoteok.com": 1,
   "himalayas.app": 1,
@@ -44,24 +44,34 @@
  "blockedByRobotsTxt": [],
  "requestsFailed": [],
  "matching": {
-  "postsRead": 1212,
+  "postsRead": 1484,
   "postsPerSource": {
-   "Alljobs (Teletalk)": 336,
-   "NextJobz": 872,
+   "Alljobs (Teletalk)": 331,
+   "NextJobz": 1149,
    "Jobicy": 1,
    "Remote OK": 3
   },
   "classifiedHow": {
-   "title": 630,
-   "category": 421,
-   "spelling": 87,
-   "none": 71,
-   "skills": 3
+   "category": 510,
+   "title": 745,
+   "spelling": 116,
+   "none": 107,
+   "skills": 6
   },
   "noFieldFound": {
-   "count": 71,
-   "percent": 6,
+   "count": 107,
+   "percent": 7,
    "examples": [
+    {
+     "title": "Medical Assistant, Skin Therapist - Noakhali",
+     "company": "Bio-Xin Cosmeceuticals",
+     "source": "NextJobz"
+    },
+    {
+     "title": "Production Incharge (Foam & Mattress)",
+     "company": "Majesto Limited",
+     "source": "NextJobz"
+    },
     {
      "title": "Assistant Manager (BOQ & Estimate Audit)",
      "company": "Building technology & Ideas Ltd.",
@@ -101,23 +111,61 @@
      "title": "R&D Chemist - Hygiene Glue",
      "company": "Redmin Industries Limited",
      "source": "NextJobz"
-    },
-    {
-     "title": "Senior Executive Shipping Operation",
-     "company": "Akij Resources",
-     "source": "NextJobz"
-    },
-    {
-     "title": "Deputy Manager / Manager, Labaid Printing & Packaging",
-     "company": "Labaid Limited (Diagnostics)",
-     "source": "NextJobz"
     }
    ]
   },
   "noLocationFound": {
-   "count": 220,
-   "percent": 18,
+   "count": 216,
+   "percent": 15,
    "examples": [
+    {
+     "title": "Field & Market Inspector",
+     "company": "Department of Agricultural Marketing (DAM)",
+     "loc": "",
+     "source": "Alljobs (Teletalk)"
+    },
+    {
+     "title": "Stenographer-Cum-Computer Operator",
+     "company": "Department of Agricultural Marketing (DAM)",
+     "loc": "",
+     "source": "Alljobs (Teletalk)"
+    },
+    {
+     "title": "Computer Operator",
+     "company": "Department of Agricultural Marketing (DAM)",
+     "loc": "",
+     "source": "Alljobs (Teletalk)"
+    },
+    {
+     "title": "Driver (Heavy)",
+     "company": "Department of Agricultural Marketing (DAM)",
+     "loc": "",
+     "source": "Alljobs (Teletalk)"
+    },
+    {
+     "title": "Office Assistant-Cum-Computer Typist",
+     "company": "Department of Agricultural Marketing (DAM)",
+     "loc": "",
+     "source": "Alljobs (Teletalk)"
+    },
+    {
+     "title": "Cashier",
+     "company": "Department of Agricultural Marketing (DAM)",
+     "loc": "",
+     "source": "Alljobs (Teletalk)"
+    },
+    {
+     "title": "Office Support Staff",
+     "company": "Department of Agricultural Marketing (DAM)",
+     "loc": "",
+     "source": "Alljobs (Teletalk)"
+    },
+    {
+     "title": "Accountant",
+     "company": "Department of Agricultural Marketing (DAM)",
+     "loc": "",
+     "source": "Alljobs (Teletalk)"
+    },
     {
      "title": "Steno-Typist Cum Computer Operator",
      "company": "Ministry of Defence (MOD)",
@@ -129,54 +177,6 @@
      "company": "Ministry of Defence (MOD)",
      "loc": "",
      "source": "Alljobs (Teletalk)"
-    },
-    {
-     "title": "Office Support Staff",
-     "company": "Ministry of Defence (MOD)",
-     "loc": "",
-     "source": "Alljobs (Teletalk)"
-    },
-    {
-     "title": "Cataloger",
-     "company": "Bangladesh Parliament Secretariat(BPS)",
-     "loc": "",
-     "source": "Alljobs (Teletalk)"
-    },
-    {
-     "title": "Legislative Assistant",
-     "company": "Bangladesh Parliament Secretariat(BPS)",
-     "loc": "",
-     "source": "Alljobs (Teletalk)"
-    },
-    {
-     "title": "Photographer Still",
-     "company": "Bangladesh Parliament Secretariat(BPS)",
-     "loc": "",
-     "source": "Alljobs (Teletalk)"
-    },
-    {
-     "title": "Technician (Network)",
-     "company": "Bangladesh Parliament Secretariat(BPS)",
-     "loc": "",
-     "source": "Alljobs (Teletalk)"
-    },
-    {
-     "title": "TV Technician",
-     "company": "Bangladesh Parliament Secretariat(BPS)",
-     "loc": "",
-     "source": "Alljobs (Teletalk)"
-    },
-    {
-     "title": "Steno-Typist cum-Computer Operator",
-     "company": "Bangladesh Parliament Secretariat(BPS)",
-     "loc": "",
-     "source": "Alljobs (Teletalk)"
-    },
-    {
-     "title": "Data Entry/Control Operator",
-     "company": "Bangladesh Parliament Secretariat(BPS)",
-     "loc": "",
-     "source": "Alljobs (Teletalk)"
     }
    ]
   },
@@ -185,10 +185,21 @@
    "percent": 0
   },
   "noSalary": {
-   "count": 1160,
+   "count": 1421,
    "percent": 96
   },
   "topUnclassifiedTitles": [
+   {
+    "title": "OT In-Charge",
+    "count": 2,
+    "sources": [
+     "NextJobz"
+    ],
+    "portalCategory": [
+     "Production / Operation / Quality Control"
+    ],
+    "suggestion": "no close role; may need a new role in src/taxonomy.js"
+   },
    {
     "title": "Store Assistant",
     "count": 2,
@@ -199,6 +210,28 @@
      "Showroom Assistant/Salesman"
     ],
     "suggestion": "add \"store assistant\" to syn of role \"pa\" (Executive / Personal Assistant) in src/taxonomy.js"
+   },
+   {
+    "title": "Medical Assistant, Skin Therapist - Noakhali",
+    "count": 1,
+    "sources": [
+     "NextJobz"
+    ],
+    "portalCategory": [
+     "Beauty / Salon / Lifestyle"
+    ],
+    "suggestion": "add \"medical assistant, skin therapist - noakhali\" to syn of role \"pa\" (Executive / Personal Assistant) in src/taxonomy.js"
+   },
+   {
+    "title": "Production Incharge (Foam & Mattress)",
+    "count": 1,
+    "sources": [
+     "NextJobz"
+    ],
+    "portalCategory": [
+     "Production / Operation / Quality Control"
+    ],
+    "suggestion": "add \"production incharge (foam & mattress)\" to syn of role \"ie\" (IE / Production) in src/taxonomy.js"
    },
    {
     "title": "Assistant Manager (BOQ & Estimate Audit)",
@@ -531,17 +564,6 @@
     "suggestion": "add \"manager - international fresh produce export\" to syn of role \"social\" (Social Media Manager) in src/taxonomy.js"
    },
    {
-    "title": "OT In-Charge",
-    "count": 1,
-    "sources": [
-     "NextJobz"
-    ],
-    "portalCategory": [
-     "Production / Operation / Quality Control"
-    ],
-    "suggestion": "no close role; may need a new role in src/taxonomy.js"
-   },
-   {
     "title": "X-Ray In-charge",
     "count": 1,
     "sources": [
@@ -716,28 +738,6 @@
      "Production / Operation / Quality Control"
     ],
     "suggestion": "add \"officer- planning\" to syn of role \"bank-officer\" (Bank Officer / Trainee Officer) in src/taxonomy.js"
-   },
-   {
-    "title": "Manager - Quality (Goodrich Sweater Ltd)",
-    "count": 1,
-    "sources": [
-     "NextJobz"
-    ],
-    "portalCategory": [
-     "Production / Operation / Quality Control"
-    ],
-    "suggestion": "add \"manager - quality (goodrich sweater ltd)\" to syn of role \"social\" (Social Media Manager) in src/taxonomy.js"
-   },
-   {
-    "title": "Manager, Quality Assurance",
-    "count": 1,
-    "sources": [
-     "NextJobz"
-    ],
-    "portalCategory": [
-     "Production / Operation / Quality Control"
-    ],
-    "suggestion": "add \"manager, quality assurance\" to syn of role \"social\" (Social Media Manager) in src/taxonomy.js"
    }
   ],
   "note": "suggestion lines are proposals only; src/taxonomy.js is never changed by the robot"
