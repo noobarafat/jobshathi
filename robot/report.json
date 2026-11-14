@@ -1,35 +1,36 @@
 {
  "run": {
-  "startedAt": "2026-11-13T09:33:18+06:00",
-  "finishedAt": "2026-11-13T09:46:13+06:00",
-  "newPostsCollected": 320,
-  "postsInFile": 1484,
-  "fileBytes": 1151683
+  "startedAt": "2026-11-14T09:30:30+06:00",
+  "finishedAt": "2026-11-14T09:45:59+06:00",
+  "newPostsCollected": 281,
+  "postsInFile": 1706,
+  "fileBytes": 1746324
  },
  "collectedPerSource": {
-  "nextjobz": 299,
-  "alljobs": 16,
+  "nextjobz": 275,
+  "alljobs": 1,
   "remote": 5,
   "companies": 0
  },
  "postsInFilePerSource": {
-  "Alljobs (Teletalk)": 331,
-  "NextJobz": 1149,
+  "Alljobs (Teletalk)": 324,
+  "Himalayas": 1,
+  "NextJobz": 1377,
   "Jobicy": 1,
   "Remote OK": 3
  },
  "removed": {
-  "expired": 21,
-  "too_old": 9,
+  "expired": 0,
+  "too_old": 31,
   "asks_for_money": 0,
-  "merged": 18,
+  "merged": 28,
   "no_title": 0,
   "over_size_limit": 0
  },
  "sourceFailures": {},
  "pagesRead": {
   "nextjobz.com.bd": 301,
-  "alljobs.teletalk.com.bd": 19,
+  "alljobs.teletalk.com.bd": 4,
   "jobicy.com": 1,
   "remoteok.com": 1,
   "himalayas.app": 1,
@@ -39,29 +40,35 @@
   "www.brac.net": 6,
   "waltonbd.com": 6,
   "pathao.com": 6,
-  "chaldal.com": 6
+  "chaldal.com": 8
  },
  "blockedByRobotsTxt": [],
  "requestsFailed": [],
  "matching": {
-  "postsRead": 1484,
+  "postsRead": 1706,
   "postsPerSource": {
-   "Alljobs (Teletalk)": 331,
-   "NextJobz": 1149,
+   "Alljobs (Teletalk)": 324,
+   "Himalayas": 1,
+   "NextJobz": 1377,
    "Jobicy": 1,
    "Remote OK": 3
   },
   "classifiedHow": {
-   "category": 510,
-   "title": 745,
-   "spelling": 116,
-   "none": 107,
-   "skills": 6
+   "category": 584,
+   "title": 853,
+   "none": 128,
+   "spelling": 134,
+   "skills": 7
   },
   "noFieldFound": {
-   "count": 107,
-   "percent": 7,
+   "count": 128,
+   "percent": 8,
    "examples": [
+    {
+     "title": "Assistant/Deputy Manager – Raw Materials Quality Assurance",
+     "company": "Fashion Step Group",
+     "source": "NextJobz"
+    },
     {
      "title": "Medical Assistant, Skin Therapist - Noakhali",
      "company": "Bio-Xin Cosmeceuticals",
@@ -106,17 +113,12 @@
      "title": "Assistant Manager – Quality Assurance",
      "company": "Fakir Apparels Ltd.",
      "source": "NextJobz"
-    },
-    {
-     "title": "R&D Chemist - Hygiene Glue",
-     "company": "Redmin Industries Limited",
-     "source": "NextJobz"
     }
    ]
   },
   "noLocationFound": {
-   "count": 216,
-   "percent": 15,
+   "count": 223,
+   "percent": 13,
    "examples": [
     {
      "title": "Field & Market Inspector",
@@ -185,8 +187,8 @@
    "percent": 0
   },
   "noSalary": {
-   "count": 1421,
-   "percent": 96
+   "count": 1597,
+   "percent": 94
   },
   "topUnclassifiedTitles": [
    {
@@ -210,6 +212,26 @@
      "Showroom Assistant/Salesman"
     ],
     "suggestion": "add \"store assistant\" to syn of role \"pa\" (Executive / Personal Assistant) in src/taxonomy.js"
+   },
+   {
+    "title": "Office Helper",
+    "count": 2,
+    "sources": [
+     "NextJobz"
+    ],
+    "portalCategory": [],
+    "suggestion": "add \"office helper\" to syn of role \"office-assistant\" (Office Assistant) in src/taxonomy.js"
+   },
+   {
+    "title": "Assistant/Deputy Manager – Raw Materials Quality Assurance",
+    "count": 1,
+    "sources": [
+     "NextJobz"
+    ],
+    "portalCategory": [
+     "Production / Operation / Quality Control"
+    ],
+    "suggestion": "add \"assistant/deputy manager – raw materials quality assurance\" to syn of role \"social\" (Social Media Manager) in src/taxonomy.js"
    },
    {
     "title": "Medical Assistant, Skin Therapist - Noakhali",
@@ -716,28 +738,6 @@
      "Project / Research / Consultancy"
     ],
     "suggestion": "no close role; may need a new role in src/taxonomy.js"
-   },
-   {
-    "title": "Contract Project Lead, Customer Implementation",
-    "count": 1,
-    "sources": [
-     "NextJobz"
-    ],
-    "portalCategory": [
-     "Project / Research / Consultancy"
-    ],
-    "suggestion": "add \"contract project lead, customer implementation\" to syn of role \"cs-exec\" (Customer Support Executive) in src/taxonomy.js"
-   },
-   {
-    "title": "Officer- Planning",
-    "count": 1,
-    "sources": [
-     "NextJobz"
-    ],
-    "portalCategory": [
-     "Production / Operation / Quality Control"
-    ],
-    "suggestion": "add \"officer- planning\" to syn of role \"bank-officer\" (Bank Officer / Trainee Officer) in src/taxonomy.js"
    }
   ],
   "note": "suggestion lines are proposals only; src/taxonomy.js is never changed by the robot"
