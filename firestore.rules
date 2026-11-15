@@ -1,13 +1,58 @@
 rules_version = '2';
 
-// JobShathi: each signed-in person can read and write only their own users/{uid} document.
-// Everything else in the database is closed.
+// JobShathi Firestore rules.
+//
+// 1. Each signed-in person can read and write only their own users/{uid} document.
+// 2. What they write must have the shape the app writes, with size limits, so nobody
+//    can use the database to store something else or to fill up the free quota.
+// 3. Everything else in the database is closed (see the last rule).
+//
+// To publish: Firebase console → Firestore Database → Rules → paste this file → Publish.
 service cloud.firestore {
   match /databases/{database}/documents {
+
+    // A missing or empty value is fine; a present one must be the right type and not too big.
+    function textMax(m, k, n) { return !(k in m) || m[k] == null || (m[k] is string && m[k].size() <= n); }
+    function listMax(m, k, n) { return !(k in m) || m[k] == null || (m[k] is list && m[k].size() <= n); }
+    function mapMax(m, k, n)  { return !(k in m) || m[k] == null || (m[k] is map && m[k].size() <= n); }
+
+    function validAccount(a) {
+      return a is map && a.size() <= 12
+        && textMax(a, 'id', 60) && textMax(a, 'name', 80)
+        && textMax(a, 'contact', 120) && textMax(a, 'google', 200);
+    }
+
+    function validProfile(p) {
+      return p is map && p.size() <= 20
+        && textMax(p, 'name', 80) && textMax(p, 'level', 20)
+        && listMax(p, 'fields', 10) && listMax(p, 'roles', 200)
+        && listMax(p, 'keywords', 60) && listMax(p, 'skills', 300)
+        && listMax(p, 'types', 10) && listMax(p, 'locations', 300)
+        && listMax(p, 'avoid', 60);
+    }
+
+    function validMarks(m) {
+      return m == null || (m is map && m.size() <= 5
+        && mapMax(m, 'saved', 1000) && mapMax(m, 'applied', 1000) && mapMax(m, 'dismissed', 5000));
+    }
+
+    function validUser(d) {
+      return d.keys().hasOnly(['account', 'profile', 'marks', 'lang', 'theme', 'updatedAt'])
+        && validAccount(d.account) && validProfile(d.profile) && validMarks(d.marks)
+        && (d.lang == null || d.lang in ['en', 'bn'])
+        && (d.theme == null || d.theme in ['auto', 'light', 'dark'])
+        && (d.updatedAt == null || d.updatedAt is number);
+    }
+
     match /users/{uid} {
       allow read, delete: if request.auth != null && request.auth.uid == uid;
       allow create, update: if request.auth != null && request.auth.uid == uid
-        && request.resource.data.keys().hasOnly(['account', 'profile', 'marks', 'lang', 'theme', 'updatedAt']);
+        && validUser(request.resource.data);
+    }
+
+    // Anything not named above: nobody can read or write it.
+    match /{document=**} {
+      allow read, write: if false;
     }
   }
 }
