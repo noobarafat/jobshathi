@@ -1,36 +1,36 @@
 {
  "run": {
-  "startedAt": "2026-11-14T09:30:30+06:00",
-  "finishedAt": "2026-11-14T09:45:59+06:00",
-  "newPostsCollected": 281,
-  "postsInFile": 1706,
-  "fileBytes": 1746324
+  "startedAt": "2026-11-15T08:59:55+06:00",
+  "finishedAt": "2026-11-15T09:08:45+06:00",
+  "newPostsCollected": 135,
+  "postsInFile": 1645,
+  "fileBytes": 1564329
  },
  "collectedPerSource": {
-  "nextjobz": 275,
-  "alljobs": 1,
-  "remote": 5,
+  "nextjobz": 123,
+  "alljobs": 8,
+  "remote": 4,
   "companies": 0
  },
  "postsInFilePerSource": {
-  "Alljobs (Teletalk)": 324,
+  "Alljobs (Teletalk)": 308,
   "Himalayas": 1,
-  "NextJobz": 1377,
+  "NextJobz": 1332,
   "Jobicy": 1,
   "Remote OK": 3
  },
  "removed": {
-  "expired": 0,
-  "too_old": 31,
+  "expired": 89,
+  "too_old": 42,
   "asks_for_money": 0,
-  "merged": 28,
+  "merged": 65,
   "no_title": 0,
   "over_size_limit": 0
  },
  "sourceFailures": {},
  "pagesRead": {
-  "nextjobz.com.bd": 301,
-  "alljobs.teletalk.com.bd": 4,
+  "nextjobz.com.bd": 185,
+  "alljobs.teletalk.com.bd": 10,
   "jobicy.com": 1,
   "remoteok.com": 1,
   "himalayas.app": 1,
@@ -40,30 +40,65 @@
   "www.brac.net": 6,
   "waltonbd.com": 6,
   "pathao.com": 6,
-  "chaldal.com": 8
+  "chaldal.com": 6
  },
  "blockedByRobotsTxt": [],
  "requestsFailed": [],
  "matching": {
-  "postsRead": 1706,
+  "postsRead": 1645,
   "postsPerSource": {
-   "Alljobs (Teletalk)": 324,
+   "Alljobs (Teletalk)": 308,
    "Himalayas": 1,
-   "NextJobz": 1377,
+   "NextJobz": 1332,
    "Jobicy": 1,
    "Remote OK": 3
   },
   "classifiedHow": {
-   "category": 584,
-   "title": 853,
-   "none": 128,
-   "spelling": 134,
-   "skills": 7
+   "category": 569,
+   "title": 811,
+   "none": 130,
+   "spelling": 129,
+   "skills": 6
   },
   "noFieldFound": {
-   "count": 128,
+   "count": 130,
    "percent": 8,
    "examples": [
+    {
+     "title": "Senior Oil Movement Operator- Offsite, Utility and Drum Plant, BOGCL",
+     "company": "Anvir Bashundhara Group",
+     "source": "NextJobz"
+    },
+    {
+     "title": "Operator/ Junior Operator (Oil Movement)- Offsite, Utility and Drum Plant, BOGCL",
+     "company": "Anvir Bashundhara Group",
+     "source": "NextJobz"
+    },
+    {
+     "title": "Showroom Manager / In-Charge (Electric Vehicle - EV)",
+     "company": "Group of Company",
+     "source": "NextJobz"
+    },
+    {
+     "title": "Engineer (Quality)",
+     "company": "Ismartu Technology BD Limited",
+     "source": "NextJobz"
+    },
+    {
+     "title": "Analytical Chemist",
+     "company": "United Healthcare Services Limited",
+     "source": "NextJobz"
+    },
+    {
+     "title": "QA Manager (Lingerie Factory CTG)",
+     "company": "Hop Lun (Bangladesh) Ltd",
+     "source": "NextJobz"
+    },
+    {
+     "title": "Phlebotomist (Pathology Sample Collection)",
+     "company": "Ashulia Women and Children Hospital",
+     "source": "NextJobz"
+    },
     {
      "title": "Assistant/Deputy Manager – Raw Materials Quality Assurance",
      "company": "Fashion Step Group",
@@ -78,47 +113,12 @@
      "title": "Production Incharge (Foam & Mattress)",
      "company": "Majesto Limited",
      "source": "NextJobz"
-    },
-    {
-     "title": "Assistant Manager (BOQ & Estimate Audit)",
-     "company": "Building technology & Ideas Ltd.",
-     "source": "NextJobz"
-    },
-    {
-     "title": "AGM - Quality",
-     "company": "A reputed Multinational Company",
-     "source": "NextJobz"
-    },
-    {
-     "title": "Optic Shop Assistant",
-     "company": "Ispahani Islamia Eye Institute & Hospital",
-     "source": "NextJobz"
-    },
-    {
-     "title": "GM - Sample & Technical",
-     "company": "A reputed Multinational Company",
-     "source": "NextJobz"
-    },
-    {
-     "title": "STP / ETP Operator",
-     "company": "Apollo Imperial Hospitals",
-     "source": "NextJobz"
-    },
-    {
-     "title": "Officer - Wastage Management",
-     "company": "Masco Group",
-     "source": "NextJobz"
-    },
-    {
-     "title": "Assistant Manager – Quality Assurance",
-     "company": "Fakir Apparels Ltd.",
-     "source": "NextJobz"
     }
    ]
   },
   "noLocationFound": {
    "count": 223,
-   "percent": 13,
+   "percent": 14,
    "examples": [
     {
      "title": "Field & Market Inspector",
@@ -187,7 +187,7 @@
    "percent": 0
   },
   "noSalary": {
-   "count": 1597,
+   "count": 1545,
    "percent": 94
   },
   "topUnclassifiedTitles": [
@@ -221,6 +221,83 @@
     ],
     "portalCategory": [],
     "suggestion": "add \"office helper\" to syn of role \"office-assistant\" (Office Assistant) in src/taxonomy.js"
+   },
+   {
+    "title": "Senior Oil Movement Operator- Offsite, Utility and Drum Plant, BOGCL",
+    "count": 1,
+    "sources": [
+     "NextJobz"
+    ],
+    "portalCategory": [
+     "Production / Operation / Quality Control"
+    ],
+    "suggestion": "add \"senior oil movement operator- offsite, utility and drum plant, bogcl\" to syn of role \"data-entry\" (Data Entry / Computer Operator) in src/taxonomy.js"
+   },
+   {
+    "title": "Operator/ Junior Operator (Oil Movement)- Offsite, Utility and Drum Plant, BOGCL",
+    "count": 1,
+    "sources": [
+     "NextJobz"
+    ],
+    "portalCategory": [
+     "Production / Operation / Quality Control"
+    ],
+    "suggestion": "add \"operator/ junior operator (oil movement)- offsite, utility and drum plant, bogcl\" to syn of role \"data-entry\" (Data Entry / Computer Operator) in src/taxonomy.js"
+   },
+   {
+    "title": "Showroom Manager / In-Charge (Electric Vehicle - EV)",
+    "count": 1,
+    "sources": [
+     "NextJobz"
+    ],
+    "portalCategory": [
+     "Showroom Assistant/Salesman"
+    ],
+    "suggestion": "add \"showroom manager / in-charge (electric vehicle - ev)\" to syn of role \"retail\" (Showroom / Retail Sales) in src/taxonomy.js"
+   },
+   {
+    "title": "Engineer (Quality)",
+    "count": 1,
+    "sources": [
+     "NextJobz"
+    ],
+    "portalCategory": [
+     "Production / Operation / Quality Control"
+    ],
+    "suggestion": "add \"engineer (quality)\" to syn of role \"ai-ml\" (AI / ML Engineer) in src/taxonomy.js"
+   },
+   {
+    "title": "Analytical Chemist",
+    "count": 1,
+    "sources": [
+     "NextJobz"
+    ],
+    "portalCategory": [
+     "Pharmaceutical / Biotech / Lab"
+    ],
+    "suggestion": "no close role; may need a new role in src/taxonomy.js"
+   },
+   {
+    "title": "QA Manager (Lingerie Factory CTG)",
+    "count": 1,
+    "sources": [
+     "NextJobz"
+    ],
+    "portalCategory": [
+     "Production / Operation / Quality Control"
+    ],
+    "suggestion": "add \"qa manager (lingerie factory ctg)\" to syn of role \"social\" (Social Media Manager) in src/taxonomy.js"
+   },
+   {
+    "title": "Phlebotomist (Pathology Sample Collection)",
+    "count": 1,
+    "sources": [
+     "NextJobz"
+    ],
+    "portalCategory": [
+     "Pathologist/ Lab Assistant"
+    ],
+    "suggestion": "no close role; may need a new role in src/taxonomy.js"
    },
    {
     "title": "Assistant/Deputy Manager – Raw Materials Quality Assurance",
@@ -661,83 +738,6 @@
      "Production / Operation / Quality Control"
     ],
     "suggestion": "add \"assistant manager - quality assurance\" to syn of role \"social\" (Social Media Manager) in src/taxonomy.js"
-   },
-   {
-    "title": "Manager-Monitoring Evaluation Accountability and Learning (MEAL)",
-    "count": 1,
-    "sources": [
-     "NextJobz"
-    ],
-    "portalCategory": [
-     "Project / Research / Consultancy"
-    ],
-    "suggestion": "add \"manager-monitoring evaluation accountability and learning (meal)\" to syn of role \"me\" (Monitoring & Evaluation) in src/taxonomy.js"
-   },
-   {
-    "title": "Business Assistant Cum PA (Female)",
-    "count": 1,
-    "sources": [
-     "NextJobz"
-    ],
-    "portalCategory": [
-     "Showroom Assistant/Salesman"
-    ],
-    "suggestion": "add \"business assistant cum pa (female)\" to syn of role \"bde\" (Business Development Executive) in src/taxonomy.js"
-   },
-   {
-    "title": "Senior Executive - Production (Savar, EPZ)",
-    "count": 1,
-    "sources": [
-     "NextJobz"
-    ],
-    "portalCategory": [
-     "Production / Operation / Quality Control"
-    ],
-    "suggestion": "add \"senior executive - production (savar, epz)\" to syn of role \"finance\" (Finance Executive / Analyst) in src/taxonomy.js"
-   },
-   {
-    "title": "Manager Environment and Climate Action",
-    "count": 1,
-    "sources": [
-     "NextJobz"
-    ],
-    "portalCategory": [
-     "Agriculture / Environment / Forestry"
-    ],
-    "suggestion": "add \"manager environment and climate action\" to syn of role \"social\" (Social Media Manager) in src/taxonomy.js"
-   },
-   {
-    "title": "Manager Assets Property and Legal Affairs",
-    "count": 1,
-    "sources": [
-     "NextJobz"
-    ],
-    "portalCategory": [
-     "Legal / Law"
-    ],
-    "suggestion": "add \"manager assets property and legal affairs\" to syn of role \"social\" (Social Media Manager) in src/taxonomy.js"
-   },
-   {
-    "title": "Chief Business Officer- Skin Care",
-    "count": 1,
-    "sources": [
-     "NextJobz"
-    ],
-    "portalCategory": [
-     "Beauty / Salon / Lifestyle"
-    ],
-    "suggestion": "add \"chief business officer- skin care\" to syn of role \"bank-officer\" (Bank Officer / Trainee Officer) in src/taxonomy.js"
-   },
-   {
-    "title": "Visa Consultant",
-    "count": 1,
-    "sources": [
-     "NextJobz"
-    ],
-    "portalCategory": [
-     "Project / Research / Consultancy"
-    ],
-    "suggestion": "no close role; may need a new role in src/taxonomy.js"
    }
   ],
   "note": "suggestion lines are proposals only; src/taxonomy.js is never changed by the robot"
