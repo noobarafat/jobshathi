@@ -9,9 +9,15 @@
   "background_color": "#F6F7FD",
   "theme_color": "#3D5AFE",
   "lang": "en",
+  "dir": "ltr",
+  "categories": ["business", "productivity"],
   "icons": [
     { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
     { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
     { "src": "icons/icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ],
+  "shortcuts": [
+    { "name": "My job matches", "short_name": "Jobs", "url": "./#jobs", "icons": [{ "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png" }] },
+    { "name": "My applications", "short_name": "Tracker", "url": "./#tracker", "icons": [{ "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png" }] }
   ]
 }

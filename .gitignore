@@ -1,3 +1,10 @@
 dist/
 __pycache__/
 .DS_Store
+
+# Secrets must never be committed. Keys live only in GitHub Actions Secrets.
+.env
+.env.*
+*service-account*.json
+*serviceAccount*.json
+*-firebase-adminsdk-*.json

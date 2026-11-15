@@ -22,6 +22,7 @@ const Cloud = (() => {
         const [app, a, f] = await withTimeout(Promise.all([import(SDK + 'firebase-app.js'), import(SDK + 'firebase-auth.js'), import(SDK + 'firebase-firestore.js')]), 15000);
         fb = { ...a, ...f };
         const firebaseApp = app.initializeApp(FIREBASE_CONFIG);
+        await startAppCheck(firebaseApp);
         auth = a.getAuth(firebaseApp);
         db = f.initializeFirestore(firebaseApp, { ignoreUndefinedProperties: true });
         await withTimeout(auth.authStateReady ? auth.authStateReady() : new Promise(ok => { const off = a.onAuthStateChanged(auth, () => { off(); ok(); }); }), 10000);
@@ -34,6 +35,20 @@ const Cloud = (() => {
       } finally { starting = null; }
     })();
     return starting;
+  }
+
+  /* App Check must start before sign-in and the database are used. If it cannot start, the app
+     carries on without it (requests then count as "unverified" in the Firebase console). */
+  async function startAppCheck(firebaseApp) {
+    if (typeof APP_CHECK_SITE_KEY === 'undefined' || !APP_CHECK_SITE_KEY) return;
+    try {
+      // on your own computer the console prints a debug token to register in Firebase → App Check
+      if (/^(localhost|127\.0\.0\.1)$/.test(location.hostname)) self.FIREBASE_APPCHECK_DEBUG_TOKEN = true;
+      const ac = await withTimeout(import(SDK + 'firebase-app-check.js'), 10000);
+      ac.initializeAppCheck(firebaseApp, { provider: new ac.ReCaptchaV3Provider(APP_CHECK_SITE_KEY), isTokenAutoRefreshEnabled: true });
+    } catch (e) {
+      if (window.console) console.warn('JobShathi: App Check did not start.', e);
+    }
   }
 
   const ready = () => status === 'ready';

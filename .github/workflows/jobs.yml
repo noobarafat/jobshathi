@@ -47,14 +47,28 @@ jobs:
         with:
           node-version: '20'
 
+      # The inputs reach the shell as environment variables, never as part of the
+      # command text, so nothing typed into the form can run as a command.
       - name: Collect today's jobs
+        env:
+          LIMIT: ${{ github.event.inputs.limit || '300' }}
+          ONLY: ${{ github.event.inputs.only }}
         run: |
-          python3 robot/run.py \
-            --limit "${{ github.event.inputs.limit || '300' }}" \
-            ${{ github.event.inputs.only && format('--only {0}', github.event.inputs.only) || '' }}
+          case "$LIMIT" in ''|*[!0-9]*) echo "limit must be a number"; exit 1;; esac
+          case "$ONLY" in ''|nextjobz|alljobs|remote|companies) ;; *) echo "unknown source: $ONLY"; exit 1;; esac
+          if [ -n "$ONLY" ]; then
+            python3 robot/run.py --limit "$LIMIT" --only "$ONLY"
+          else
+            python3 robot/run.py --limit "$LIMIT"
+          fi
 
       - name: Check the matching with the site's own engine
         run: node robot/classify.mjs
+
+      - name: Smoke test (a broken jobs.json is never committed or published)
+        run: |
+          python3 build.py
+          node tests/smoke.mjs
 
       - name: Show the run
         run: |
@@ -113,6 +127,11 @@ jobs:
         run: |
           python3 build.py
           test -f dist/jobs.json || { echo "jobs.json missing from dist/"; exit 1; }
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Smoke test
+        run: node tests/smoke.mjs
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
         with:
