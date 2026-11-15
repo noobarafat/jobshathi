@@ -187,6 +187,7 @@ def main() -> int:
             log.exception("%s failed, carrying on with the others", name)
 
     merged, counts = clean(existing + fresh, today)
+    merged = [N.public(j) for j in merged]          # descriptions are never written to jobs.json
 
     def payload_for(rows):
         return {"updatedAt": started.isoformat(timespec="seconds"),

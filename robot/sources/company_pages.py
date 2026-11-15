@@ -76,6 +76,7 @@ def _one(ld: dict, row: dict, page_url: str) -> dict | None:
         url=N.text_of(ld.get("url")) or page_url,
         logo=S.first(ld, "hiringOrganization", "logo") or N.text_of(row.get("logo")),
         site=row.get("website"),
+        text=f"{N.text_of(desc)} {N.text_of(quals)}",
     )
 
 

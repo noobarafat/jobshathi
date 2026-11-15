@@ -46,6 +46,12 @@ Every push to `main` runs the same build in GitHub Actions and publishes `dist/`
 python3 build.py && node tests/smoke.mjs
 ```
 
+```
+python3 -m unittest discover -s tests -p "test_*.py"
+```
+
+The unit tests cover the AI step and the company job-board readers. They never use the network: the Gemini service is replaced by `tests/fake_gemini.py`.
+
 The smoke test checks that `dist/` is complete, that every script parses, that no secret is in the page, that the matching engine gives sensible results for three sample people, and that it can read the real `jobs.json`. Both workflows run it before publishing, so a build that fails is never deployed and a broken `jobs.json` is never committed.
 
 Work happens on the `dev` branch. Only `main` is published, so nothing reaches the live site until `dev` is merged.
@@ -59,6 +65,26 @@ Work happens on the `dev` branch. Only `main` is published, so nothing reaches t
 | Firebase service account key | GitHub Actions Secrets only | No. Never in the repo or the page. |
 
 `.gitignore` blocks the usual secret file names, and the smoke test fails if something that looks like a secret reaches the page.
+
+## App Check
+
+App Check (reCAPTCHA v3) proves that a request to Firestore comes from the real site and not from a script. It starts when `APP_CHECK_SITE_KEY` in `src/firebase-config.js` is filled in. The site key is public; the reCAPTCHA secret key is pasted into the Firebase console only.
+
+Testing on your own computer (`http://localhost:8000`): reCAPTCHA does not know `localhost`, so the app asks Firebase for a debug token instead.
+
+1. Open the local site, press F12, open the Console tab. A line shows `App Check debug token: xxxxxxxx-xxxx-...`.
+2. Firebase console, App Check, Apps, the web app's three-dot menu, Manage debug tokens, Add debug token. Paste the token and save.
+3. Reload the local site. The token is remembered by that browser.
+
+A debug token lets its holder pass App Check, so treat it like a password: never commit it or share it. Delete it in the console when it is no longer needed.
+
+## Sources and the pilot run
+
+`robot/sources.json` lists every source with `enabled: true/false`, the AI settings (model names, posts per call, calls per run) and the places the robot deliberately does not read. The company job boards (SmartRecruiters, Lever, Freshteam, Trakstar Hire) are read by `robot/sources/ats.py`.
+
+`robot/ai.py` is the AI step. It sends only posts that have never been through it, several per request, checks every value that comes back, asks once more for a post whose answer fails the check, and otherwise keeps the post with its basic fields. Links never come from the AI. The key is the GitHub Actions secret `GEMINI_API_KEY`.
+
+`robot/pilot.py` is a trial run on a few posts. It never writes `jobs.json`. Push to the branch `pilot` (or press Run workflow on "Pilot run") and the report appears in `robot/pilot/report.md` on that branch. `python3 robot/pilot.py --fake-ai` runs it without a key, with a stand-in for the AI.
 
 ## Moving to a custom domain later
 

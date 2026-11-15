@@ -105,6 +105,7 @@ def _one(page: str, url: str) -> dict | None:
         url=N.text_of(ld.get("url")) or url,
         logo=S.first(ld, "hiringOrganization", "logo"),
         site=S.first(ld, "hiringOrganization", "url"),
+        text=f"{N.text_of(desc)} {N.text_of(quals)}",
     )
 
 

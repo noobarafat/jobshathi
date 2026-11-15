@@ -179,8 +179,16 @@ def place_text(*parts) -> str:
     return ", ".join(out)
 
 
+TEXT_FOR_AI = 3500      # characters of a post's own wording the AI step may read
+
+
 def post(**kw) -> dict:
-    """One jobs.json entry, with empty fields left out."""
+    """One jobs.json entry, with empty fields left out.
+
+    `text` (the post's description) is kept under the private key `_text` only while
+    the run lasts, for the AI step to read. run.py removes every key that starts with
+    "_" before jobs.json is written, so descriptions are never stored or published.
+    """
     allowed = ("id", "title", "company", "cat", "loc", "type", "salary", "exp", "edu", "age",
                "req", "postedAt", "deadline", "vacancies", "source", "url", "logo", "site")
     out = {}
@@ -189,4 +197,12 @@ def post(**kw) -> dict:
         if v is None or v == "" or v == []:
             continue
         out[k] = v if k == "vacancies" else (v if isinstance(v, (int, float)) else text_of(v))
+    text = text_of(kw.get("text"))
+    if text:
+        out["_text"] = text[:TEXT_FOR_AI]
     return out
+
+
+def public(job: dict) -> dict:
+    """The post as it may be written to a file: without the private "_..." keys."""
+    return {k: v for k, v in job.items() if not k.startswith("_")}

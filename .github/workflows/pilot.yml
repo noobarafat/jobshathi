@@ -1,0 +1,71 @@
+name: Pilot run (AI pipeline trial)
+
+# A small trial of the AI job pipeline. It reads a few posts, sends them to Gemini and
+# writes a report. It never changes jobs.json and never publishes the site.
+#
+# Two ways to start it:
+#   1. Push to the branch named "pilot": the report is committed back to that branch
+#      (robot/pilot/report.md), so it can be read without opening GitHub.
+#   2. The "Run workflow" button: the report is shown on the run's Summary page.
+on:
+  workflow_dispatch:
+  push:
+    branches: [pilot]
+
+permissions:
+  contents: write
+
+concurrency:
+  group: pilot
+  cancel-in-progress: true
+
+jobs:
+  pilot:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: pip
+
+      - name: Install what the robot needs
+        run: pip install -r robot/requirements.txt
+
+      - name: Unit tests (no network, stand-in AI)
+        run: python3 -m unittest discover -s tests -p "test_*.py"
+
+      # The key exists only inside this step, as an environment variable.
+      # It is never printed, never written to a file and never part of the report.
+      - name: Pilot run
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+        run: python3 robot/pilot.py
+
+      - name: Show the report
+        if: always()
+        run: |
+          if [ -f robot/pilot/report.md ]; then cat robot/pilot/report.md >> "$GITHUB_STEP_SUMMARY"; else echo "No report was written." >> "$GITHUB_STEP_SUMMARY"; fi
+
+      - name: Keep the report as a download
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: pilot-report
+          path: robot/pilot/
+          if-no-files-found: ignore
+
+      - name: Commit the report to the pilot branch
+        if: always() && github.ref_name == 'pilot'
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -f robot/pilot
+          if git diff --staged --quiet; then
+            echo "no report to commit"
+          else
+            git commit -m "Pilot report $(date -u +%Y-%m-%dT%H:%MZ)"
+            git push
+          fi
