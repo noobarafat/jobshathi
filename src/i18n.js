@@ -152,3 +152,9 @@ Object.assign(TEXT, {
   delReauth: ['For your safety, confirm with Google once more to delete the account.', 'নিরাপত্তার জন্য অ্যাকাউন্ট মুছতে আরেকবার Google দিয়ে নিশ্চিত করুন।'], confirmGoogle: ['Confirm with Google', 'Google দিয়ে নিশ্চিত করুন'],
 });
 
+/* ───────── Updates and App Check ───────── */
+Object.assign(TEXT, {
+  updateReady: ['Update available — tap to refresh', 'নতুন আপডেট এসেছে — রিফ্রেশ করতে ট্যাপ করুন'],
+  recaptcha: ['This site is protected by reCAPTCHA. The Google {p} and {s} apply.', 'এই সাইট reCAPTCHA দিয়ে সুরক্ষিত। Google-এর {p} ও {s} প্রযোজ্য।'],
+  recaptchaP: ['Privacy Policy', 'গোপনীয়তা নীতি'], recaptchaS: ['Terms of Service', 'সেবার শর্তাবলি'],
+});

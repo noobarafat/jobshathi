@@ -354,7 +354,7 @@
       <div class="card panel"><div class="stack-s"><div><span class="lbl">${t('language')}</span>${seg('setlang', [['en', 'English'], ['bn', 'বাংলা']], S.lang)}</div><div><span class="lbl">${t('theme')}</span>${seg('theme', [['auto', t('themeAuto')], ['light', t('themeLight')], ['dark', t('themeDark')]], S.theme)}</div></div></div>
       ${installCard()}
       <div class="card panel"><details><summary>${t('howTitle')}${ic('chevR')}</summary><div class="prose">${t('how').split('|').map(x => `<p>${x}</p>`).join('')}</div></details></div>
-      <div class="card panel"><h2 style="margin-bottom:6px">${t('privacyTitle')}</h2><div class="prose"><p>${t('privacy')}</p>${storageWorks ? '' : `<p class="err">${t('storageOff')}</p>`}${FIREBASE_CONFIG.apiKey && (Cloud.status === 'failed' || (a.uid && Store.get('dirty', false) && !navigator.onLine)) ? `<p class="hint">${t('cloudOff')}</p>` : ''}</div>
+      <div class="card panel"><h2 style="margin-bottom:6px">${t('privacyTitle')}</h2><div class="prose"><p>${t('privacy')}</p>${storageWorks ? '' : `<p class="err">${t('storageOff')}</p>`}${FIREBASE_CONFIG.apiKey && (Cloud.status === 'failed' || (a.uid && Store.get('dirty', false) && !navigator.onLine)) ? `<p class="hint">${t('cloudOff')}</p>` : ''}${APP_CHECK_SITE_KEY ? `<p class="hint">${t('recaptcha', { p: `<a href="https://policies.google.com/privacy" target="_blank" rel="noopener noreferrer">${t('recaptchaP')}</a>`, s: `<a href="https://policies.google.com/terms" target="_blank" rel="noopener noreferrer">${t('recaptchaS')}</a>` })}</p>` : ''}</div>
         <div style="margin-top:12px;display:flex;flex-wrap:wrap;gap:8px;align-items:center">${S.delReauth ? `<span>${t('delReauth')}</span><button type="button" class="btn danger" data-a="del-google" data-fid="del-google" ${S.busy ? 'disabled' : ''}>${GLOGO}${S.busy === 'delete' ? t('wait') : t('confirmGoogle')}</button><button type="button" class="btn" data-a="del-no" data-fid="del-no">${t('cancel')}</button>` : S.delAsk ? `<span>${t('deleteAsk')}</span><button type="button" class="btn danger" data-a="del-yes" data-fid="del-yes" ${S.busy ? 'disabled' : ''}>${S.busy === 'delete' ? t('wait') : t('deleteYes')}</button><button type="button" class="btn" data-a="del-no" data-fid="del-no">${t('cancel')}</button>` : `<button type="button" class="btn danger" data-a="del-ask" data-fid="del-ask">${t('deleteAccount')}</button>`}</div></div>
       ${creditCard()}</div>`;
   }
@@ -424,7 +424,7 @@
         <button type="button" class="me" data-a="go" data-v="profile"><span class="avatar" aria-hidden="true">${esc(initials(S.account.name))}</span><span><b>${esc(S.account.name)}</b><span>${t('navProfile')}</span></span></button></aside>` : ''}
       <div><header class="mtop"><div class="mtop-in">${brand}<span class="push"></span>${langBtn}${app ? `<button type="button" class="avatar" data-a="go" data-v="profile" aria-label="${t('navProfile')}">${esc(initials(S.account.name))}</button>` : ''}</div></header>
         <main><div class="${key !== lastKey ? 'view' : ''}">${page}</div></main></div>
-      ${app ? `<nav class="tabbar" aria-label="Main">${navBtns(false)}</nav>` : ''}</div>${sheetHtml()}`;
+      ${app ? `<nav class="tabbar" aria-label="Main">${navBtns(false)}</nav>` : ''}</div>${updateReady && !S.draft && !S.sheet ? `<button type="button" class="update-bar" data-a="refresh" data-fid="refresh" ${S.busy === 'refresh' ? 'disabled' : ''}>${ic('download')}<span>${S.busy === 'refresh' ? t('wait') : t('updateReady')}</span></button>` : ''}${sheetHtml()}`;
     lastKey = key;
     root.querySelectorAll('[data-keep]').forEach(el => { const k = keep[el.dataset.keep]; if (k) { el.scrollLeft = k[0]; el.scrollTop = k[1]; } });
     document.body.style.overflow = S.sheet ? 'hidden' : ''; document.body.classList.toggle('sheet-open', !!S.sheet);
@@ -632,6 +632,7 @@
       case 'google': googleSignIn(); return;
       case 'google-link': googleLink(); return;
       case 'sign-out': signOutHere(); return;
+      case 'refresh': if (S.busy) return; busy('refresh'); refreshApp(); return;
       default: return;
     }
     render();
@@ -660,18 +661,60 @@
   window.addEventListener('beforeinstallprompt', e => { e.preventDefault(); deferredInstall = e; });
   window.addEventListener('appinstalled', () => { S.installed = true; deferredInstall = null; render(); });
 
-  /* ── jobs: the examples first, then the robot's jobs.json if it is there ── */
-  async function loadLiveJobs() {
-    try {
-      const ctl = new AbortController(), timer = setTimeout(() => ctl.abort(), 6000);
-      const res = await fetch('jobs.json', { signal: ctl.signal, cache: 'no-store' }); clearTimeout(timer);
-      if (!res.ok) return;
-      const data = await res.json(), list = Array.isArray(data) ? data : data && data.jobs;
-      if (!Array.isArray(list) || !list.length) return;
-      S.updatedAt = (data && data.updatedAt) || '';
-      S.jobs = Engine.prepareJobs(list); S.demo = false; recompute(); render();
-    } catch { /* no jobs.json yet: the examples stay */ }
+  /* ── jobs: the examples first, then the robot's jobs.json ──
+     1. The copy the service worker saved last time is shown at once (a slow phone sees real jobs immediately).
+     2. The newest file is always asked from the network (never from the browser's cache) and replaces it. */
+  function useJobs(data) {
+    const list = Array.isArray(data) ? data : data && data.jobs;
+    if (!Array.isArray(list) || !list.length) return false;
+    const stamp = (data && data.updatedAt) || '';
+    if (!S.demo && stamp && stamp === S.updatedAt) return true; // the same file as on screen
+    S.updatedAt = stamp; S.jobs = Engine.prepareJobs(list); S.demo = false; recompute(); render();
+    return true;
   }
+  let jobsLoading = false, jobsLookedAt = 0;
+  async function loadLiveJobs() {
+    if (jobsLoading) return;
+    jobsLoading = true; jobsLookedAt = Date.now();
+    if (S.demo) { try { const hit = window.caches && await caches.match('jobs.json'); if (hit) useJobs(await hit.json()); } catch { /* nothing saved yet */ } }
+    try {
+      const ctl = new AbortController(), timer = setTimeout(() => ctl.abort(), 30000);
+      const res = await fetch('jobs.json', { signal: ctl.signal, cache: 'no-store' });
+      if (res.ok) useJobs(await res.json());
+      clearTimeout(timer);
+    } catch { /* offline or no jobs.json yet: what is on screen stays */ }
+    jobsLoading = false;
+  }
+
+  /* ── "Update available": version.json holds the fingerprint of the newest build ── */
+  const BUILT = !APP_VERSION.startsWith('__'); // false when the page was not made by build.py
+  let updateReady = false, versionLookedAt = 0;
+  const triedUpdate = v => { try { const [tv, at] = (sessionStorage.getItem('jobshathi:update') || '|0').split('|'); return tv === v && Date.now() - +at < 15 * 60000; } catch { return false; } };
+  async function checkVersion() {
+    if (!BUILT || updateReady || !navigator.onLine) return;
+    versionLookedAt = Date.now();
+    try {
+      const res = await fetch('version.json?t=' + Date.now(), { cache: 'no-store' });
+      if (!res.ok) return;
+      const v = (await res.json()).v;
+      // after a refresh the web host can serve the old page for a few minutes: do not ask again for the same version
+      if (v && v !== APP_VERSION && !triedUpdate(v)) { updateReady = v; render(); }
+    } catch { /* offline: ask again later */ }
+  }
+  async function refreshApp() {
+    try { sessionStorage.setItem('jobshathi:update', updateReady + '|' + Date.now()); } catch { /* private mode */ }
+    if (Store.get('dirty', false)) await Promise.race([Sync.push(), new Promise(ok => setTimeout(ok, 4000))]);
+    try { await Promise.race([fetch('./', { cache: 'reload' }), new Promise(ok => setTimeout(ok, 8000))]); } catch { /* the reload below still tries */ }
+    location.reload();
+  }
+  /* back to the app after a while: look for a new version and newer jobs */
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState !== 'visible') return;
+    if (Date.now() - versionLookedAt > 10 * 60000) checkVersion();
+    if (Date.now() - jobsLookedAt > 30 * 60000 && !S.draft) loadLiveJobs();
+  });
+  window.addEventListener('online', () => { checkVersion(); if (S.demo || Date.now() - jobsLookedAt > 30 * 60000) loadLiveJobs(); });
+
   if ('serviceWorker' in navigator && location.protocol === 'https:' && !inFrame) navigator.serviceWorker.register('sw.js').catch(() => {});
 
   /* back online, or back to this tab: send what is waiting, or pick up changes made on another device */
@@ -688,6 +731,6 @@
     if (r.ok && r.data && r.data.account && r.data.profile && (r.data.updatedAt || 0) > Store.get('updatedAt', 0) && !Store.get('dirty', false)) { applyRemote(r.data); resolveRoute(); render(); }
   });
 
-  recompute(); resolveRoute(); render(); loadLiveJobs(); connect();
+  recompute(); resolveRoute(); render(); loadLiveJobs(); connect(); setTimeout(checkVersion, 4000);
 })();
 

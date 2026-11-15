@@ -15,6 +15,7 @@ self.addEventListener('activate', e => { e.waitUntil(caches.keys().then(keys => 
 self.addEventListener('fetch', e => {
   const req = e.request;
   if (req.method !== 'GET' || new URL(req.url).origin !== location.origin) return;
+  if (/\/version\.json$/.test(new URL(req.url).pathname)) return; // always straight from the network, never saved
   const isPage = req.mode === 'navigate';
 
   // always ask the network, and keep a copy of every good answer

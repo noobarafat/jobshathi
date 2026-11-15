@@ -48,6 +48,12 @@ check('manifest is valid and its icons exist', () => {
   m.icons.forEach(i => need(existsSync(join(ROOT, 'dist', i.src)), 'missing icon ' + i.src));
   (m.shortcuts || []).forEach(s => need(/^\.\//.test(s.url), 'shortcut url must be relative: ' + s.url));
 });
+check('version.json matches the page', () => {
+  const v = JSON.parse(read('dist/version.json')).v;
+  need(/^[0-9a-f]{12}$/.test(v), 'bad version: ' + v);
+  need(page.includes(`const APP_VERSION = '${v}'`), 'the page carries a different version');
+  need(!page.includes('__APP_VERSION__'), 'the version marker was not replaced');
+});
 check('service worker parses', () => { new vm.Script(read('dist/sw.js'), { filename: 'sw.js' }); });
 
 /* ── 2. the matching engine ── */
