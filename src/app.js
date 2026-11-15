@@ -332,8 +332,11 @@
       const when = `<div class="when">${t(kind === 'applied' ? 'appliedOn' : 'savedOn', { d: fmtDate(marks[id].t) })}</div>`;
       const status = kind === 'applied' ? `<div class="status" style="margin:8px 4px 0">${STATUS.map(([v, k]) => chip('status', id + '|' + v, (marks[id].status || 'applied') === v, t(k), 'sm')).join('')}</div>` : '';
       if (byId[id]) return `<div>${when}${jobCard(byId[id])}${status}</div>`;
-      return `<div>${when}<article class="card job dim"><div class="job-top">${logo(marks[id])}<div><h3>${esc(marks[id].title)}</h3><div class="co">${esc(marks[id].company)}</div></div><span></span></div>
-        <div class="job-foot"><div class="fit"><span class="tag mute">${t('closed')}</span></div><button type="button" class="icon-btn" data-a="${kind === 'applied' ? 'apply' : 'save'}" data-v="${esc(id)}" aria-label="${t('remove')}">${ic('x')}</button></div></article>${status}</div>`;
+      const k = marks[id], gone = [k.loc ? `<span class="fact">${ic('pin')}${esc(k.loc)}</span>` : '', k.pay ? `<span class="fact">${ic('cash')}${esc(k.pay)}</span>` : '', k.deadline ? `<span class="fact">${ic('clock')}${t('deadlineWas', { d: fmtDate(k.deadline) })}</span>` : ''].join('');
+      const post = /^https?:\/\//i.test(k.url || '') ? `<a class="btn sm soft" href="${esc(k.url)}" target="_blank" rel="noopener noreferrer">${t('view')} ${ic('ext')}</a>` : '';
+      return `<div>${when}<article class="card job dim"><div class="job-top">${logo(k)}<div><h3>${esc(k.title || t('closed'))}</h3><div class="co">${esc(k.company)}${k.source ? ' · ' + esc(k.source) : ''}</div></div><span></span></div>
+        ${gone ? `<div class="facts">${gone}</div>` : ''}
+        <div class="job-foot"><div class="fit"><span class="tag mute">${t('closed')}</span>${post}</div><button type="button" class="icon-btn" data-a="${kind === 'applied' ? 'apply' : 'save'}" data-v="${esc(id)}" aria-label="${t('remove')}: ${esc(k.title)}">${ic('x')}</button></div></article>${status}</div>`;
     }).join('');
     return `<div class="page-head"><h1>${t('trackerHead')}</h1><p>${t('trackerLead')}</p></div><div class="feed" style="margin-top:14px;max-width:720px">
       <div class="seg" role="tablist">${segBtn('saved', t('tabSaved'), Object.keys(S.marks.saved).length)}${segBtn('applied', t('tabApplied'), Object.keys(S.marks.applied).length)}</div>
@@ -443,7 +446,27 @@
 
   /* ── actions ── */
   const toggle = (arr, v) => { const i = arr.indexOf(v); i < 0 ? arr.push(v) : arr.splice(i, 1); };
-  const snapshot = id => { const r = S.results.find(r => r.job.id === id); return r ? { t: Date.now(), title: r.job.title, company: r.job.company, url: r.job.url, logo: /^https?:/i.test(r.job.logo) ? r.job.logo : '', site: r.job.site, status: 'applied' } : { t: Date.now(), title: '', company: '', status: 'applied' }; };
+  /* The copy a saved or applied job keeps for itself. The robot removes a post from jobs.json when its
+     deadline passes; the tracker must still show the job and its apply link after that. */
+  const snapshot = id => {
+    const r = S.results.find(r => r.job.id === id);
+    if (!r) return { t: Date.now(), title: '', company: '', status: 'applied' };
+    const j = r.job;
+    return { t: Date.now(), title: j.title, company: j.company, url: j.url, logo: /^https?:/i.test(j.logo) ? j.logo : '', site: j.site, status: 'applied',
+      deadline: j.deadline == null ? null : j.deadline, loc: j.loc.text || '', pay: j.salaryText || '', source: j.source || '' };
+  };
+  /** Saved before this was added, or changed since: fill the copy from the live post while it still exists. */
+  function refreshSnapshots() {
+    const byId = {}; S.jobs.forEach(j => (byId[j.id] = j));
+    let changed = false;
+    ['saved', 'applied'].forEach(kind => Object.keys(S.marks[kind] || {}).forEach(id => {
+      const m = S.marks[kind][id], j = byId[id];
+      if (!m || typeof m !== 'object' || !j) return;
+      const want = { title: j.title, company: j.company, url: j.url, deadline: j.deadline == null ? null : j.deadline, loc: j.loc.text || '', pay: j.salaryText || '', source: j.source || '' };
+      for (const k in want) if ((m[k] == null ? null : m[k]) !== want[k] && !(m[k] == null && want[k] === '')) { m[k] = want[k]; changed = true; }
+    }));
+    if (changed) saveMarks();
+  }
   function addToken(key) {
     const input = document.getElementById('tok-' + key); if (!input) return;
     const d = S.draft; input.value.split(',').map(s => s.trim()).filter(Boolean).forEach(v => { if (!d[key].some(x => x.toLowerCase() === v.toLowerCase())) d[key].push(v.slice(0, 60)); });
@@ -669,7 +692,7 @@
     if (!Array.isArray(list) || !list.length) return false;
     const stamp = (data && data.updatedAt) || '';
     if (!S.demo && stamp && stamp === S.updatedAt) return true; // the same file as on screen
-    S.updatedAt = stamp; S.jobs = Engine.prepareJobs(list); S.demo = false; recompute(); render();
+    S.updatedAt = stamp; S.jobs = Engine.prepareJobs(list); S.demo = false; recompute(); refreshSnapshots(); render();
     return true;
   }
   let jobsLoading = false, jobsLookedAt = 0;

@@ -154,6 +154,7 @@ Object.assign(TEXT, {
 
 /* ───────── Updates and App Check ───────── */
 Object.assign(TEXT, {
+  deadlineWas: ['Deadline was {d}', 'শেষ তারিখ ছিল {d}'],
   updateReady: ['Update available — tap to refresh', 'নতুন আপডেট এসেছে — রিফ্রেশ করতে ট্যাপ করুন'],
   recaptcha: ['This site is protected by reCAPTCHA. The Google {p} and {s} apply.', 'এই সাইট reCAPTCHA দিয়ে সুরক্ষিত। Google-এর {p} ও {s} প্রযোজ্য।'],
   recaptchaP: ['Privacy Policy', 'গোপনীয়তা নীতি'], recaptchaS: ['Terms of Service', 'সেবার শর্তাবলি'],
