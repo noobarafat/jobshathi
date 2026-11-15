@@ -60,7 +60,7 @@ def collect(cfg: dict, fetcher) -> tuple[list[dict], list[dict]]:
         else:
             got, info = ats.collect_one(fetcher, src, set(), limit=pilot.get("postsPerSource", 3))
         for j in got:
-            j["_src"] = sid
+            j["_src"], j["_kind"] = sid, src["type"]
         jobs.extend(got)
         rows.append({"id": sid, "type": src["type"], "company": src.get("company", ""), **info,
                      "seconds": round(time.monotonic() - t0, 1)})
@@ -82,10 +82,11 @@ def quality(jobs: list[dict]) -> tuple[list[dict], dict]:
 
 
 def pick(jobs: list[dict], most: int) -> list[dict]:
-    """Up to `most` posts, taken in turn from each source so the sample is mixed."""
+    """Up to `most` posts, taken in turn from each kind of source so the sample is mixed
+    (otherwise the many small company boards would crowd out the local job portal)."""
     groups: dict[str, list[dict]] = {}
     for j in jobs:
-        groups.setdefault(j["_src"], []).append(j)
+        groups.setdefault(j["_kind"], []).append(j)
     out = []
     while len(out) < most and any(groups.values()):
         for sid in list(groups):
