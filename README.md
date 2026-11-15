@@ -40,6 +40,35 @@ This writes `dist/`: one self-contained `index.html`, plus `manifest.webmanifest
 
 Every push to `main` runs the same build in GitHub Actions and publishes `dist/` to GitHub Pages.
 
+## Test
+
+```
+python3 build.py && node tests/smoke.mjs
+```
+
+The smoke test checks that `dist/` is complete, that every script parses, that no secret is in the page, that the matching engine gives sensible results for three sample people, and that it can read the real `jobs.json`. Both workflows run it before publishing, so a build that fails is never deployed and a broken `jobs.json` is never committed.
+
+Work happens on the `dev` branch. Only `main` is published, so nothing reaches the live site until `dev` is merged.
+
+## Keys and secrets
+
+| Key | Where it lives | Public? |
+| --- | --- | --- |
+| Firebase web config (`src/firebase-config.js`) | in the page | Yes, by design. It only names the project. `firestore.rules` and the key's website restriction protect the data. |
+| Gemini API key | GitHub Actions Secrets only | No. Never in the repo or the page. |
+| Firebase service account key | GitHub Actions Secrets only | No. Never in the repo or the page. |
+
+`.gitignore` blocks the usual secret file names, and the smoke test fails if something that looks like a secret reaches the page.
+
+## Moving to a custom domain later
+
+Every path in the site, the manifest and the service worker is relative, so the files need no change. What does need doing:
+
+1. GitHub: repo Settings, Pages, Custom domain.
+2. Firebase console: Authentication, Settings, Authorized domains: add the new domain.
+3. Google Cloud console: the browser API key's website restrictions: add the new domain.
+4. People who never connected Google keep their account only in the old address's browser storage. Ask them to connect Google before the move.
+
 ## Accounts and data
 
 Finishing the setup questions creates the account in the person's name. Behind the scenes the app signs them in to Firebase anonymously, so there is no extra step.
@@ -52,7 +81,7 @@ All storage goes through `Store` in `src/app.js`. Every change is written to loc
 
 If the Firebase SDK cannot load (offline, blocked, or `apiKey` left empty in `src/firebase-config.js`), the app works exactly as before with this browser's storage only.
 
-Firebase project: `jobshathi-c8888` (Spark plan). Authentication: Anonymous and Google, `noobarafat.github.io` in Authorized domains. Firestore: `asia-south1`, rules in `firestore.rules` (each signed-in user can read and write only their own `users/{uid}`). To change the rules, paste `firestore.rules` into Firebase console, Firestore Database, Rules, and publish.
+Firebase project: `jobshathi-c8888` (Spark plan). Authentication: Anonymous and Google, `noobarafat.github.io` in Authorized domains. Firestore: `asia-south1`, rules in `firestore.rules` (each signed-in user can read and write only their own `users/{uid}`, the document must have the app's shape and stay within size limits, and everything else is closed). To change the rules, paste `firestore.rules` into Firebase console, Firestore Database, Rules, and publish.
 
 ## jobs.json
 
