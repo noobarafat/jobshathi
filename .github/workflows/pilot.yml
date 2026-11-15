@@ -62,10 +62,16 @@ jobs:
         run: |
           git config user.name  "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          # Put the report on top of whatever the branch holds now, so pressing "Re-run all jobs"
+          # on an older run still works.
+          rm -rf "$RUNNER_TEMP/pilot-report" && cp -r robot/pilot "$RUNNER_TEMP/pilot-report"
+          git fetch origin pilot
+          git checkout -f -B pilot origin/pilot
+          rm -rf robot/pilot && cp -r "$RUNNER_TEMP/pilot-report" robot/pilot
           git add -f robot/pilot
           if git diff --staged --quiet; then
             echo "no report to commit"
           else
             git commit -m "Pilot report $(date -u +%Y-%m-%dT%H:%MZ)"
-            git push
+            git push origin pilot
           fi
