@@ -100,6 +100,12 @@ class Clean(unittest.TestCase):
         self.assertEqual([j["title"] for j in kept], ["Good"])
         self.assertEqual((counts["expired"], counts["no_apply_link"], counts["asks_for_money"]), (1, 2, 2))
 
+    def test_the_thirty_day_rule_is_only_for_posts_with_no_deadline(self):
+        open_still = job("a:1", title="Open", posted="2026-09-01", deadline="2026-12-10")
+        no_deadline = job("a:2", title="Stale", posted="2026-09-01")
+        kept, counts = run.clean([open_still, no_deadline], TODAY)
+        self.assertEqual(([j["title"] for j in kept], counts["too_old"]), (["Open"], 1))
+
     def test_the_same_job_from_two_sources_is_one_post(self):
         a = job("a:1", title="Accountant", company="Shapla Agro Foods Ltd.", source="One")
         b = job("b:1", title="Accountant", company="Shapla Agro Foods Ltd", source="Two", salary="Tk. 20,000")

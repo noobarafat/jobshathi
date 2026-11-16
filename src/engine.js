@@ -91,6 +91,10 @@ const Engine = (() => {
     return { ...s, ws, budget: ws.reduce((n, w) => n + w[1], 0), mask: letters(s.k) };
   }).filter(s => s.budget > 0);
   const maxWords = spellIndex.reduce((n, s) => Math.max(n, s.words), 1);
+  // Words the dictionary itself uses. A title word that is one of them is a real word, never a misspelling
+  // of another: “Trainee Engineer” is not a “Trainer”, a “Team Leader” is not a “Loader”.
+  const vocab = new Set(['officer', 'executive', 'manager', 'assistant', 'associate', 'specialist', 'analyst', 'consultant', 'trainee', 'leader', 'member', 'staff', 'worker', 'helper', 'agent', 'advisor', 'expert', 'deputy', 'senior', 'junior', 'intern']);
+  [...synIndex, ...kwIndex].forEach(s => s.k.split(' ').forEach(w => vocab.add(w)));
 
   const skillFields = {}; // skill → the fields that list it
   FIELDS.forEach(f => f.skills.forEach(s => (skillFields[s] = skillFields[s] || []).push(f.id)));
@@ -163,6 +167,7 @@ const Engine = (() => {
           for (let i = 0; i < ws.length; i++) {
             const a = ws[i], b = s.ws[i][0], max = s.ws[i][1];
             if (a === b) continue;
+            if (vocab.has(a)) { d = -1; break; } // a real word of its own
             // a mistake rarely changes a word's first letter
             const e = max && a.charCodeAt(0) === b.charCodeAt(0) ? within(a, b, max) : max + 1;
             if (e > max) { d = -1; break; }

@@ -86,6 +86,8 @@ test('spelling: a mistake inside a long word is forgiven, a different short word
   assert.notEqual(cls('Tr. Assistant Engineer', 'Engineering (Civil / Mechanical / Electrical / Other)').split('/')[0], 'it'); // "Tr." is not "IT"
   assert.notEqual(cls('SAP CO Consultant - IT', 'Information Technology (IT) / Software').split('/')[0], 'health');            // "IT" is not "ENT"
   assert.notEqual(cls('Team Leader').split('/')[1], 'rider');
+  assert.equal(cls('Trainee Engineer', 'Information Technology And Services'), 'it/-');     // a trainee is not a "trainer": real words are never "corrected"
+  assert.notEqual(cls('Trainee Engineer').split('/')[0], 'education');
 });
 
 test('spelling: the fast distance agrees with the plain one', () => {

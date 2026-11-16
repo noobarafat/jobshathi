@@ -16,7 +16,7 @@
     { "id": "nextjobz", "type": "nextjobz", "enabled": true, "limit": 300 },
     { "id": "alljobs", "type": "alljobs", "enabled": true, "limit": 300 },
     { "id": "remote", "type": "remote_boards", "enabled": true },
-    { "id": "companies", "type": "company_pages", "enabled": true },
+    { "id": "companies", "type": "company_pages", "enabled": false, "_note": "Off: the 7 companies in companies.json publish no structured job data at the usual addresses, so each run made 42 requests and found nothing. Put a company's exact careers address in companies.json ('careers'), then set enabled to true." },
 
     { "id": "sr-polygon", "type": "smartrecruiters", "enabled": true, "company": "PolygonTechnology" },
     { "id": "sr-nagorik", "type": "smartrecruiters", "enabled": true, "company": "NagorikTechnologiesLtd" },

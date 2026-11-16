@@ -200,7 +200,8 @@ def clean(jobs: list[dict], today, keep_while_listed: tuple[str, ...] = ()) -> t
             continue
         age = days_old(job, today)
         on_board = bool(keep_while_listed) and str(job.get("id") or "").startswith(keep_while_listed)
-        if age is not None and age > KEEP_DAYS and not on_board:
+        # the 30-day rule is for posts that state no deadline: one whose deadline is still ahead is open
+        if age is not None and age > KEEP_DAYS and not on_board and not deadline:
             counts["too_old"] += 1
             continue
         if not str(job.get("url") or "").lower().startswith(("http://", "https://")):
