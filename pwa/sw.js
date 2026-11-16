@@ -18,9 +18,14 @@ self.addEventListener('fetch', e => {
   if (/\/version\.json$/.test(new URL(req.url).pathname)) return; // always straight from the network, never saved
   const isPage = req.mode === 'navigate';
 
-  // always ask the network, and keep a copy of every good answer
+  // always ask the network, and keep a copy of every good answer. When the answer is the very file
+  // already saved (the same ETag: jobs.json that has not changed), it is not written again.
+  const keep = res => caches.open(CACHE).then(c => c.match(req).then(old => {
+    const tag = res.headers.get('etag');
+    if (!(tag && old && old.headers.get('etag') === tag)) return c.put(req, res);
+  })).catch(() => {});
   const fresh = fetch(req).then(res => {
-    if (res.ok) { const copy = res.clone(); caches.open(CACHE).then(c => c.put(req, copy)); }
+    if (res.ok) keep(res.clone());
     return res;
   });
   const saved = () => caches.match(req, { ignoreSearch: isPage }).then(hit => hit || (isPage ? caches.match('index.html') : undefined));

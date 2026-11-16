@@ -515,7 +515,7 @@ const Engine = (() => {
     return Object.entries(count).filter(([, n]) => n >= 2).sort((a, b) => b[1] - a[1]).slice(0, limit).map(([skill, n]) => ({ skill, n, of: pool.length }));
   }
 
-  return { prepareJobs, rank, skillGaps, classify, parseLocation, parseExperience, findSkills, expandProfile, match, fieldById, roleById, allSkills, skillFields, districtDiv, norm, hasTerm,
+  return { prepareJobs, rank, skillGaps, classify, parseLocation, parseExperience, parseEducation, findSkills, expandProfile, match, fieldById, roleById, allSkills, skillFields, districtDiv, norm, hasTerm,
     _internals: { found, prep, tokensOf, within } }; // for tests/engine.test.mjs
 })();
 

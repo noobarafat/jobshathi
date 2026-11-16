@@ -175,6 +175,31 @@ test('skills: the tags portals use and Bangla terms are understood', () => {
   assert.deepEqual(skills('BBA in Business Administration'), []);                             // a degree is not a skill
 });
 
+test('robot dictionary step: a long education field becomes a short line with the same level', async () => {
+  const { spawnSync } = await import('node:child_process');
+  const ask = posts => JSON.parse(spawnSync(process.execPath, [join(ROOT, 'robot/keywords.mjs')], { input: JSON.stringify(posts), encoding: 'utf8' }).stdout);
+  const filler = 'সকল পদের প্রার্থীর বয়স ১৮ থেকে ৩২ বছর হতে হবে। '.repeat(8);
+  const cases = [
+    { id: 'hsc', edu: filler + 'শিক্ষাগত যোগ্যতা: স্বীকৃত বোর্ড হতে এইচএসসি পাস। কম্পিউটার জ্ঞান থাকতে হবে।', level: 2 },
+    { id: 'two-levels', edu: 'Post 1: Bachelor degree in any discipline. ' + filler + 'Post 2: SSC pass with MS Office skills.', level: 1 },
+    { id: 'bachelor', edu: "Bachelor's degree in Computer Science or a related field from a reputed university. " + 'Strong knowledge of JavaScript and React. '.repeat(4), level: 4 },
+    { id: 'no-level', edu: filler, level: null },
+  ];
+  const out = ask(cases.map(c => ({ id: c.id, slim: { title: 'Officer', req: '', exp: '', edu: c.edu }, max: 120 })));
+  for (const c of cases) {
+    const s = out[c.id].slim;
+    assert.ok(s, c.id);
+    assert.ok(s.edu.length <= 120, `${c.id}: ${s.edu.length} characters`);
+    assert.equal(Engine.parseEducation(s.edu, ''), c.level, `${c.id}: "${s.edu}"`);
+    assert.equal(s.level, c.level, c.id);
+  }
+  assert.equal(out['no-level'].slim.edu, '');                                                // nothing to keep
+  assert.ok(out['two-levels'].slim.edu.includes('SSC'));                                      // the lowest level a post accepts is kept
+  assert.ok(out.hsc.slim.skills.includes('MS Office'));                                        // "কম্পিউটার জ্ঞান" leaves the field, so it is handed back as a skill
+  assert.ok([...out.bachelor.slim.skills].includes('JavaScript') && [...out.bachelor.slim.skills].includes('React'));
+  assert.equal(ask([{ id: 'short', slim: { title: 'Officer', edu: 'HSC' }, max: 120 }]).short.slim, null);   // a short field is left alone
+});
+
 test('speed: reading every real post stays fast enough for a phone', { skip: !existsSync(join(ROOT, 'jobs.json')) }, () => {
   const raw = JSON.parse(read('jobs.json')).jobs;
   const t = Date.now(); const jobs = Engine.prepareJobs(raw); const ms = Date.now() - t;

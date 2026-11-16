@@ -126,13 +126,73 @@ class Size(unittest.TestCase):
         self.assertIs(run.download_size(os.urandom(400 * 1024))["withinBudget"], False)     # 400 KB that does not compress
 
 
+class Slim(unittest.TestCase):
+    LONG = "১। সকল পদের প্রার্থীর ক্ষেত্রেই বয়স ১৮ থেকে ৩২ বছর। " * 6 + "শিক্ষাগত যোগ্যতা: এইচএসসি পাস। Computer skills required."
+
+    def fake(self, readings_differ=False, runs=True):
+        """A stand-in for the dictionary step (keywords.mjs)."""
+        def ask(posts):
+            if not runs:
+                return {}
+            out = {}
+            for p in posts:
+                if "slim" in p:
+                    out[p["id"]] = {"slim": {"edu": "শিক্ষাগত যোগ্যতা: এইচএসসি পাস", "level": 2, "skills": ["MS Office"]}}
+                else:
+                    side = p["id"].split("\u0001")[1]
+                    out[p["id"]] = {"read": {"education": 2, "skills": ["MS Office"], "side": side if readings_differ else "same"}}
+            return out
+        return ask
+
+    def jobs(self):
+        return [job("a:1", title="Office Assistant", edu=self.LONG, req="Age 18 to 32 years", logo="https://x.example/logo.png", site="https://x.example"),
+                job("a:2", title="Driver", edu="SSC", site="https://y.example"),
+                job("a:3", title="Clerk", edu="HSC", logo="data:image/png;base64,AAAA", site="https://z.example")]
+
+    def test_a_long_education_field_becomes_a_short_line_and_its_skills_move_to_the_keywords(self):
+        jobs = self.jobs()
+        stats = run.slim(jobs, ask=self.fake())
+        self.assertEqual(jobs[0]["edu"], "শিক্ষাগত যোগ্যতা: এইচএসসি পাস")
+        self.assertEqual(jobs[0]["req"], "Age 18 to 32 years, MS Office")        # the age signal stays first
+        self.assertEqual((jobs[1]["edu"], jobs[2]["edu"]), ("SSC", "HSC"))         # short ones are left alone
+        self.assertEqual((stats["educationShortened"], stats["skillsMovedToKeywords"]), (1, 1))
+
+    def test_the_website_is_left_out_only_when_the_post_has_a_real_logo(self):
+        jobs = self.jobs()
+        stats = run.slim(jobs, ask=self.fake())
+        self.assertNotIn("site", jobs[0])
+        self.assertEqual((jobs[1]["site"], jobs[2]["site"]), ("https://y.example", "https://z.example"))
+        self.assertEqual(stats["websiteLeftOut"], 1)
+
+    def test_a_post_the_site_would_read_differently_keeps_its_long_field(self):
+        jobs = self.jobs()
+        stats = run.slim(jobs, ask=self.fake(readings_differ=True))
+        self.assertEqual(jobs[0]["edu"], self.LONG)
+        self.assertEqual(jobs[0]["req"], "Age 18 to 32 years")
+        self.assertEqual((stats["educationShortened"], stats["keptLongToKeepMatching"]), (0, 1))
+
+    def test_without_the_dictionary_step_nothing_changes_but_the_website_rule(self):
+        jobs = self.jobs()
+        stats = run.slim(jobs, ask=self.fake(runs=False))
+        self.assertEqual(jobs[0]["edu"], self.LONG)
+        self.assertEqual(stats["educationLeftLong"], 1)
+
+    def test_doing_it_twice_changes_nothing(self):
+        jobs = self.jobs()
+        run.slim(jobs, ask=self.fake())
+        once = json.dumps(jobs, ensure_ascii=False)
+        stats = run.slim(jobs, ask=self.fake())
+        self.assertEqual(json.dumps(jobs, ensure_ascii=False), once)
+        self.assertEqual((stats["websiteLeftOut"], stats["educationShortened"]), (0, 0))
+
+
 class Keywords(unittest.TestCase):
-    def test_skills_found_in_the_text_go_first_and_the_text_is_never_written(self):
+    def test_skills_found_in_the_text_are_added_and_the_text_is_never_written(self):
         fresh = [job("a:1", req="Freshers are encouraged", _text="We use Excel and Tally every day."), job("a:2", req="x")]
         asked = []
         stats = run.add_keywords(fresh, ask=lambda posts: asked.extend(posts) or {"a:1": {"skills": ["Excel", "Tally"], "place": ""}})
         self.assertEqual([p["id"] for p in asked], ["a:1"])                    # only posts that have text are read
-        self.assertEqual(fresh[0]["req"], "Excel, Tally, Freshers are encouraged")
+        self.assertEqual(fresh[0]["req"], "Freshers are encouraged, Excel, Tally")       # a requirement signal always stays first
         self.assertEqual(fresh[1]["req"], "x")
         self.assertEqual((stats["postsRead"], stats["postsWithSkills"]), (1, 1))
         self.assertNotIn("_text", N.public(fresh[0]))
@@ -143,10 +203,11 @@ class Keywords(unittest.TestCase):
         self.assertEqual(fresh[0]["req"], "Freshers are encouraged")
         self.assertIs(stats["ran"], False)
 
-    def test_keywords_stay_within_the_size_limit(self):
-        req = N.keywords_req([f"Skill {i}" for i in range(80)], "tail")
+    def test_keywords_stay_within_the_size_limit_and_signals_are_never_cut_off(self):
+        req = N.keywords_req([f"Skill {i}" for i in range(80)], "tail, Age 22 to 30 years, Freshers can apply")
         self.assertLessEqual(len(req), 300)
-        self.assertTrue(req.startswith("Skill 0, Skill 1"))
+        self.assertTrue(req.startswith("Age 22 to 30 years, Freshers can apply, Skill 0, Skill 1"))
+        self.assertNotIn("tail", req)
 
 
 class Places(unittest.TestCase):

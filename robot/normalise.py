@@ -240,9 +240,16 @@ def education_line(text) -> str:
 
 
 def keywords_req(skills, req: str = "", limit: int = 300) -> str:
-    """`req` with the dictionary's skills in front: what the matcher needs, never the description."""
+    """`req` with the dictionary's skills added: what the matcher needs, never the description.
+
+    Order: the short requirement signals first ("Freshers can apply", an age limit), because the line is
+    cut at `limit` and those must never be the part that falls off; then the skills; then the rest.
+    """
+    pieces = [p.strip() for p in re.split(r",\s+", req or "") if p.strip()]
+    signals = [p for p in pieces if any(s.search(p) for s in SIGNALS)]
+    rest = [p for p in pieces if p not in signals]
     parts, seen = [], set()
-    for piece in list(skills or []) + [p.strip() for p in re.split(r",\s+", req or "")]:
+    for piece in signals + list(skills or []) + rest:
         if piece and piece.lower() not in seen:
             seen.add(piece.lower())
             parts.append(piece)

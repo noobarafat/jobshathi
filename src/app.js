@@ -697,15 +697,25 @@
     S.updatedAt = stamp; S.jobs = Engine.prepareJobs(list); S.demo = false; recompute(); refreshSnapshots(); render();
     return true;
   }
-  let jobsLoading = false, jobsLookedAt = 0;
+  /* `jobsTag` is the ETag (the file's fingerprint from the web server) of the jobs.json on screen.
+     cache: 'no-cache' makes the browser ask the server "has jobs.json changed since the copy I hold?"
+     every time. Unchanged: the answer is "304 Not Modified", nothing is downloaded, and the copy is used.
+     Changed (after a robot run): the new file is downloaded. So the list is always the newest when the
+     network works, and a person who opens the app many times a day downloads it only when it changed. */
+  let jobsLoading = false, jobsLookedAt = 0, jobsTag = '';
+  const tagOf = res => res.headers.get('etag') || '';
   async function loadLiveJobs() {
     if (jobsLoading) return;
     jobsLoading = true; jobsLookedAt = Date.now();
-    if (S.demo) { try { const hit = window.caches && await caches.match('jobs.json'); if (hit) useJobs(await hit.json()); } catch { /* nothing saved yet */ } }
+    if (S.demo) { try { const hit = window.caches && await caches.match('jobs.json'); if (hit) { const tag = tagOf(hit); if (useJobs(await hit.json())) jobsTag = tag; } } catch { /* nothing saved yet */ } }
     try {
       const ctl = new AbortController(), timer = setTimeout(() => ctl.abort(), 30000);
-      const res = await fetch('jobs.json', { signal: ctl.signal, cache: 'no-store' });
-      if (res.ok) useJobs(await res.json());
+      const res = await fetch('jobs.json', { signal: ctl.signal, cache: 'no-cache' });
+      if (res.ok) {
+        const tag = tagOf(res);
+        // the same file as on screen: not even read again (saves the phone a second or more of work)
+        if (!(tag && tag === jobsTag && !S.demo) && useJobs(await res.json())) jobsTag = tag;
+      }
       clearTimeout(timer);
     } catch { /* offline or no jobs.json yet: what is on screen stays */ }
     jobsLoading = false;
@@ -740,7 +750,8 @@
   });
   window.addEventListener('online', () => { checkVersion(); if (S.demo || Date.now() - jobsLookedAt > 30 * 60000) loadLiveJobs(); });
 
-  if ('serviceWorker' in navigator && location.protocol === 'https:' && !inFrame) navigator.serviceWorker.register('sw.js').catch(() => {});
+  // a secure context: https, or this computer (localhost), where offline use can then be tested too
+  if ('serviceWorker' in navigator && window.isSecureContext && !inFrame) navigator.serviceWorker.register('sw.js').catch(() => {});
 
   /* back online, or back to this tab: send what is waiting, or pick up changes made on another device */
   window.addEventListener('online', () => { if (Cloud.status === 'failed') connect(); else if (Store.get('dirty', false)) Sync.push(); });
