@@ -31,14 +31,16 @@
     },
   };
 
-  const DEMO_JOBS = Engine.prepareJobs(SAMPLE_JOBS);
+  // the example posts are read only when they are shown (the welcome page, or no real jobs to be had)
+  let demoReady = null;
+  const demoJobs = () => demoReady || (demoReady = Engine.prepareJobs(SAMPLE_JOBS));
   const emptyMarks = () => ({ saved: {}, applied: {}, dismissed: {} });
   const newFilter = () => ({ bucket: 'fit', quick: [], sort: 'match', q: '' });
   const inFrame = (() => { try { return window.self !== window.top; } catch { return true; } })();
   const S = {
     account: Store.get('account', null), profile: Store.get('profile', null), marks: Object.assign(emptyMarks(), Store.get('marks', {})),
     lang: Store.get('lang', (navigator.language || '').toLowerCase().startsWith('bn') ? 'bn' : 'en'), theme: Store.get('theme', 'auto'),
-    jobs: DEMO_JOBS, results: [], demo: true, updatedAt: '', route: 'welcome', f: newFilter(), stab: 'saved', draft: null, step: 0, editOne: false, done: false, err: '', wq: '', delAsk: false, delReauth: false, busy: '', sheet: null,
+    jobs: [], results: [], demo: true, updatedAt: '', route: 'welcome', f: newFilter(), stab: 'saved', draft: null, step: 0, editOne: false, done: false, err: '', wq: '', delAsk: false, delReauth: false, busy: '', sheet: null,
     installed: (window.matchMedia && matchMedia('(display-mode: standalone)').matches) || navigator.standalone === true,
   };
   if (S.profile && !S.account) { S.account = { id: 'u' + Date.now().toString(36), name: S.profile.name || '', contact: '', createdAt: Date.now() }; Store.set('account', S.account); }
@@ -186,7 +188,7 @@
   /* ── pages ── */
   function pageWelcome() {
     const demoProfile = { fields: ['accounting'], roles: ['accountant'], skills: ['Excel', 'Bookkeeping', 'Bank Reconciliation'], level: 'fresher', edu: 4, age: 24, locations: ['area:Dhaka/Mirpur'], types: ['full'], minSalary: 18000 };
-    const r = Engine.rank(demoProfile, DEMO_JOBS.filter(j => j.role === 'accountant'), {})[0];
+    const r = Engine.rank(demoProfile, demoJobs().filter(j => j.role === 'accountant'), {})[0];
     const demo = r ? `<p class="demo-cap">${t('demoCap')}</p><div class="card demo-card demo"><div class="job-top">${logo(r.job)}<div><h3 style="font-size:1.15rem;font-weight:700">${esc(r.job.title)}</h3><div class="co" style="color:var(--ink-2)">${esc(r.job.company)}</div></div>${ring(r)}</div>
       <div class="facts"><span class="fact">${ic('pin')}${esc(r.job.loc.text)}</span><span class="fact">${ic('cash')}${payWords(r.job)}</span><span class="fact">${ic('clock')}${deadlineWords(r.job)}</span></div>
       <div><div class="slip-title"><span>${t('fitTitle')}</span><small>${t('meets', { a: num(r.met), b: num(r.of) })}</small></div>${checklist(r)}</div></div>` : '';
@@ -289,13 +291,18 @@
   }
   const freshLine = (cls = '') => { const w = freshWords(); return w ? `<p class="hint ${cls}">${esc(w)}</p>` : ''; };
 
-  const demoBanner = () => (S.demo ? `<div class="banner">${ic('info')}<span>${t('demoBanner')}</span></div>` : '');
+  const demoBanner = () => (S.demo && !S.jobsPending ? `<div class="banner">${ic('info')}<span>${t('demoBanner')}</span></div>` : '');
+  /* While the real jobs are being read: placeholder cards, never the example posts. */
+  const waiting = () => S.demo && S.jobsPending;
+  const loadingBlock = (n = 3) => `<div class="loading" role="status"><p class="hint">${t('loadingJobs')}</p>${'<div class="card skel" aria-hidden="true"><i></i><i></i><i></i></div>'.repeat(n)}</div>`;
 
   function pageHome() {
     const m = live(), strong = m.filter(r => r.bucket === 'strong'), h = new Date().getHours();
     const stat = (n, label, icon, a, v, cls) => `<button type="button" class="stat ${cls}" data-a="${a}" data-v="${v}" data-fid="stat:${v}"><span class="sb">${ic(icon)}</span><b>${num(n)}</b><span class="lb">${label}</span></button>`;
     const picks = m.slice(0, 3);
-    return `<div class="greet"><p>${fmtDate(Date.now(), true)}</p><h1>${t(h < 12 ? 'gm' : h < 17 ? 'ga' : 'ge')}, ${esc(S.account.name.split(/\s+/)[0])}</h1>${freshLine()}</div>
+    const greet = `<div class="greet"><p>${fmtDate(Date.now(), true)}</p><h1>${t(h < 12 ? 'gm' : h < 17 ? 'ga' : 'ge')}, ${esc(S.account.name.split(/\s+/)[0])}</h1>${freshLine()}</div>`;
+    if (waiting()) return `${greet}<div class="home-grid"><div class="feed">${loadingBlock(3)}</div><div class="side">${strengthCard()}${installCard()}</div></div>`;
+    return `${greet}
       <section class="sunrise"><svg class="sun" viewBox="0 0 200 200" aria-hidden="true"><defs><radialGradient id="sunGlow"><stop offset="0" stop-color="#FFC27A" stop-opacity=".95"/><stop offset=".45" stop-color="#FF8A3D" stop-opacity=".5"/><stop offset="1" stop-color="#FF8A3D" stop-opacity="0"/></radialGradient><linearGradient id="sunCore" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#FFD08A"/><stop offset="1" stop-color="#FF7A45"/></linearGradient></defs><circle cx="100" cy="100" r="100" fill="url(#sunGlow)"/><circle cx="100" cy="100" r="42" fill="url(#sunCore)"/><circle cx="100" cy="100" r="64" fill="none" stroke="#FFD08A" stroke-opacity=".35" stroke-width="1.5"/><circle cx="100" cy="100" r="86" fill="none" stroke="#FFD08A" stroke-opacity=".18" stroke-width="1.5"/></svg>
         <div><div class="big">${num(strong.length)}</div><div class="cap">${t('heroCount')}</div></div><p class="sub">${t('heroSub', { b: num(m.length - strong.length), n: num(S.results.length) })}</p>
         <button type="button" class="btn" data-a="quick-go" data-v="">${t('seeMatches')}</button></section>
@@ -312,7 +319,7 @@
      "Load more" button). The cards already drawn are kept from one render to the next, so opening a job
      and closing it again redraws nothing and the scroll position stays. When something changes (a job
      saved, a filter), only the cards whose content changed are redrawn. */
-  const FEED_CHUNK = 8; // about two screens of cards on a phone
+  const FEED_CHUNK = 6; // about one and a half screens of cards on a phone
   const Feed = { el: null, qk: '', shown: FEED_CHUNK, nodes: new Map(), plan: null };
   let moreWatch = null;
   const nodeFrom = html => { const tpl = document.createElement('template'); tpl.innerHTML = html.trim(); return tpl.content.firstElementChild; };
@@ -378,7 +385,8 @@
     const segBtn = (id, label, n) => `<button type="button" role="tab" data-a="bucket" data-v="${id}" data-fid="bucket:${id}" aria-selected="${f.bucket === id}">${label}<span class="n">${num(n)}</span></button>`;
     const card = r => ({ key: 'j:' + r.job.id, card: true, html: () => jobCard(r) });
     let items = [];
-    if (f.bucket === 'fit' && f.sort === 'match') {
+    if (waiting()) list = [];
+    else if (f.bucket === 'fit' && f.sort === 'match') {
       const s = list.filter(r => r.bucket === 'strong'), p = list.filter(r => r.bucket === 'possible');
       if (s.length) items.push({ key: 'h:strong', html: () => `<div class="sec-head"><h2 class="sec-title">${t('bestH')}</h2></div>` }, ...s.map(card));
       if (p.length) items.push({ key: 'h:possible', html: () => `<div class="sec-head"><div><h2 class="sec-title">${t('possibleH')}</h2><p class="hint">${t('possibleD')}</p></div></div>` }, ...p.map(card));
@@ -391,7 +399,7 @@
         <div class="scroller" data-keep="quick">${['new', 'soon', 'fresher', 'remote'].map(k => chip('quick', k, f.quick.includes(k), t({ new: 'fNew', soon: 'fSoon', fresher: 'fFresher', remote: 'fRemote' }[k]), 'sm')).join('')}</div>`,
       'j-banner': demoBanner(),
       'j-bar': `<span>${t('nJobs', { n: num(list.length) })}</span><label><span class="sr">${t('sortBy')}</span><select data-in="sort" data-fid="in:sort" aria-label="${t('sortBy')}">${[['match', 'sMatch'], ['new', 'sNew'], ['deadline', 'sDeadline']].map(([v, k]) => `<option value="${v}" ${f.sort === v ? 'selected' : ''}>${t(k)}</option>`).join('')}</select></label>`,
-      'j-empty': list.length ? '' : (q || f.quick.length) ? emptyBlock(t('emptyFilter'), t('emptyFilterD'), `<button type="button" class="btn soft" data-a="clear-filters">${t('clearFilters')}</button>`) : emptyBlock(t('emptyForYou'), t('emptyForYouD'), `<button type="button" class="btn soft" data-a="bucket" data-v="all">${t('seeAll')}</button>`),
+      'j-empty': waiting() ? loadingBlock(4) : list.length ? '' : (q || f.quick.length) ? emptyBlock(t('emptyFilter'), t('emptyFilterD'), `<button type="button" class="btn soft" data-a="clear-filters">${t('clearFilters')}</button>`) : emptyBlock(t('emptyForYou'), t('emptyForYouD'), `<button type="button" class="btn soft" data-a="bucket" data-v="all">${t('seeAll')}</button>`),
     };
     // the frame: the same every time (the search box carries no value here; render sets it when the frame is new)
     return `<div class="page-head" id="j-head"></div>
@@ -404,7 +412,8 @@
     const kind = S.stab, marks = S.marks[kind], byId = {}; S.results.forEach(r => (byId[r.job.id] = r));
     const ids = Object.keys(marks).sort((a, b) => marks[b].t - marks[a].t);
     const segBtn = (id, label, n) => `<button type="button" role="tab" data-a="stab" data-v="${id}" data-fid="stab:${id}" aria-selected="${S.stab === id}">${label}<span class="n">${num(n)}</span></button>`;
-    const items = ids.map(id => {
+    // while the jobs are being read, a saved job is not yet among them: not "closed", just not ready
+    const items = waiting() && ids.length ? loadingBlock(Math.min(ids.length, 3)) : ids.map(id => {
       const when = `<div class="when">${t(kind === 'applied' ? 'appliedOn' : 'savedOn', { d: fmtDate(marks[id].t) })}</div>`;
       const status = kind === 'applied' ? `<div class="status" style="margin:8px 4px 0">${STATUS.map(([v, k]) => chip('status', id + '|' + v, (marks[id].status || 'applied') === v, t(k), 'sm')).join('')}</div>` : '';
       if (byId[id]) return `<div>${when}${jobCard(byId[id])}${status}</div>`;
@@ -849,7 +858,7 @@
     if (!Array.isArray(list) || !list.length) return false;
     const stamp = (data && data.updatedAt) || '';
     if (!S.demo && stamp && stamp === S.updatedAt) return true; // the same file as on screen
-    S.updatedAt = stamp; S.jobs = Engine.prepareJobs(list); S.demo = false; recompute(); refreshSnapshots(); render();
+    S.updatedAt = stamp; S.jobs = Engine.prepareJobs(list); S.demo = false; S.jobsPending = false; recompute(); refreshSnapshots(); render();
     return true;
   }
   /* `jobsTag` is the ETag (the file's fingerprint from the web server) of the jobs.json on screen.
@@ -859,7 +868,39 @@
      network works, and a person who opens the app many times a day downloads it only when it changed. */
   let jobsLoading = false, jobsLookedAt = 0, jobsTag = '';
   const tagOf = res => res.headers.get('etag') || '';
-  async function loadLiveJobs() {
+
+  /* The jobs are read by a worker (src/worker.js), away from the screen. It sends them in small parts;
+     each part is taken in as its own short task, so the screen never freezes. Until the first file is
+     read the pages show placeholder cards ("Reading today's jobs…"). A browser that cannot run the
+     worker reads the jobs here as before (loadOnPage). */
+  let reader = null, readerFailed = false, incoming = null;
+  S.jobsPending = true;
+  function startReader() {
+    if (reader || readerFailed || !window.Worker || typeof WORKER_URL !== 'string' || WORKER_URL.startsWith('__')) return null;
+    try {
+      reader = new Worker(WORKER_URL);
+      reader.onmessage = e => {
+        const m = e.data || {};
+        if (m.type === 'begin') incoming = { stamp: m.stamp, jobs: [] };
+        else if (m.type === 'chunk' && incoming) { incoming.jobs.push(...m.jobs); reader.postMessage({ type: 'next' }); }
+        else if (m.type === 'end' && incoming) {
+          const got = incoming; incoming = null;
+          if (!(S.demo || got.stamp !== S.updatedAt)) { S.jobsPending = false; return; }   // the same file as on screen
+          S.updatedAt = got.stamp; S.jobs = got.jobs; S.demo = false; S.jobsPending = false;
+          recompute(); refreshSnapshots(); render();
+        } else if (m.type === 'same' || m.type === 'failed') { if (S.jobsPending) { S.jobsPending = false; useDemo(); render(); } }
+      };
+      reader.onerror = () => { readerFailed = true; reader = null; jobsLoading = false; loadOnPage(); };   // the old way
+      return reader;
+    } catch { readerFailed = true; reader = null; return null; }
+  }
+  function loadLiveJobs() {
+    jobsLookedAt = Date.now();
+    const w = startReader();
+    if (w) { w.postMessage({ type: 'load', first: S.demo }); return; }
+    loadOnPage();
+  }
+  async function loadOnPage() {
     if (jobsLoading) return;
     jobsLoading = true; jobsLookedAt = Date.now();
     if (S.demo) { try { const hit = window.caches && await caches.match('jobs.json'); if (hit) { const tag = tagOf(hit); if (useJobs(await hit.json())) jobsTag = tag; } } catch { /* nothing saved yet */ } }
@@ -874,7 +915,10 @@
       clearTimeout(timer);
     } catch { /* offline or no jobs.json yet: what is on screen stays */ }
     jobsLoading = false;
+    if (S.jobsPending) { S.jobsPending = false; useDemo(); render(); }
   }
+  /** No real jobs could be had (offline on a first visit): the example posts, with the banner saying so. */
+  function useDemo() { if (S.demo && !S.jobs.length) { S.jobs = demoJobs(); recompute(); } }
 
   /* ── "Update available": version.json holds the fingerprint of the newest build ── */
   const BUILT = !APP_VERSION.startsWith('__'); // false when the page was not made by build.py

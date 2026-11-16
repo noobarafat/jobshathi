@@ -86,15 +86,22 @@ const Engine = (() => {
   /* Wordings a misspelt title is compared with. A typing mistake sits inside a long word, so each word gets
      its own allowance: a word under six letters must match exactly (“Deputy” is not “Duty”, “Tr.” is not “IT”),
      a longer one may differ by 18% of its letters, two at most. `budget` is the allowance of the whole wording. */
-  const spellIndex = synIndex.filter(s => s.p.latin && s.k.length >= 6).map(s => {
-    const ws = s.k.split(' ').map(w => [w, w.length < 6 ? 0 : Math.min(2, Math.floor(w.length * 0.18))]);
-    return { ...s, ws, budget: ws.reduce((n, w) => n + w[1], 0), mask: letters(s.k) };
-  }).filter(s => s.budget > 0);
-  const maxWords = spellIndex.reduce((n, s) => Math.max(n, s.words), 1);
-  // Words the dictionary itself uses. A title word that is one of them is a real word, never a misspelling
-  // of another: “Trainee Engineer” is not a “Trainer”, a “Team Leader” is not a “Loader”.
-  const vocab = new Set(['officer', 'executive', 'manager', 'assistant', 'associate', 'specialist', 'analyst', 'consultant', 'trainee', 'leader', 'member', 'staff', 'worker', 'helper', 'agent', 'advisor', 'expert', 'deputy', 'senior', 'junior', 'intern']);
-  [...synIndex, ...kwIndex].forEach(s => s.k.split(' ').forEach(w => vocab.add(w)));
+  // Built the first time a title has to be checked for a misspelling (reading posts, mostly in the worker),
+  // so that the page itself starts faster.
+  let spellBuilt = null;
+  function spelling() {
+    if (spellBuilt) return spellBuilt;
+    const spellIndex = synIndex.filter(s => s.p.latin && s.k.length >= 6).map(s => {
+      const ws = s.k.split(' ').map(w => [w, w.length < 6 ? 0 : Math.min(2, Math.floor(w.length * 0.18))]);
+      return { ...s, ws, budget: ws.reduce((n, w) => n + w[1], 0), mask: letters(s.k) };
+    }).filter(s => s.budget > 0);
+    const maxWords = spellIndex.reduce((n, s) => Math.max(n, s.words), 1);
+    // Words the dictionary itself uses. A title word that is one of them is a real word, never a misspelling
+    // of another: “Trainee Engineer” is not a “Trainer”, a “Team Leader” is not a “Loader”.
+    const vocab = new Set(['officer', 'executive', 'manager', 'assistant', 'associate', 'specialist', 'analyst', 'consultant', 'trainee', 'leader', 'member', 'staff', 'worker', 'helper', 'agent', 'advisor', 'expert', 'deputy', 'senior', 'junior', 'intern']);
+    [...synIndex, ...kwIndex].forEach(s => s.k.split(' ').forEach(w => vocab.add(w)));
+    return (spellBuilt = { spellIndex, maxWords, vocab });
+  }
 
   const skillFields = {}; // skill → the fields that list it
   FIELDS.forEach(f => f.skills.forEach(s => (skillFields[s] = skillFields[s] || []).push(f.id)));
@@ -158,6 +165,7 @@ const Engine = (() => {
       if (!best || w > best.w) best = { w, role: s.role, field: s.field, how: 'title' };
     }
     if (!best) { // a spelling mistake: “Accountent”, “Merchandizer”
+      const { spellIndex, maxWords, vocab } = spelling();
       const words = t.split(' '), runs = []; // runs[n] = every run of n words in the title: [the words, their length together, their letter mask]
       for (let n = 1; n <= maxWords; n++) { runs[n] = []; for (let i = 0; i + n <= words.length; i++) { const ws = words.slice(i, i + n), win = ws.join(' '); runs[n].push([ws, win.length, letters(win)]); } }
       for (const s of spellIndex) {

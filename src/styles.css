@@ -180,6 +180,14 @@ input:focus, select:focus { border-color: var(--brand); outline: 3px solid var(-
 .feed-more { display: grid; }
 .feed-more:empty { display: none; }
 .more-btn { justify-self: center; min-height: 44px; }
+/* placeholder cards while the jobs are read (the worker); a soft pulse, none with reduced motion */
+.loading { display: grid; gap: 12px; }
+.skel { padding: 16px; display: grid; gap: 10px; box-shadow: none; }
+.skel i { display: block; height: 14px; border-radius: 8px; background: var(--line); animation: skel 1.4s ease-in-out infinite; }
+.skel i:first-child { width: 62%; height: 18px; }
+.skel i:nth-child(2) { width: 40%; }
+.skel i:last-child { width: 85%; }
+@keyframes skel { 50% { opacity: .45; } }
 .side { display: grid; gap: 14px; align-content: start; }
 .meter { height: 10px; border-radius: 99px; background: var(--line); overflow: hidden; margin: 10px 0 12px; }
 .meter i { display: block; height: 100%; background: var(--ok); border-radius: 99px; }

@@ -159,6 +159,7 @@ Object.assign(TEXT, {
   cExpGuess: ['Experience is not stated; the title suggests a {x} role', 'অভিজ্ঞতা লেখা নেই; পদের নাম দেখে {x} পদ মনে হচ্ছে'],
   lvl_junior: ['junior', 'জুনিয়র'], lvl_mid: ['mid-level', 'মধ্যম পর্যায়ের'], lvl_senior: ['senior', 'সিনিয়র'],
   shLikelyExp: ['May need experience', 'অভিজ্ঞতা লাগতে পারে'],
+  loadingJobs: ['Reading today\'s jobs…', 'আজকের চাকরিগুলো পড়া হচ্ছে…'],
   loadMore: ['Show more jobs ({n} more)', 'আরও চাকরি দেখুন (আরও {n}টি)'],
   deadlineWas: ['Deadline was {d}', 'শেষ তারিখ ছিল {d}'],
   updateReady: ['Update available — tap to refresh', 'নতুন আপডেট এসেছে — রিফ্রেশ করতে ট্যাপ করুন'],
