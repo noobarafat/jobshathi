@@ -24,7 +24,9 @@ NEW_PER_RUN = 300
 log = logging.getLogger("robot.nextjobz")
 
 URL_ENTRY = re.compile(r"<url>\s*<loc>([^<]+)</loc>(?:\s*<lastmod>([^<]+)</lastmod>)?", re.I | re.S)
-ID_IN_URL = re.compile(r"-((?:IJOB|XKU)[A-Za-z0-9]+)/?$")
+# the id at the end of a job page's address: "...-IJOB202683272", and "...-SSR1793521971346" on government pages
+ID_IN_URL = re.compile(r"-((?:IJOB|XKU)[A-Za-z0-9]+|[A-Z]{3}\d{10,})/?$")
+GOVERNMENT_PAGE = "/gov-jobs/"
 
 VACANCY = re.compile(r"Vacanc(?:y|ies)\s*([0-9০-৯]{1,4})", re.I)
 PAY = re.compile(r"((?:Tk\.?|BDT|৳)\s*[0-9০-৯][0-9০-৯,\s\-–to]{2,30}"
@@ -60,10 +62,9 @@ def _one(page: str, url: str) -> dict | None:
     head = _header(page)
     loc, remote = S.place_of(ld)
 
-    ident = S.first(ld, "identifier", "value")
-    if not ident:
-        m = ID_IN_URL.search(url)
-        ident = m.group(1) if m else url.rsplit("/", 1)[-1]
+    # the id in the address first: collect() uses the same one to know a page it has already read
+    m = ID_IN_URL.search(url)
+    ident = m.group(1) if m else (S.first(ld, "identifier", "value") or url.rsplit("/", 1)[-1])
 
     salary = S.salary_of(ld)
     if not salary:
@@ -80,21 +81,21 @@ def _one(page: str, url: str) -> dict | None:
     quals = ld.get("qualifications") or ""
     req = N.short_req(skills=ld.get("skills") or "", description=desc, qualifications=quals)
 
-    if N.is_scam(req, desc, title, salary):
-        log.info("skipped (asks candidates for money): %s", url)
-        return None
-
+    # A post that seems to ask candidates for money is not dropped here: run.py holds it back
+    # from the site and lists it in the report for a person to look at.
     return N.post(
         id=f"nextjobz:{ident}",
         title=title,
         company=S.first(ld, "hiringOrganization", "name"),
-        cat=ld.get("occupationalCategory") or ld.get("industry"),
+        # the government section gives no category of its own
+        cat=ld.get("occupationalCategory") or ld.get("industry") or ("Government" if GOVERNMENT_PAGE in url else None),
         loc=loc or ("Remote" if remote else ""),
         type=N.employment_type(ld.get("employmentType")),
         salary=salary,
+        # the header's own figure first; when the page states none there, the sentence in the description
         exp=N.experience_text(S.first(ld, "experienceRequirements", "monthsOfExperience"),
-                              years.group(1) if years else ""),
-        edu=N.text_of(ld.get("educationRequirements")) or quals,
+                              years.group(1) if years else "") or N.experience_line(f"{N.text_of(quals)} {N.text_of(desc)}"),
+        edu=N.text_of(ld.get("educationRequirements")) or quals or N.education_line(desc),
         req=req,
         postedAt=N.iso_date(ld.get("datePosted")),
         # validThrough is this post's own date. Never read a deadline off the page text:
@@ -105,6 +106,7 @@ def _one(page: str, url: str) -> dict | None:
         url=N.text_of(ld.get("url")) or url,
         logo=S.first(ld, "hiringOrganization", "logo"),
         site=S.first(ld, "hiringOrganization", "url"),
+        text=f"{N.text_of(desc)} {N.text_of(quals)}",
     )
 
 

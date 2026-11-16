@@ -1,12 +1,15 @@
 name: Collect jobs
 
-# About 6 AM Bangladesh time (UTC+6), plus a "Run workflow" button.
-# 23:37 UTC rather than 00:00: GitHub queues scheduled runs, and the top of the
-# hour (midnight UTC most of all) is when everyone else schedules theirs. The
-# first run at '0 0 * * *' landed five hours late.
+# Two runs a day, plus a "Run workflow" button. GitHub's clock is UTC; Bangladesh is UTC+6.
+#   23:37 UTC  =  5:37 AM in Bangladesh (the next calendar day)
+#   07:37 UTC  =  1:37 PM in Bangladesh
+# An odd minute rather than :00 or :30: GitHub queues scheduled runs, and round times
+# are when everyone else schedules theirs (the first run at '0 0 * * *' landed five
+# hours late). A run can still start 5 to 30 minutes after its time.
 on:
   schedule:
     - cron: '37 23 * * *'
+    - cron: '37 7 * * *'
   workflow_dispatch:
     inputs:
       limit:
@@ -14,7 +17,7 @@ on:
         required: false
         default: '300'
       only:
-        description: 'Run one source only: nextjobz, alljobs, remote, companies'
+        description: 'Run one source only: its id in robot/sources.json (nextjobz, alljobs, sr-polygon, ...)'
         required: false
         default: ''
 
@@ -49,13 +52,23 @@ jobs:
 
       # The inputs reach the shell as environment variables, never as part of the
       # command text, so nothing typed into the form can run as a command.
+      #
+      # The AI step is switched off in robot/sources.json ("ai": {"enabled": false}): it never runs
+      # and no secret is needed, so this workflow does not mention one. To use the AI later:
+      #   1. add the repository secret GEMINI_API_KEY (Settings, Secrets and variables, Actions);
+      #   2. remove the "# " in front of the GEMINI_API_KEY line below;
+      #   3. set "enabled": true in robot/sources.json.
+      # (GitHub only hands a secret to a step that names it, and an editor warns about a named
+      # secret that does not exist yet. That is why step 2 cannot live in sources.json.)
       - name: Collect today's jobs
         env:
           LIMIT: ${{ github.event.inputs.limit || '300' }}
           ONLY: ${{ github.event.inputs.only }}
+          # GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
         run: |
           case "$LIMIT" in ''|*[!0-9]*) echo "limit must be a number"; exit 1;; esac
-          case "$ONLY" in ''|nextjobz|alljobs|remote|companies) ;; *) echo "unknown source: $ONLY"; exit 1;; esac
+          # a source id from robot/sources.json: small letters, digits and hyphens only
+          case "$ONLY" in *[!a-z0-9-]*) echo "not a source id: $ONLY"; exit 1;; esac
           if [ -n "$ONLY" ]; then
             python3 robot/run.py --limit "$LIMIT" --only "$ONLY"
           else
@@ -65,10 +78,12 @@ jobs:
       - name: Check the matching with the site's own engine
         run: node robot/classify.mjs
 
-      - name: Smoke test (a broken jobs.json is never committed or published)
+      - name: Tests (a broken jobs.json is never committed or published)
         run: |
           python3 build.py
           node tests/smoke.mjs
+          node --test tests/engine.test.mjs
+          python3 -m unittest discover -s tests -p "test_*.py"
 
       - name: Show the run
         run: |
@@ -77,16 +92,25 @@ jobs:
           import json, pathlib
           r = json.loads(pathlib.Path('robot/report.json').read_text())
           m = r.get('matching', {})
+          z = r.get('size') or {}
           print(f"- posts in jobs.json: **{r['run']['postsInFile']}** "
                 f"({r['run']['fileBytes'] // 1024} KB)")
+          if z:
+              print(f"- a phone downloads: **{z['downloadBytes'] // 1024} KB** of a {z['budgetBytes'] // 1024} KB budget"
+                    + ("" if z['withinBudget'] else " — **OVER THE BUDGET**"))
           print(f"- new this run: {r['run']['newPostsCollected']}")
           print(f"- per source: `{r.get('postsInFilePerSource')}`")
           print(f"- removed: `{r.get('removed')}`")
           if r.get('sourceFailures'):
               print(f"- failures: `{r['sourceFailures']}`")
+          if r.get('keywords'):
+              print(f"- keywords from full text: `{r['keywords']}`; government places: `{r.get('governmentPlaces')}`")
+          print(f"- AI step: {'on' if (r.get('ai') or {}).get('enabled') else 'off'}")
           if m:
               print(f"- no field found: {m['noFieldFound']['count']} ({m['noFieldFound']['percent']}%), "
-                    f"no location: {m['noLocationFound']['count']} ({m['noLocationFound']['percent']}%)")
+                    f"no location: {m['noLocationFound']['count']} ({m['noLocationFound']['percent']}%), "
+                    f"no skill: {m.get('noSkillFound', {}).get('percent', '?')}%, "
+                    f"no experience level: {m.get('noExperienceLevel', {}).get('percent', '?')}%")
           PY
 
       - name: Commit jobs.json and report.json when they changed

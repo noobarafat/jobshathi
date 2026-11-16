@@ -8,3 +8,7 @@ __pycache__/
 *service-account*.json
 *serviceAccount*.json
 *-firebase-adminsdk-*.json
+
+# Local output of the pilot run (the workflow adds it to the pilot branch on purpose)
+robot/pilot/
+.venv/

@@ -4,6 +4,7 @@
  *
  * Adds a "matching" section to robot/report.json.
  * Run from the repository root:  node robot/classify.mjs
+ * For a rehearsal:               node robot/classify.mjs <jobs file> <report file>
  */
 import { readFileSync, writeFileSync, existsSync } from 'node:fs';
 import { dirname, join } from 'node:path';
@@ -24,9 +25,12 @@ function loadEngine() {
   return vm.runInContext('Engine', ctx);
 }
 
+const JOBS_PATH = process.argv[2] || join(ROOT, 'jobs.json');
+const REPORT_PATH = process.argv[3] || join(HERE, 'report.json');
+
 function loadJobs() {
-  if (!existsSync(join(ROOT, 'jobs.json'))) return [];
-  const data = JSON.parse(read('jobs.json'));
+  if (!existsSync(JOBS_PATH)) return [];
+  const data = JSON.parse(readFileSync(JOBS_PATH, 'utf8'));
   return Array.isArray(data) ? data : (data.jobs || []);
 }
 
@@ -44,7 +48,9 @@ function nearestRole(title, roles) {
 
 const Engine = loadEngine();
 const raw = loadJobs();
+const readStarted = Date.now();
 const jobs = Engine.prepareJobs(raw);
+const engineReadMs = Date.now() - readStarted;   // the same work a visitor's phone does when the job list loads
 /* the engine does not carry the portal's own category through, so read it from the raw post */
 const rawById = new Map(raw.filter(r => r && r.id).map(r => [String(r.id), r]));
 
@@ -53,12 +59,16 @@ const roleList = Object.values(Engine.roleById || {});
 
 const perSource = {}, how = {};
 const noField = [], noLocation = [], noDeadline = [], noSalary = [];
+const noRole = [], noLevel = [], noSkill = [];
 const unknownTitles = new Map();
 
 for (const j of jobs) {
   const src = j.source || 'unknown';
   perSource[src] = (perSource[src] || 0) + 1;
   how[j.how] = (how[j.how] || 0) + 1;
+  if (!j.role) noRole.push(j.title);
+  if (!j.exp.stated && !j.exp.guess) noLevel.push(j.title);     // no experience stated, and the title gives no level either
+  if (!j.skills.length) noSkill.push(j.title);
   if (!j.field) {
     noField.push({ title: j.title, company: j.company, source: src });
     const key = j.title.trim();
@@ -68,7 +78,7 @@ for (const j of jobs) {
     if (portalCat) e.cats.add(portalCat);
     unknownTitles.set(key, e);
   }
-  if (!j.loc.places.length && !j.loc.remote && !j.loc.anywhere) {
+  if (!j.loc.places.length && !j.loc.remote && !j.loc.anywhere && !j.loc.abroad) {
     noLocation.push({ title: j.title, company: j.company, loc: j.loc.text || '', source: src });
   }
   if (j.deadline == null) noDeadline.push(j.title);
@@ -92,17 +102,21 @@ const top = [...unknownTitles.values()].sort((a, b) => b.count - a.count).slice(
 const pct = n => (jobs.length ? Math.round((n / jobs.length) * 100) : 0);
 const matching = {
   postsRead: jobs.length,
+  engineReadMs,                             // on this machine; a phone is several times slower
   postsPerSource: perSource,
-  classifiedHow: how,                       // title | spelling | category | skills | none
+  classifiedHow: how,                       // title | spelling | keyword | category | skills | none
   noFieldFound: { count: noField.length, percent: pct(noField.length), examples: noField.slice(0, 10) },
+  noRoleFound: { count: noRole.length, percent: pct(noRole.length) },
   noLocationFound: { count: noLocation.length, percent: pct(noLocation.length), examples: noLocation.slice(0, 10) },
+  noExperienceLevel: { count: noLevel.length, percent: pct(noLevel.length) },
+  noSkillFound: { count: noSkill.length, percent: pct(noSkill.length) },
   noDeadline: { count: noDeadline.length, percent: pct(noDeadline.length) },
   noSalary: { count: noSalary.length, percent: pct(noSalary.length) },
   topUnclassifiedTitles: top,
   note: 'suggestion lines are proposals only; src/taxonomy.js is never changed by the robot',
 };
 
-const reportPath = join(HERE, 'report.json');
+const reportPath = REPORT_PATH;
 const report = existsSync(reportPath) ? JSON.parse(readFileSync(reportPath, 'utf8')) : {};
 report.matching = matching;
 writeFileSync(reportPath, JSON.stringify(report, null, 1) + '\n');

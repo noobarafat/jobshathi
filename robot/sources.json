@@ -1,0 +1,68 @@
+{
+  "_readme": [
+    "Where JobShathi's job posts come from. Edit this file to add, remove, or switch off a source. No code change is needed.",
+    "Each source: id (your own short name), type, enabled (true or false), plus the settings of its type.",
+    "Types: nextjobz, alljobs, remote_boards, company_pages (the four original sources),",
+    "       smartrecruiters, lever, freshteam, trakstar (a company's own job board; 'company' is the board's name in its web address).",
+    "Optional for a company board: name (company name to show), site (company website, used for the logo), onlyPlaces (keep only posts whose place contains one of these words), location (SmartRecruiters only: the board's own location filter, e.g. 'Dhaka, BD').",
+    "The daily robot and the pilot run both read this file. The pilot run reads only the sources listed under 'pilot'.",
+    "A company board's posts stay on the site for as long as the board lists them, and are removed when the board removes them.",
+    "Switching a source off (enabled: false) also removes its posts from the site at the next run.",
+    "'ai' is the optional Gemini step. It is OFF: with enabled false it never runs, and the GEMINI_API_KEY secret is not needed. To turn it on: add the secret, then set enabled to true. 'summaries' adds the English and Bangla summaries (off).",
+    "'notRead' is the list of places the robot deliberately does not read, with the reason. It is shown in every report."
+  ],
+
+  "sources": [
+    { "id": "nextjobz", "type": "nextjobz", "enabled": true, "limit": 300 },
+    { "id": "alljobs", "type": "alljobs", "enabled": true, "limit": 300 },
+    { "id": "remote", "type": "remote_boards", "enabled": true },
+    { "id": "companies", "type": "company_pages", "enabled": false, "_note": "Off: the 7 companies in companies.json publish no structured job data at the usual addresses, so each run made 42 requests and found nothing. Put a company's exact careers address in companies.json ('careers'), then set enabled to true." },
+
+    { "id": "sr-polygon", "type": "smartrecruiters", "enabled": true, "company": "PolygonTechnology" },
+    { "id": "sr-nagorik", "type": "smartrecruiters", "enabled": true, "company": "NagorikTechnologiesLtd" },
+    { "id": "sr-gigalogy", "type": "smartrecruiters", "enabled": true, "company": "GigalogyInc", "location": "Dhaka, BD" },
+    { "id": "sr-niftycoders", "type": "smartrecruiters", "enabled": true, "company": "NiftyCodersPvtLtd" },
+    { "id": "sr-portonics", "type": "smartrecruiters", "enabled": true, "company": "PortonicsLimited" },
+    { "id": "sr-optimizely", "type": "smartrecruiters", "enabled": true, "company": "Optimizely", "location": "Dhaka, BD" },
+
+    { "id": "lever-fieldnation", "type": "lever", "enabled": true, "company": "fieldnation", "name": "Field Nation", "site": "https://fieldnation.com", "onlyPlaces": ["Dhaka"] },
+
+    { "id": "ft-shikho", "type": "freshteam", "enabled": true, "company": "shikho" },
+    { "id": "ft-technext", "type": "freshteam", "enabled": true, "company": "technext" },
+    { "id": "ft-6sense", "type": "freshteam", "enabled": true, "company": "6sensehq" },
+    { "id": "ft-tezzdigital", "type": "freshteam", "enabled": true, "company": "tezzdigital" },
+    { "id": "ft-talentedcube", "type": "freshteam", "enabled": true, "company": "talentedcube" },
+
+    { "id": "ts-therap", "type": "trakstar", "enabled": true, "company": "therap", "name": "Therap (BD) Ltd." },
+    { "id": "ts-kazsoftware", "type": "trakstar", "enabled": true, "company": "kazsoftware", "name": "Kaz Software" }
+  ],
+
+  "ai": {
+    "enabled": false,
+    "summaries": false,
+    "models": ["gemini-3.5-flash-lite", "gemini-3.1-flash-lite", "gemini-2.5-flash-lite"],
+    "postsPerCall": 6,
+    "maxCallsPerRun": 12,
+    "secondsBetweenCalls": 7,
+    "thinking": "minimal"
+  },
+
+  "pilot": {
+    "sources": ["sr-polygon", "sr-nagorik", "sr-gigalogy", "sr-niftycoders", "sr-portonics", "sr-optimizely",
+                "lever-fieldnation", "ft-shikho", "ft-technext", "ft-6sense", "ft-tezzdigital", "ft-talentedcube",
+                "ts-therap", "ts-kazsoftware", "nextjobz"],
+    "postsPerSource": 3,
+    "nextjobzPosts": 8,
+    "maxPostsToAI": 30
+  },
+
+  "notRead": [
+    { "name": "BDJobs", "why": "robots.txt blocks every robot" },
+    { "name": "LinkedIn", "why": "terms forbid scraping, and it blocks robots" },
+    { "name": "Facebook", "why": "terms forbid scraping, and it blocks robots" },
+    { "name": "Skill.jobs", "why": "terms forbid aggregating or linking to its content" },
+    { "name": "Shomvob", "why": "its jobs sit behind /api/, which its robots.txt disallows" },
+    { "name": "Remotive", "why": "terms ask that its jobs are not passed to other job sites" },
+    { "name": "SmartRecruiters Posting API (api.smartrecruiters.com)", "why": "that host's robots.txt disallows all robots; the public career pages are read instead" }
+  ]
+}

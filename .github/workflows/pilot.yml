@@ -1,0 +1,109 @@
+name: Pilot run (AI pipeline trial)
+
+# A small trial of the AI job pipeline. It reads a few posts, sends them to Gemini and
+# writes a report. It never changes jobs.json and never publishes the site.
+#
+# Two ways to start it:
+#   1. Push to the branch named "pilot": the report is committed back to that branch
+#      (robot/pilot/report.md), so it can be read without opening GitHub.
+#   2. The "Run workflow" button: the report is shown on the run's Summary page.
+on:
+  workflow_dispatch:
+  push:
+    branches: [pilot]
+
+permissions:
+  contents: write
+
+concurrency:
+  group: pilot
+  cancel-in-progress: true
+
+jobs:
+  pilot:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: pip
+
+      - name: Install what the robot needs
+        run: pip install -r robot/requirements.txt
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      # The results go to a file as well, so a failure can be read on the pilot branch.
+      - name: Tests (no network)
+        run: |
+          set -o pipefail
+          mkdir -p robot/pilot
+          { python3 build.py && node tests/smoke.mjs && node --test tests/engine.test.mjs && python3 -m unittest discover -s tests -p "test_*.py"; } 2>&1 | tee robot/pilot/tests.txt
+
+      # The AI step is switched off in robot/sources.json ("ai": {"enabled": false}): it never runs
+      # and no secret is needed, so this workflow does not mention one. To try the AI later: add
+      # the repository secret GEMINI_API_KEY, replace the "PILOT: '1'" line below with
+      #     GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+      # and set "enabled": true in robot/sources.json. The key then exists only inside this
+      # step, is never printed, and is never written to a file or the report.
+      # A push whose last commit message holds "[rehearsal only]" skips this step and runs only the rehearsal below.
+      - name: Pilot run
+        if: always() && !contains(github.event.head_commit.message, '[rehearsal only]')
+        env:
+          PILOT: '1'
+        run: |
+          set -o pipefail
+          mkdir -p robot/pilot
+          python3 robot/pilot.py 2>&1 | tee robot/pilot/log.txt
+
+      # The whole daily robot, with every source that is switched on, writing to a temporary file:
+      # jobs.json is not touched and nothing is published. Only the run's report is kept.
+      - name: Rehearsal of the daily robot
+        if: always()
+        run: |
+          set -o pipefail
+          mkdir -p robot/pilot "$RUNNER_TEMP/rehearsal"
+          {
+            python3 robot/run.py --limit 40 --out "$RUNNER_TEMP/rehearsal/jobs.json" &&
+            node robot/classify.mjs "$RUNNER_TEMP/rehearsal/jobs.json" "$RUNNER_TEMP/rehearsal/report.json" &&
+            cp "$RUNNER_TEMP/rehearsal/report.json" robot/pilot/rehearsal-report.json &&
+            echo "size, measured with the gzip program: $(wc -c < "$RUNNER_TEMP/rehearsal/jobs.json") bytes as a file, $(gzip -5 -c "$RUNNER_TEMP/rehearsal/jobs.json" | wc -c) bytes compressed the way GitHub Pages serves it (gzip level 5); the budget is $((350 * 1024)) bytes" &&
+            git diff --quiet -- jobs.json robot/report.json && echo "jobs.json and robot/report.json were not touched"
+          } 2>&1 | grep -v "^INFO robot.fetch" | tee robot/pilot/rehearsal-log.txt
+
+      - name: Show the report
+        if: always()
+        run: |
+          if [ -f robot/pilot/report.md ]; then cat robot/pilot/report.md >> "$GITHUB_STEP_SUMMARY"; else echo "No report was written." >> "$GITHUB_STEP_SUMMARY"; fi
+
+      - name: Keep the report as a download
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: pilot-report
+          path: robot/pilot/
+          if-no-files-found: ignore
+
+      - name: Commit the report to the pilot branch
+        if: always() && github.ref_name == 'pilot'
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          # Put the report on top of whatever the branch holds now, so pressing "Re-run all jobs"
+          # on an older run still works.
+          rm -rf "$RUNNER_TEMP/pilot-report" && cp -r robot/pilot "$RUNNER_TEMP/pilot-report"
+          git fetch origin pilot
+          git checkout -f -B pilot origin/pilot
+          rm -rf robot/pilot && cp -r "$RUNNER_TEMP/pilot-report" robot/pilot
+          git add -f robot/pilot
+          if git diff --staged --quiet; then
+            echo "no report to commit"
+          else
+            git commit -m "Pilot report $(date -u +%Y-%m-%dT%H:%MZ)"
+            git push origin pilot
+          fi

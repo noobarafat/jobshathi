@@ -1,0 +1,17 @@
+{
+  "_readme": [
+    "Government circulars often give no place: it is only inside the PDF advertisement, which the robot cannot read.",
+    "When an organisation works from one place, write it here and its posts get that place.",
+    "Left side: part of the organisation's name, as it appears on the post (capital and small letters do not matter).",
+    "Right side: a district in English as the site spells it (Dhaka, Chattogram, Khulna, Bogura, ...), or 'Area, District' (Agargaon, Dhaka).",
+    "Do not add an organisation that hires for offices all over the country (Bangladesh Post Office, Bangladesh Police, the banks): leave those without a place.",
+    "The robot never guesses a place. An organisation whose own name says the place (Ashuganj Power Station, Dhaka WASA) is found without this file."
+  ],
+  "places": {
+    "Bangladesh Parliament Secretariat": "Dhaka",
+    "Supreme Court of Bangladesh": "Dhaka",
+    "National Academy for Computer Training and Research": "Bogura",
+    "Bangladesh Cable Shilpa": "Khulna",
+    "Bangladesh Fisheries Research Institute": "Mymensingh"
+  }
+}
