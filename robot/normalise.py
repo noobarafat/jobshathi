@@ -31,17 +31,36 @@ SCAM = [
     )
 ] + [re.compile(p) for p in (r"জামানত", r"রেজিস্ট্রেশন ফি", r"টাকা জমা")]
 
+def _rx(pattern: str, flags=re.I):
+    """A pattern in the same Unicode form text_of() gives the text (Bangla letters such as য় have two)."""
+    return re.compile(unicodedata.normalize("NFC", pattern), flags)
+
+
 # Short phrases worth keeping in `req` because the engine looks for them.
 SIGNALS = [
-    re.compile(r"freshers?[^.]{0,40}(are\s+)?(also\s+)?(encouraged|welcome|can apply|may apply)", re.I),
-    re.compile(r"no experience (is )?(needed|required)", re.I),
-    re.compile(r"ফ্রেশার[^।.]{0,30}", re.I),
-    re.compile(r"(age|বয়স)[^.।]{0,40}?\d{2}[^.।]{0,25}", re.I),
-    re.compile(r"(only|শুধুমাত্র|শুধু)\s*(females?|males?|নারী|পুরুষ)[^.।]{0,20}", re.I),
-    re.compile(r"(females?|males?|নারী|পুরুষ)\s*(candidates?\s*)?only", re.I),
-    re.compile(r"(driving|driver'?s?|valid)\s+licen[cs]e[^.।]{0,20}", re.I),
-    re.compile(r"ড্রাইভিং লাইসেন্স", re.I),
+    _rx(r"freshers?[^.]{0,40}(are\s+)?(also\s+)?(encouraged|welcome|can apply|may apply)"),
+    _rx(r"no experience (is )?(needed|required)"),
+    _rx(r"ফ্রেশার[^।.]{0,30}"),
+    _rx(r"অভিজ্ঞতার প্রয়োজন নেই"),
+    _rx(r"(age|বয়স)[^.।]{0,40}?\d{2}[^.।]{0,25}"),
+    _rx(r"(only|শুধুমাত্র|শুধু)\s*(females?|males?|নারী|পুরুষ)[^.।]{0,20}"),
+    _rx(r"(females?|males?|নারী|পুরুষ)\s*(candidates?\s*)?only"),
+    _rx(r"(driving|driver'?s?|valid)\s+licen[cs]e[^.।]{0,20}"),
+    _rx(r"ড্রাইভিং লাইসেন্স"),
 ]
+
+# How a post words the experience and the education it asks for. A company's own board gives no
+# separate field for either: they are sentences in the description.
+_NUM = r"[\d০-৯]+(?:\.[\d০-৯]+)?"
+_SPAN = r"\s*(?:\+|(?:to|-|–|থেকে|হতে)\s*" + _NUM + r")?\s*\+?\s*"
+EXPERIENCE = [
+    _rx(_NUM + _SPAN + r"(?:years?|yrs?|year\(s\))['’s]*\s*(?:of\s+)?(?:[a-z-]+\s+){0,3}experience"),
+    _rx(r"experience\s*(?:of|:|-)?\s*(?:at least|minimum|min\.?)?\s*" + _NUM + _SPAN + r"(?:years?|yrs?|year\(s\))"),
+    _rx(_NUM + _SPAN + r"(?:বছর|বৎসর)(?:ের)?\s*(?:বাস্তব\s*)?(?:কাজের\s*)?অভিজ্ঞতা"),
+    _rx(r"অভিজ্ঞতা[^।.\d০-৯]{0,20}" + _NUM + _SPAN + r"(?:বছর|বৎসর)"),
+]
+REQUIREMENTS_START = _rx(r"requirements?|qualifications?|what you(?:'ll| will)? (?:need|bring)|who you are|you (?:should |must )?have|eligibility|যোগ্যতা")
+EDUCATION = _rx(r"(?:bachelor|\bb\.?\s?sc\b|\bbba\b|\bmba\b|master'?s?\b|\bm\.?\s?sc\b|post[- ]?graduat\w*|graduat(?:e|ion)\b|diploma|honou?rs|\bhsc\b|\bssc\b|স্নাতকোত্তর|স্নাতক|ডিপ্লোমা|এইচএসসি|এসএসসি)[^.;।\n]{0,60}")
 
 TAGS = re.compile(r"<[^>]+>")
 SPACES = re.compile(r"\s+")
@@ -134,6 +153,21 @@ def is_scam(*parts: str) -> bool:
     return any(p.search(blob) for p in SCAM)
 
 
+def is_government(job: dict) -> bool:
+    """A government circular. Its application fee ("টাকা জমা", "processing fee" paid through Teletalk)
+    is official, so the money rule does not apply to it."""
+    return ("govern" in str(job.get("cat") or "").lower()
+            or str(job.get("id") or "").startswith("alljobs:")
+            or "/gov-jobs/" in str(job.get("url") or ""))
+
+
+def asks_for_money(job: dict) -> bool:
+    """The money rule for one post: its keywords, title, pay line and (when still held) full text."""
+    if is_government(job):
+        return False
+    return is_scam(job.get("_text", ""), job.get("req", ""), job.get("title", ""), job.get("salary", ""))
+
+
 def short_req(skills="", description="", qualifications="", limit: int = 300) -> str:
     """Only what the matcher needs: skill keywords plus short requirement signals.
 
@@ -149,19 +183,72 @@ def short_req(skills="", description="", qualifications="", limit: int = 300) ->
             seen.add(key)
             bits.append(piece)
 
-    if isinstance(skills, (list, tuple, set)):
-        skills = ", ".join(str(s) for s in skills)
-    for s in re.split(r"[,;|/\n]+", text_of(skills)):
-        add(s)
-
+    # the short requirement signals first (there are few of them), then the skill words
     blob = " ".join(text_of(x) for x in (qualifications, description))
     for pat in SIGNALS:
         for m in pat.finditer(blob):
             add(m.group(0))
 
+    if isinstance(skills, (list, tuple, set)):
+        skills = ", ".join(str(s) for s in skills)
+    for s in re.split(r"[,;|/\n]+", text_of(skills)):
+        add(s)
+
     out = ""
     for b in bits:
         candidate = f"{out}, {b}" if out else b
+        if len(candidate) > limit:
+            break
+        out = candidate
+    return out
+
+
+def experience_line(text) -> str:
+    """The post's own wording of the experience it asks for ("2 to 4 years of hands-on experience"), or ""."""
+    t = text_of(text)
+    if not t:
+        return ""
+    hits = []
+    for pat in EXPERIENCE:
+        for m in pat.finditer(t):
+            years = [float(x) for x in re.findall(r"\d+(?:\.\d+)?", digits(m.group(0)))]
+            if years and max(years) <= 15:       # "25 years of experience in the industry" is the company describing itself
+                hits.append((m.start(), m.group(0)))
+    if not hits:
+        return ""
+    start = REQUIREMENTS_START.search(t)        # a number in the requirements part is the one that counts
+    later = [h for h in hits if start and h[0] >= start.start()]
+    return digits(min(later or hits)[1]).strip()[:70]
+
+
+def requirements_part(text) -> str:
+    """A description from its "Requirements" / "Qualifications" heading on, or all of it when there is none.
+
+    The introduction of a company and its list of benefits name many things that are not asked of the candidate.
+    """
+    t = text_of(text)
+    m = REQUIREMENTS_START.search(t)
+    return t[m.start():] if m and len(t) - m.start() >= 80 else t
+
+
+def education_line(text) -> str:
+    """The post's own wording of the education it asks for ("Bachelor's degree in CSE"), or ""."""
+    t = text_of(text)
+    start = REQUIREMENTS_START.search(t) if t else None
+    m = (EDUCATION.search(t, start.start()) if start else None) or (EDUCATION.search(t) if t else None)
+    return m.group(0).strip(" ,:-")[:80] if m else ""
+
+
+def keywords_req(skills, req: str = "", limit: int = 300) -> str:
+    """`req` with the dictionary's skills in front: what the matcher needs, never the description."""
+    parts, seen = [], set()
+    for piece in list(skills or []) + [p.strip() for p in re.split(r",\s+", req or "")]:
+        if piece and piece.lower() not in seen:
+            seen.add(piece.lower())
+            parts.append(piece)
+    out = ""
+    for p in parts:
+        candidate = f"{out}, {p}" if out else p
         if len(candidate) > limit:
             break
         out = candidate
@@ -200,6 +287,9 @@ def post(**kw) -> dict:
     text = text_of(kw.get("text"))
     if text:
         out["_text"] = text[:TEXT_FOR_AI]
+        # what the keyword step reads: the part that says what the candidate must have, when a reader
+        # can point to it (skills_text), else from the first "Requirements" heading on
+        out["_kw"] = (text_of(kw.get("skills_text")) or requirements_part(text))[:TEXT_FOR_AI]
     return out
 
 

@@ -29,6 +29,8 @@ jobs:
           node-version: '20'
       - name: Smoke test (a failing build is never published)
         run: node tests/smoke.mjs
+      - name: Tests for the matching engine
+        run: node --test tests/engine.test.mjs
       - name: Unit tests for the robot (no network)
         run: python3 -m unittest discover -s tests -p "test_*.py"
       - uses: actions/configure-pages@v5

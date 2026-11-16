@@ -1,18 +1,22 @@
 #!/usr/bin/env python3
-"""A small trial run of the AI pipeline.
+"""A small trial run of the job pipeline.
 
-Reads a few posts from the sources listed under "pilot" in robot/sources.json, sends
-them through the AI step, and writes what came back for a person to check:
+Reads a few posts from the sources listed under "pilot" in robot/sources.json, puts them
+through the same steps as the daily robot (keywords from the full text, then the site's
+own matcher), and writes what came out for a person to check:
 
-  robot/pilot/report.md    the readable report (sources, time, AI calls, sizes, every sample job)
+  robot/pilot/report.md    the readable report (sources, time, how well posts were read, every sample job)
   robot/pilot/result.json  the same data as JSON
 
 It NEVER touches jobs.json and nothing it writes is published on the site.
 Job descriptions are read but not written to either file.
 
+The AI step runs only when robot/sources.json says "ai": {"enabled": true}. It is off:
+this script then needs no key at all.
+
 Run from the repository root:
-  python3 robot/pilot.py              # needs GEMINI_API_KEY in the environment
-  python3 robot/pilot.py --fake-ai    # no key needed: a stand-in service, to test the plumbing
+  python3 robot/pilot.py
+  python3 robot/pilot.py --fake-ai    # exercise the AI step with a stand-in service (no key needed)
 """
 from __future__ import annotations
 
@@ -33,7 +37,7 @@ sys.path.insert(0, str(HERE))
 
 import ai                                    # noqa: E402
 import normalise as N                        # noqa: E402
-from fetcher import Fetcher                  # noqa: E402
+import run as robot                          # noqa: E402
 from sources import ats, nextjobz            # noqa: E402
 
 DHAKA = timezone(timedelta(hours=6))
@@ -62,8 +66,8 @@ def collect(cfg: dict, fetcher) -> tuple[list[dict], list[dict]]:
         for j in got:
             j["_src"], j["_kind"] = sid, src["type"]
         jobs.extend(got)
-        rows.append({"id": sid, "type": src["type"], "company": src.get("company", ""), **info,
-                     "seconds": round(time.monotonic() - t0, 1)})
+        rows.append({"id": sid, "type": src["type"], "company": src.get("company", ""),
+                     **{k: v for k, v in info.items() if k != "ids"}, "seconds": round(time.monotonic() - t0, 1)})
     return jobs, rows
 
 
@@ -74,7 +78,7 @@ def quality(jobs: list[dict]) -> tuple[list[dict], dict]:
         if not str(j.get("url") or "").lower().startswith(("http://", "https://")):
             counts["noApplyLink"] += 1
             continue
-        if N.is_scam(j.get("_text", ""), j.get("req", ""), j.get("title", ""), j.get("salary", "")):
+        if N.asks_for_money(j):
             j["_flag"] = "asks candidates for money (rule)"
             counts["flaggedByRules"] += 1
         kept.append(j)
@@ -95,24 +99,39 @@ def pick(jobs: list[dict], most: int) -> list[dict]:
     return out
 
 
-def sizes(done: list[dict]) -> dict:
-    """How much the AI data would add to jobs.json, measured on this sample."""
-    out = {"sample": len(done)}
+def read_all(jobs: list[dict]) -> dict:
+    """How the site's matcher reads each post, as it would be stored (without the description)."""
+    return robot.ask_dictionary([{"id": j["id"], "post": N.public(j)} for j in jobs if j.get("id")])
+
+
+def rates(jobs: list[dict]) -> dict:
+    """Of the posts the matcher read: how many got a field, a role, a place, a level, a skill."""
+    read = [j["_read"] for j in jobs if j.get("_read")]
+    n = len(read)
+
+    def share(test):
+        hit = sum(1 for r in read if test(r))
+        return {"count": hit, "percent": round(100 * hit / n, 1) if n else 0}
+    return {"posts": n,
+            "field": share(lambda r: r["field"]), "role": share(lambda r: r["role"]), "place": share(lambda r: r["located"]),
+            "experienceStated": share(lambda r: r["experience"]),
+            "experienceLevel": share(lambda r: r["experience"] or r["levelFromTitle"]),
+            "education": share(lambda r: r["education"] is not None), "skill": share(lambda r: r["skills"]),
+            "skillsPerPost": round(sum(len(r["skills"]) for r in read) / n, 1) if n else 0}
+
+
+def sizes(jobs: list[dict]) -> dict:
+    """What a post costs in jobs.json, measured on this run's posts."""
+    out = {"sample": len(jobs)}
     path = ROOT / "jobs.json"
     if path.exists():
         data = json.loads(path.read_text(encoding="utf-8"))
         rows = data.get("jobs") if isinstance(data, dict) else data
         raw = compact(data).encode()
-        out.update(posts=len(rows), nowRaw=len(raw), nowGzip=len(gzip.compress(raw, 6)))
-    if not done:
-        return out
-    short = [(',"ai":' + compact(j["ai"])).encode() for j in done]
-    summ = [(',"sum":' + compact(j["_sum"])).encode() for j in done]
-    out["shortPerPost"] = round(sum(map(len, short)) / len(done))
-    out["summariesPerPost"] = round(sum(map(len, summ)) / len(done))
-    # a small sample compresses worse than a big file, so these two are on the careful side
-    out["shortGzipRatio"] = round(len(gzip.compress(b"".join(short), 6)) / sum(map(len, short)), 2)
-    out["summariesGzipRatio"] = round(len(gzip.compress(b"".join(summ), 6)) / sum(map(len, summ)), 2)
+        out.update(posts=len(rows), nowRaw=len(raw), nowGzip=len(gzip.compress(raw, 6)), nowPerPost=round(len(raw) / max(1, len(rows))))
+    if jobs:
+        each = [len(compact(N.public(j)).encode()) for j in jobs]
+        out["pilotPerPost"] = round(sum(each) / len(each))
     return out
 
 
@@ -121,28 +140,44 @@ def kb(n) -> str:
     return f"{n / 1024:,.0f} KB"
 
 
+def level_words(r: dict) -> str:
+    e = r.get("experience")
+    if e:
+        if e.get("fresher") and not e.get("min"):
+            return "freshers can apply (stated)"
+        return f"{e['min']:g}" + (f" to {e['max']:g}" if e.get("max") else "+") + " years (stated)"
+    if r.get("levelFromTitle"):
+        return f"{r['levelFromTitle']} (from the title; the post states none)"
+    return "NOT FOUND"
+
+
 def report_md(r: dict) -> str:
-    a, L = r["ai"], []
-    L.append("# JobShathi pilot run: AI job pipeline\n")
+    L = []
+    L.append("# JobShathi pilot run\n")
     L.append(f"Run at {r['startedAt']} (Bangladesh time). This run did not change `jobs.json` and published nothing.\n")
 
+    q = r["rates"]
     L.append("## 1. Result in short\n")
     L.append(f"- Posts collected: **{r['collected']}** from {len(r['sources'])} sources "
              f"({r['quality']['noApplyLink']} dropped for having no apply link)")
-    L.append(f"- Posts sent to the AI: **{a['wanted']}**. Came back correct: **{a['done']}**. "
-             f"Failed the check twice (kept with basic fields only): **{a['failedCheck']}**")
-    L.append(f"- AI calls that returned an answer: **{a['answers']}** (HTTP requests sent in all: {a['requests']}; "
-             f"waits after a rate limit or server error: {a['waits']}; posts asked for a second time: {a['askedAgain']})")
-    L.append(f"- Model: `{a['model'] or 'none'}`, request type: `{a['shape'] or 'none'}`"
-             + ("  **(stand-in service, not the real AI)**" if r["fake"] else ""))
-    L.append(f"- Tokens: {a['usage']['input']:,} in, {a['usage']['output']:,} out, {a['usage']['thinking']:,} thinking")
-    L.append(f"- Time: collecting {r['seconds']['collect']}s, AI {r['seconds']['ai']}s, total {r['seconds']['total']}s")
+    L.append(f"- AI step: **{'on' if r['ai']['enabled'] else 'off'}**"
+             + ("" if r["ai"]["enabled"] else " (switched off in `robot/sources.json`; no key is needed and none was read)"))
+    L.append(f"- Keywords: the dictionary read the full text of {r['keywords'].get('postsRead', 0)} posts "
+             f"and found skills in {r['keywords'].get('postsWithSkills', 0)}"
+             + ("" if r["keywords"].get("ran") else " (**the dictionary step did not run**)"))
+    L.append(f"- Time: collecting {r['seconds']['collect']}s, reading {r['seconds']['read']}s, total {r['seconds']['total']}s")
     L.append(f"- Flagged as possible scam: {r['flagged']} (by rules: {r['quality']['flaggedByRules']})")
-    if a["stopped"]:
-        L.append(f"- **The AI step stopped early:** {a['stopped']}")
     if r.get("crash"):
         L.append(f"- **The run hit an error:** `{r['crash']}`")
     L.append("")
+    if q.get("posts"):
+        L.append(f"How well the site's matcher read these {q['posts']} posts, with rules only (no AI):\n")
+        L.append("| | Found in | |")
+        L.append("| --- | --- | --- |")
+        for label, key in (("Field", "field"), ("Role", "role"), ("Place", "place"), ("Experience stated in the post", "experienceStated"),
+                           ("Experience level (stated, or from the title)", "experienceLevel"), ("Education", "education"), ("At least one skill", "skill")):
+            L.append(f"| {label} | {q[key]['count']} of {q['posts']} | {q[key]['percent']}% |")
+        L.append(f"\nSkills found per post, on average: {q['skillsPerPost']}\n")
 
     L.append("## 2. Sources\n")
     L.append("| Source | System | How it is read | Live jobs listed | Read in this pilot | Seconds | Problem |")
@@ -160,110 +195,97 @@ def report_md(r: dict) -> str:
 
     z = r["sizes"]
     L.append("## 3. File size\n")
-    if z.get("posts") and z.get("shortPerPost"):
-        n = z["posts"]
-        short_raw, sum_raw = z["shortPerPost"] * n, z["summariesPerPost"] * n
-        short_gz, sum_gz = short_raw * z["shortGzipRatio"], sum_raw * z["summariesGzipRatio"]
-        L.append(f"Measured on the {z['sample']} sample posts, then multiplied by the {n:,} posts in today's `jobs.json`. "
-                 "Phones download the compressed (gzip) size.\n")
-        L.append("| | Raw | Compressed (what a phone downloads) |")
-        L.append("| --- | --- | --- |")
-        L.append(f"| `jobs.json` today | {kb(z['nowRaw'])} | {kb(z['nowGzip'])} |")
-        L.append(f"| + short AI fields ({z['shortPerPost']} bytes a post) | +{kb(short_raw)} | about +{kb(short_gz)} |")
-        L.append(f"| + both summaries ({z['summariesPerPost']} bytes a post) | +{kb(sum_raw)} | about +{kb(sum_gz)} |")
-        L.append(f"| **A. Everything in `jobs.json`** | {kb(z['nowRaw'] + short_raw + sum_raw)} | about {kb(z['nowGzip'] + short_gz + sum_gz)} |")
-        L.append(f"| **B. Short fields in `jobs.json`, summaries in separate files** | {kb(z['nowRaw'] + short_raw)} | about {kb(z['nowGzip'] + short_gz)} |")
-        L.append("\nThe compressed figures are estimates from a small sample, so they lean high.\n")
+    if z.get("posts") and z.get("pilotPerPost"):
+        L.append(f"`jobs.json` today: {z['posts']:,} posts, {kb(z['nowRaw'])} ({kb(z['nowGzip'])} compressed, which is what a phone downloads), "
+                 f"{z['nowPerPost']} bytes a post. A post from this run is {z['pilotPerPost']} bytes. "
+                 "No summaries and no AI fields are stored, so a new post costs about the same as an old one.\n")
     else:
-        L.append("Not measured (no AI answers, or no `jobs.json`).\n")
+        L.append("Not measured.\n")
 
     L.append(f"## 4. Sample jobs ({len(r['jobs'])})\n")
-    L.append("\"From the source\" is what the site has today without AI. \"AI\" is what Gemini returned. Open the link to compare with the real post.\n")
+    L.append("\"From the source\" is what is stored. \"The matcher reads\" is what the site makes of it with rules only. Open the link to compare with the real post.\n")
     for i, j in enumerate(r["jobs"], 1):
-        x = j.get("ai") or {}
         L.append(f"### {i}. {j.get('title', '')} ({j.get('company', '') or 'no company'})\n")
-        L.append(f"Source: {j.get('source', '')} · posted {j.get('postedAt', 'date not given')} · "
-                 f"[original post]({j.get('url', '')}) · the AI read {j.get('textChars', 0):,} characters of it\n")
-        src_bits = [f"place: {j['loc']}" if j.get("loc") else "", f"type: {j['type']}" if j.get("type") else "",
-                    f"category: {j['cat']}" if j.get("cat") else "", f"experience: {j['exp']}" if j.get("exp") else "",
-                    f"salary: {j['salary']}" if j.get("salary") else "", f"deadline: {j['deadline']}" if j.get("deadline") else ""]
-        L.append("- **From the source:** " + ("; ".join(b for b in src_bits if b) or "title and link only"))
-        if not x:
-            L.append(f"- **AI:** none ({'failed the check twice' if j.get('aiSkip') else 'not sent in this run'})\n")
+        L.append(f"Source: {j.get('source', '')} · posted {j.get('postedAt', 'date not given')} · [original post]({j.get('url', '')})\n")
+        bits = [f"place: {j['loc']}" if j.get("loc") else "", f"type: {j['type']}" if j.get("type") else "",
+                f"category: {j['cat']}" if j.get("cat") else "", f"experience: {j['exp']}" if j.get("exp") else "",
+                f"education: {j['edu']}" if j.get("edu") else "", f"salary: {j['salary']}" if j.get("salary") else "",
+                f"deadline: {j['deadline']}" if j.get("deadline") else ""]
+        L.append("- **From the source:** " + ("; ".join(b for b in bits if b) or "title and link only"))
+        L.append(f"- **Keywords kept:** {j.get('req') or 'none'}")
+        m = j.get("read")
+        if not m:
+            L.append("- **The matcher reads:** nothing (the post has expired or has no title)\n")
             continue
-        yrs = ""
-        if "minYears" in x or "maxYears" in x:
-            lo, hi = x.get("minYears"), x.get("maxYears")
-            yrs = f" ({lo if lo is not None else '?'}" + (f" to {hi}" if hi is not None else "+") + " years)"
-        L.append(f"- **AI title:** {x.get('title', '(same)')}")
-        L.append(f"- **Field:** {x.get('field', '?')} ({r['fields'].get(x.get('field'), 'other')}) · **Level:** {x.get('level', 'not stated')}{yrs}"
-                 f" · **Type:** {x.get('type', 'not stated')} · **Mode:** {x.get('mode', 'not stated')}")
-        L.append(f"- **City / area:** {x.get('city', 'not stated')} / {x.get('area', 'not stated')} · **Education:** {x.get('edu', 'not stated')}"
-                 f" · **Salary:** {x.get('salary', 'not stated')} · **Deadline:** {x.get('deadline', 'not stated')}")
-        L.append(f"- **Required skills:** {', '.join(x.get('skills', [])) or 'none found'}")
-        L.append(f"- **Nice to have:** {', '.join(x.get('nice', [])) or 'none found'}")
-        L.append(f"- **English:** {j['sum']['en']}")
-        L.append(f"- **বাংলা:** {j['sum']['bn']}")
-        L.append(f"- **Scam flag:** {'YES: ' + j['flag'] if j.get('flag') else 'no'}\n")
-
-    if a["problems"] or a["errors"]:
+        field = f"{m['fieldName']}" + (f" / {m['roleName']}" if m.get("roleName") else " / no role") if m.get("field") else "NOT FOUND"
+        where = "remote" if m.get("remote") and not m.get("place") else (m.get("place") or ("anywhere in Bangladesh" if m.get("anywhere") else "NOT FOUND"))
+        if m.get("placeFrom") == "title" and m.get("place"):
+            where += " (from the title)"
+        L.append(f"- **The matcher reads:** field and role: **{field}** (by {m['how']}) · place: **{where}**"
+                 f" · experience: **{level_words(m)}** · type: {m.get('type')}")
+        L.append(f"- **Skills found:** {', '.join(m.get('skills') or []) or 'NONE'}")
+        if j.get("ai"):
+            L.append(f"- **AI:** {compact(j['ai'])}")
+        if j.get("flag"):
+            L.append(f"- **Scam flag:** YES: {j['flag']}")
+        L.append("")
+    if r["ai"].get("problems") or r["ai"].get("errors"):
         L.append("## 5. Problems the AI step met\n")
-        for p in (a["errors"] + a["problems"])[:40]:
+        for p in (r["ai"].get("errors", []) + r["ai"].get("problems", []))[:40]:
             L.append(f"- {p}")
         L.append("")
     return "\n".join(L) + "\n"
 
 
 def main() -> int:
-    ap = argparse.ArgumentParser(description="Trial run of the AI pipeline (never writes jobs.json)")
-    ap.add_argument("--fake-ai", action="store_true", help="use a stand-in for Gemini (no key needed)")
+    ap = argparse.ArgumentParser(description="Trial run of the job pipeline (never writes jobs.json)")
+    ap.add_argument("--fake-ai", action="store_true", help="run the AI step with a stand-in for Gemini (no key needed)")
     ap.add_argument("--out", default=str(HERE / "pilot"))
     args = ap.parse_args()
     logging.basicConfig(level=logging.INFO, format="%(levelname)s %(name)s: %(message)s")
 
     started = datetime.now(DHAKA)
     t_start = time.monotonic()
-    cfg = json.loads((HERE / "sources.json").read_text(encoding="utf-8"))
-    fields = ai.fields_from_repo()
-    conf = cfg.get("ai", {})
-    r = {"startedAt": started.isoformat(timespec="seconds"), "fake": args.fake_ai, "fields": fields,
-         "notRead": cfg.get("notRead", []), "sources": [], "collected": 0, "flagged": 0, "jobs": [],
-         "quality": {"noApplyLink": 0, "flaggedByRules": 0}, "blocked": [], "failed": [], "sizes": {},
-         "seconds": {"collect": 0, "ai": 0, "total": 0},
-         "ai": {"wanted": 0, "done": 0, "failedCheck": 0, "askedAgain": 0, "stopped": "", "problems": [], "errors": [],
-                "answers": 0, "requests": 0, "waits": 0, "model": None, "shape": None,
-                "usage": {"input": 0, "output": 0, "thinking": 0}}}
-    key = os.environ.get("GEMINI_API_KEY", "").strip()
+    cfg = robot.load_config()
+    cfg.setdefault("pilot", {"sources": [s["id"] for s in cfg["sources"] if s.get("type") == "nextjobz"]})
+    conf = dict(cfg.get("ai") or {})
+    r = {"startedAt": started.isoformat(timespec="seconds"), "notRead": cfg.get("notRead", []), "sources": [], "collected": 0,
+         "flagged": 0, "jobs": [], "quality": {"noApplyLink": 0, "flaggedByRules": 0}, "blocked": [], "failed": [], "sizes": {},
+         "keywords": {}, "rates": {}, "ai": {"enabled": False}, "seconds": {"collect": 0, "read": 0, "total": 0}}
+    key = ""
     try:
+        from fetcher import Fetcher
         fetcher = Fetcher()
         jobs, r["sources"] = collect(cfg, fetcher)
         r["collected"] = len(jobs)
         r["blocked"], r["failed"] = fetcher.blocked[:20], fetcher.failed[:20]
         r["seconds"]["collect"] = round(time.monotonic() - t_start, 1)
         jobs, r["quality"] = quality(jobs)
-        sample = pick(jobs, cfg["pilot"].get("maxPostsToAI", 30))
 
-        t_ai = time.monotonic()
-        session = None
-        if args.fake_ai:
+        t_read = time.monotonic()
+        r["keywords"] = robot.add_keywords(jobs)
+
+        if args.fake_ai:                          # only to exercise the AI code path: never the real service
             sys.path.insert(0, str(ROOT / "tests"))
             from fake_gemini import FakeSession
-            session, key = FakeSession(), "fake-key"
-        client = ai.Gemini(key, conf.get("models", ["gemini-3.5-flash-lite"]),
-                           pause=0 if args.fake_ai else conf.get("secondsBetweenCalls", 7),
-                           max_requests=conf.get("maxCallsPerRun", 12), thinking=conf.get("thinking", "minimal"),
-                           session=session)
-        stats = ai.enrich(sample, client, fields, posts_per_call=conf.get("postsPerCall", 6))
-        r["seconds"]["ai"] = round(time.monotonic() - t_ai, 1)
-        r["ai"].update(stats, answers=client.answers, requests=client.requests, waits=client.waits,
-                       model=client.model, shape=client.shape, usage=client.usage, errors=client.errors[:20])
-        r["flagged"] = sum(1 for j in sample if j.get("_flag"))
-        r["sizes"] = sizes([j for j in sample if j.get("ai")])
-        for j in sample:                          # what is written: never the description
+            client = ai.Gemini("fake-key", conf.get("models", ["fake"]), pause=0, max_requests=conf.get("maxCallsPerRun", 12), session=FakeSession())
+            stats = ai.enrich(pick(jobs, cfg["pilot"].get("maxPostsToAI", 30)), client, ai.fields_from_repo(),
+                              posts_per_call=conf.get("postsPerCall", 6), summaries=bool(conf.get("summaries")))
+            r["ai"] = {"enabled": True, "fake": True, **stats, "answers": client.answers, "requests": client.requests, "errors": client.errors[:20]}
+        elif conf.get("enabled"):
+            key = os.environ.get("GEMINI_API_KEY", "").strip()
+            r["ai"] = robot.ai_step(pick(jobs, cfg["pilot"].get("maxPostsToAI", 30)), conf)
+
+        found = read_all(jobs)
+        for j in jobs:
+            j["_read"] = (found.get(j["id"]) or {}).get("read")
+        r["seconds"]["read"] = round(time.monotonic() - t_read, 1)
+        r["rates"] = rates(jobs)
+        r["flagged"] = sum(1 for j in jobs if j.get("_flag"))
+        r["sizes"] = sizes(jobs)
+        for j in pick(list(jobs), cfg["pilot"].get("maxPostsToShow", 45)):     # what is written: never the description
             out = N.public(j)
-            out["textChars"] = len(j.get("_text") or "")     # how much of the post the AI could read (not the text itself)
-            if j.get("_sum"):
-                out["sum"] = j["_sum"]
+            out["read"] = j.get("_read")
             if j.get("_flag"):
                 out["flag"] = j["_flag"]
             r["jobs"].append(out)
@@ -277,7 +299,7 @@ def main() -> int:
     out_dir.mkdir(parents=True, exist_ok=True)
     (out_dir / "result.json").write_text(json.dumps(r, ensure_ascii=False, indent=1) + "\n", encoding="utf-8")
     (out_dir / "report.md").write_text(report_md(r), encoding="utf-8")
-    log.info("wrote %s (%d sample jobs, %d with AI data)", out_dir / "report.md", len(r["jobs"]), r["ai"]["done"])
+    log.info("wrote %s (%d sample jobs)", out_dir / "report.md", len(r["jobs"]))
     return 0
 
 

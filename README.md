@@ -47,10 +47,11 @@ python3 build.py && node tests/smoke.mjs
 ```
 
 ```
+node --test tests/engine.test.mjs
 python3 -m unittest discover -s tests -p "test_*.py"
 ```
 
-The unit tests cover the AI step and the company job-board readers. They never use the network: the Gemini service is replaced by `tests/fake_gemini.py`.
+`tests/engine.test.mjs` covers the matching engine and its dictionaries: how titles, places, experience and skills are read (English and Bangla), and that reading every real post stays fast. The Python tests cover the robot's rules, the company job-board readers and the optional AI step. None of them uses the network: the Gemini service is replaced by `tests/fake_gemini.py`.
 
 The smoke test checks that `dist/` is complete, that every script parses, that no secret is in the page, that the matching engine gives sensible results for three sample people, and that it can read the real `jobs.json`. Both workflows run it before publishing, so a build that fails is never deployed and a broken `jobs.json` is never committed.
 
@@ -61,7 +62,7 @@ Work happens on the `dev` branch. Only `main` is published, so nothing reaches t
 | Key | Where it lives | Public? |
 | --- | --- | --- |
 | Firebase web config (`src/firebase-config.js`) | in the page | Yes, by design. It only names the project. `firestore.rules` and the key's website restriction protect the data. |
-| Gemini API key | GitHub Actions Secrets only | No. Never in the repo or the page. |
+| Gemini API key (optional: the AI step is off, so none is needed) | GitHub Actions Secrets only | No. Never in the repo or the page. |
 | Firebase service account key | GitHub Actions Secrets only | No. Never in the repo or the page. |
 
 `.gitignore` blocks the usual secret file names, and the smoke test fails if something that looks like a secret reaches the page.
@@ -80,11 +81,25 @@ A debug token lets its holder pass App Check, so treat it like a password: never
 
 ## Sources and the pilot run
 
-`robot/sources.json` lists every source with `enabled: true/false`, the AI settings (model names, posts per call, calls per run) and the places the robot deliberately does not read. The company job boards (SmartRecruiters, Lever, Freshteam, Trakstar Hire) are read by `robot/sources/ats.py`.
+`robot/sources.json` lists every source with `enabled: true/false`, the places the robot deliberately does not read, and the settings of the optional AI step. Add or switch off a source there; no code changes. Switching a source off also removes its posts at the next run. The company job boards (SmartRecruiters, Lever, Freshteam, Trakstar Hire) are read by `robot/sources/ats.py`; a board's post stays for as long as the board lists it and is removed when the board removes it.
 
-`robot/ai.py` is the AI step. It sends only posts that have never been through it, several per request, checks every value that comes back, asks once more for a post whose answer fails the check, and otherwise keeps the post with its basic fields. Links never come from the AI. The key is the GitHub Actions secret `GEMINI_API_KEY`.
+`robot/org-places.json` gives a place to government organisations that work from one place. Government circulars carry their place only inside a PDF, which the robot cannot read, and it never guesses one.
 
-`robot/pilot.py` is a trial run on a few posts. It never writes `jobs.json`. Push to the branch `pilot` (or press Run workflow on "Pilot run") and the report appears in `robot/pilot/report.md` on that branch. `python3 robot/pilot.py --fake-ai` runs it without a key, with a stand-in for the AI.
+`robot/pilot.py` is a trial run on a few posts from the sources listed under `pilot` in `sources.json`. It never writes `jobs.json`. Push to the branch `pilot` (or press Run workflow on "Pilot run") and the report appears in `robot/pilot/report.md` on that branch: the sources, and for every sample post what is stored and how the matcher reads it.
+
+### The AI step (off)
+
+`robot/ai.py` can send new posts to Google Gemini for cleaner fields. It is switched off (`"ai": {"enabled": false}` in `sources.json`): it never runs, no key is read, and the workflows do not mention a secret. The matcher works with rules and dictionaries only.
+
+To turn it on later:
+
+1. Add the repository secret `GEMINI_API_KEY` (Settings, Secrets and variables, Actions).
+2. In `.github/workflows/jobs.yml`, remove the `# ` in front of the `GEMINI_API_KEY` line.
+3. Set `"enabled": true` in `robot/sources.json` (`"summaries": true` also asks for the English and Bangla summaries).
+
+Step 2 cannot live in `sources.json`: GitHub only hands a secret to a step that names it, and editors warn about a named secret that does not exist yet.
+
+When it runs, it sends only posts that have never been through it, several per request, checks every value that comes back, asks once more for a post whose answer fails the check, and otherwise keeps the post with its basic fields. Links never come from the AI. `python3 robot/pilot.py --fake-ai` exercises it with a stand-in service.
 
 ## Moving to a custom domain later
 
@@ -138,13 +153,18 @@ Only `title` is required. See the comment at the top of `src/jobs-sample.js` for
 
 ```
 robot/run.py              the run: collect, merge, clean up, write jobs.json + report.json
+robot/sources.json        every source with its on/off switch (edit this, not the code)
 robot/fetcher.py          polite HTTP: robots.txt, one request per host per 2s, timeouts, caps
 robot/normalise.py        Bangla dates and digits, the short req line, the money-asking filter
 robot/structured.py       reads schema.org JobPosting data out of a page
-robot/sources/            one reader per source
+robot/sources/            one reader per source (ats.py: the company job boards)
+robot/keywords.mjs        reads a post's full text with the site's own dictionary and returns the skills found
+robot/org-places.json     the place of government organisations that work from one place
 robot/companies.json      company career pages to read (add your own)
 robot/classify.mjs        runs src/engine.js over jobs.json and writes the matching report
 robot/report.json         how the last run went
+robot/ai.py               the optional AI step (off)
+robot/pilot.py            a trial run on a few posts
 ```
 
 Run it by hand:
@@ -155,7 +175,7 @@ python3 robot/run.py              # add --dry-run to leave jobs.json alone
 node robot/classify.mjs
 ```
 
-Useful flags: `--limit N` (new pages per source), `--only nextjobz|alljobs|remote|companies`.
+Useful flags: `--limit N` (new pages per source), `--only ID` (one source, by its id in `sources.json`), `--out FILE` (for testing: write the jobs to another file and leave `jobs.json` alone).
 
 ### Where the posts come from
 
@@ -165,22 +185,29 @@ Useful flags: `--limit N` (new pages per source), `--only nextjobz|alljobs|remot
 | Alljobs by Teletalk | its public JSON API (government jobs) | no robots.txt and no terms restricting it |
 | Jobicy, Remote OK, Himalayas | their public job APIs, entry-level roles open to Bangladesh | free APIs; each asks to be credited with a link back, which the site does |
 | Company career pages | `robot/companies.json`, schema.org JobPosting only | the company's own site |
+| Company job boards on SmartRecruiters | the public career page, then each job page's schema.org data | the career site has no robots.txt rules |
+| Company job boards on Lever | its public postings API | robots.txt: `Allow: /` |
+| Company job boards on Freshteam | the careers page, then each job page's schema.org JobPosting | robots.txt: `Allow: /jobs` |
+| Company job boards on Trakstar Hire | the board's own openings feed | robots.txt: `Allow: /` |
 
-Deliberately **not** read: BDJobs (robots.txt blocks every robot), LinkedIn, Facebook, Skill.jobs (its terms forbid aggregating or linking to its content), Shomvob (its public site carries no listings; the jobs sit behind `/api/`, which its robots.txt disallows), and Remotive (its terms ask that its jobs are not passed to other job sites).
+Deliberately **not** read: BDJobs (robots.txt blocks every robot), LinkedIn, Facebook, Skill.jobs (its terms forbid aggregating or linking to its content), Shomvob (its public site carries no listings; the jobs sit behind `/api/`, which its robots.txt disallows), Remotive (its terms ask that its jobs are not passed to other job sites), and the SmartRecruiters Posting API at `api.smartrecruiters.com` (that host's robots.txt disallows every robot; the public career pages carry the same posts). The same list is in `sources.json` under `notRead` and appears in every report.
 
 Every host's robots.txt is read again at run time and any disallowed path is skipped, so this stays true even if a site changes its rules.
 
 ### What each run does
 
 1. Reads the existing `jobs.json` so pages already collected are not fetched again.
-2. Collects from each source in turn. A source that fails is logged and the run carries on.
-3. Drops posts whose deadline has passed, posts older than 30 days, and posts that ask candidates for money.
-4. Merges the same job from two sources into one entry and lists the others in `alsoOn`.
-5. Keeps the file under 3 MB, oldest posts first to go.
-6. Runs the site's own engine over the result and writes `robot/report.json`.
+2. Collects from each source that is switched on. A source that fails is logged and the run carries on.
+3. Removes a company board's post once the board no longer lists it, and the posts of a source that was switched off.
+4. Keywords: the site's own dictionary reads the requirements part of each new post's full text; the skills it finds go to the front of `req`. The experience and education sentences are lifted the same way. The text itself is never written to a file.
+5. Gives a government post a place only from `org-places.json` or from a place the organisation's own name states.
+6. Drops posts whose deadline has passed, posts older than 30 days (not company-board posts: those stay while listed), posts with no apply link, and posts that ask candidates for money.
+7. Merges the same job from two sources into one entry and lists the others in `alsoOn`.
+8. Keeps the file under 3 MB, oldest posts first to go.
+9. Runs the site's own engine over the result and writes `robot/report.json`.
 
-`report.json` shows posts per source, what was removed, which requests failed, how many posts the matcher could not place, and the 50 most common titles it could not classify, each with a suggested line for `src/taxonomy.js`. The robot never edits `src/taxonomy.js` itself.
+`report.json` shows every source (on or off, posts collected, jobs listed, any failure), what was removed, which requests failed, how many posts the matcher could not give a field, a role, a place, an experience level or a skill, and the 50 most common titles it could not classify, each with a suggested line for `src/taxonomy.js`. The robot never edits `src/taxonomy.js` itself.
 
 ### Daily run
 
-`.github/workflows/jobs.yml` runs at 23:37 UTC (about 5:37 AM in Dhaka; an odd minute off the hour, because GitHub queues scheduled runs and the top of the hour is busiest) and has a **Run workflow** button. It commits `jobs.json` and `robot/report.json` only when they changed, then rebuilds and publishes the site, because a push made with `GITHUB_TOKEN` does not start another workflow. It uses no secrets beyond the built-in `GITHUB_TOKEN`.
+`.github/workflows/jobs.yml` runs twice a day, at 23:37 UTC (5:37 AM in Dhaka) and 07:37 UTC (1:37 PM in Dhaka), and has a **Run workflow** button. The odd minute is on purpose: GitHub queues scheduled runs, and round times are the busiest. It runs every test, commits `jobs.json` and `robot/report.json` only when they changed, then rebuilds and publishes the site, because a push made with `GITHUB_TOKEN` does not start another workflow. It uses no secrets beyond the built-in `GITHUB_TOKEN`.

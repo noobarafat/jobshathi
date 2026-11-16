@@ -57,8 +57,6 @@ def _one(ld: dict, row: dict, page_url: str) -> dict | None:
     desc = ld.get("description") or ""
     quals = ld.get("qualifications") or ""
     req = N.short_req(skills=ld.get("skills") or "", description=desc, qualifications=quals)
-    if N.is_scam(req, desc, title):
-        return None
     ident = S.first(ld, "identifier", "value") or re.sub(r"\W+", "-", f"{company}-{title}".lower())[:60]
     return N.post(
         id=f"company:{ident}",

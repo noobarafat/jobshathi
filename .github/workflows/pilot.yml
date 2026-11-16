@@ -34,15 +34,45 @@ jobs:
       - name: Install what the robot needs
         run: pip install -r robot/requirements.txt
 
-      - name: Unit tests (no network, stand-in AI)
-        run: python3 -m unittest discover -s tests -p "test_*.py"
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
 
-      # The key exists only inside this step, as an environment variable.
-      # It is never printed, never written to a file and never part of the report.
+      # The results go to a file as well, so a failure can be read on the pilot branch.
+      - name: Tests (no network)
+        run: |
+          set -o pipefail
+          mkdir -p robot/pilot
+          { python3 build.py && node tests/smoke.mjs && node --test tests/engine.test.mjs && python3 -m unittest discover -s tests -p "test_*.py"; } 2>&1 | tee robot/pilot/tests.txt
+
+      # The AI step is switched off in robot/sources.json ("ai": {"enabled": false}): it never runs
+      # and no secret is needed, so this workflow does not mention one. To try the AI later: add
+      # the repository secret GEMINI_API_KEY, replace the "PILOT: '1'" line below with
+      #     GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+      # and set "enabled": true in robot/sources.json. The key then exists only inside this
+      # step, is never printed, and is never written to a file or the report.
       - name: Pilot run
+        if: always()
         env:
-          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
-        run: python3 robot/pilot.py
+          PILOT: '1'
+        run: |
+          set -o pipefail
+          mkdir -p robot/pilot
+          python3 robot/pilot.py 2>&1 | tee robot/pilot/log.txt
+
+      # The whole daily robot, with every source that is switched on, writing to a temporary file:
+      # jobs.json is not touched and nothing is published. Only the run's report is kept.
+      - name: Rehearsal of the daily robot
+        if: always()
+        run: |
+          set -o pipefail
+          mkdir -p robot/pilot "$RUNNER_TEMP/rehearsal"
+          {
+            python3 robot/run.py --limit 40 --out "$RUNNER_TEMP/rehearsal/jobs.json" &&
+            node robot/classify.mjs "$RUNNER_TEMP/rehearsal/jobs.json" "$RUNNER_TEMP/rehearsal/report.json" &&
+            cp "$RUNNER_TEMP/rehearsal/report.json" robot/pilot/rehearsal-report.json &&
+            git diff --quiet -- jobs.json robot/report.json && echo "jobs.json and robot/report.json were not touched"
+          } 2>&1 | grep -v "^INFO robot.fetch" | tee robot/pilot/rehearsal-log.txt
 
       - name: Show the report
         if: always()

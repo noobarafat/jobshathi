@@ -277,13 +277,13 @@ const MORE_ALIASES = {
   'English Communication': ['english proficiency', 'english language proficiency', 'ইংরেজিতে দক্ষ', 'ইংরেজি ভাষায় দক্ষ'],
   'Office Management': ['administrative tasks', 'administrative support', 'administrative assistance', 'administrative operations', 'administrative duties', 'office administration', 'office assistance', 'back office operations', 'back office', 'secretarial skills', 'secretarial', 'general administration'],
   'Front Desk': ['front desk', 'front office support', 'front desk operations', 'front office', 'receptionist duties', 'reception duties'],
-  'Translation': ['translation', 'interpretation', 'interpreting', 'chinese language', 'mandarin', 'অনুবাদ'],
-  'Report Writing': ['reporting', 'documentation', 'প্রতিবেদন'],
+  'Translation': ['translation', 'chinese language', 'mandarin', 'অনুবাদ'],
+  'Report Writing': ['প্রতিবেদন'],
   'Team Management': ['team management', 'team leadership', 'staff management', 'people management', 'department management', 'technical team management', 'team supervision'],
   'Driving Licence': ['হালকা যানবাহন', 'ভারী যানবাহন', 'ড্রাইভিং'],
   // sales and marketing
   'Target Achievement': ['sales targets', 'sales target', 'sales target achievement', 'exceed sales goals', 'achieving targets', 'টার্গেট'],
-  'B2B Sales': ['corporate sales', 'b2b', 'key account management', 'institutional sales'],
+  'B2B Sales': ['corporate sales', 'key account management', 'institutional sales'],
   'Field Sales': ['outside sales', 'market visit', 'door to door'],
   'Business Development': ['business development', 'new business development', 'businessdevelopment', 'client development', 'client acquisition', 'global business development'],
   'Dealer Management': ['dealer management', 'dealer operations', 'distributor management', 'channel sales', 'distribution management'],
@@ -294,7 +294,7 @@ const MORE_ALIASES = {
   'Content Writing': ['content creation', 'article writing', 'blog writing', 'কনটেন্ট রাইটিং'],
   'Market Research': ['market analysis', 'market survey'],
   'Branding': ['brand management', 'brand management & development', 'brand development', 'brand strategy'],
-  'Event Management': ['event management', 'event planning', 'marketing event planning', 'activation'],
+  'Event Management': ['event management', 'event planning', 'marketing event planning'],
   'Public Relations': ['public relations', 'media relations'],
   'Customer Service': ['customer inquiries handling', 'customer service skills', 'client servicing', 'গ্রাহক সেবা'],
   'Call Handling': ['call handling', 'call center operations', 'call center', 'contact center', 'inbound calls', 'outbound calls'],
@@ -303,19 +303,19 @@ const MORE_ALIASES = {
   'Accounting Software': ['accounting software', 'proficiency in accounting software', 'knowledge of accounting software'],
   'Auditing': ['auditing', 'internal auditing', 'internal audit', 'internal audits', 'audits', 'financial audits', 'external audit', 'audit procedures', 'it audit', 'it auditing', 'নিরীক্ষা'],
   'Financial Analysis': ['financial analysis', 'corporate finance', 'financial management', 'finance management', 'financial planning', 'financial modelling', 'financial modeling'],
-  'Banking Operations': ['general banking', 'banking'],
+  'Banking Operations': ['general banking'],
   'Credit Analysis': ['credit management', 'credit risk', 'credit scoring'],
   'Credit Recovery': ['credit recovery', 'debt collection', 'loan recovery'],
   // HR
-  'HR Management': ['hr management', 'human resources management', 'human resource management', 'strategic hr', 'hr operations', 'hr policies', 'human resources'],
+  'HR Management': ['hr management', 'human resources management', 'human resource management', 'strategic hr', 'hr operations', 'hr policies'],
   'HRIS': ['hris management'],
   'Training Coordination': ['staff training and development', 'training & development', 'training and development', 'employee training'],
   'Employee Relations': ['employee relations', 'industrial relations', 'grievance handling'],
   'Compliance': ['hr compliance', 'social compliance', 'regulatory compliance'],
   // IT
-  'IT Support': ['it support', 'technical support', 'computer maintenance', 'it operations', 'hardware troubleshooting', 'troubleshooting', 'help desk', 'desktop support'],
+  'IT Support': ['it support', 'technical support', 'computer maintenance', 'it operations', 'hardware troubleshooting', 'help desk', 'desktop support'],
   'Networking': ['computer network operations', 'network engineering', 'network administration', 'cisco networking', 'fiber optic networks', 'fiber optic'],
-  'UI/UX Design': ['ui/ux', 'ui ux', 'ux design', 'ui design', 'user interface design', 'user experience', 'wireframing', 'prototyping'],
+  'UI/UX Design': ['ui/ux', 'ui ux', 'ux design', 'ui design', 'user interface design', 'wireframing', 'prototyping'],
   'Data Analysis': ['data analysis', 'data analytics', 'business analysis', 'data visualization'],
   'Automation Testing': ['automation testing', 'test automation', 'cypress', 'playwright', 'appium', 'jmeter'],
   'TypeScript': ['typescript'], 'Vue.js': ['vue', 'vue.js', 'vuejs', 'nuxt'], 'Angular': ['angular', 'angularjs'], 'Golang': ['golang', 'go lang'], 'Kubernetes': ['kubernetes', 'k8s'],
@@ -337,7 +337,7 @@ const MORE_ALIASES = {
   // supply chain
   'Inventory Management': ['stock management', 'inventory control', 'store management', 'stock control'],
   'Warehouse Management': ['warehouse operations', 'warehousing'],
-  'Procurement': ['purchase management', 'purchasing', 'sourcing', 'procurement processes', 'tender management', 'tendering'],
+  'Procurement': ['purchase management', 'purchasing', 'procurement processes', 'tender management', 'tendering'],
   'Vendor Management': ['supplier management', 'supplier development', 'supply management', 'supplier relationship'],
   'Supply Chain': ['supply chain', 'supply chain management', 'supply chain operations'],
   'Import/Export': ['import/export', 'import export', 'export import', 'export operations', 'import operations', 'customs clearance'],
@@ -367,9 +367,20 @@ const MORE_ALIASES = {
   'Crop Production': ['crop production', 'agronomy', 'cultivation', 'horticulture'],
   'Legal Drafting': ['legal drafting', 'legal documentation', 'legal affairs', 'legal compliance'],
   'Company Law': ['company law', 'company law knowledge', 'corporate law'],
-  'Litigation': ['litigation', 'case management'],
+  'Litigation': ['litigation'],
 };
 for (const name in MORE_ALIASES) SKILL_ALIASES[name] = (SKILL_ALIASES[name] || []).concat(MORE_ALIASES[name]);
+
+/* Wordings that mean the skill when a job portal lists them as a skill tag ("Reporting", "Banking"), but are
+   ordinary words inside a sentence ("reporting to the manager", "a banking client"). The site reads them in a
+   post's short keyword line; the robot does not use them when it reads a post's full text. */
+const TAG_ONLY_ALIASES = {
+  'Report Writing': ['reporting', 'documentation'], 'Translation': ['interpretation', 'interpreting'], 'B2B Sales': ['b2b'],
+  'Event Management': ['activation'], 'Banking Operations': ['banking'], 'HR Management': ['human resources'],
+  'IT Support': ['troubleshooting'], 'UI/UX Design': ['user experience'], 'Procurement': ['sourcing'], 'Litigation': ['case management'],
+};
+/* Skills whose own name is an ordinary word ("maintenance of the code", "our sales team"): also tag-only. */
+const TAG_ONLY_NAMES = ['Maintenance', 'Sales', 'Logistics', 'Compliance', 'Generator', 'Networking', 'Presentation', 'Costing', 'Estimation', 'Washing', 'Finishing', 'Solar', 'Hospitality', 'Teaching', 'Accounting', 'Recruitment', 'Procurement', 'Payroll'];
 
 /* Words in a post that often mean a scam: a real employer never asks a candidate for money. */
 const SCAM_PATTERNS = [

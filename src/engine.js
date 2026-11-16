@@ -95,7 +95,14 @@ const Engine = (() => {
   const skillFields = {}; // skill → the fields that list it
   FIELDS.forEach(f => f.skills.forEach(s => (skillFields[s] = skillFields[s] || []).push(f.id)));
   const allSkills = Object.keys(skillFields).sort((a, b) => a.localeCompare(b));
-  const skillTerms = allSkills.map(s => [s, [...new Set([norm(s), ...(SKILL_ALIASES[s] || []).map(norm)])].filter(Boolean).map(prep)]);
+  // each skill: its own name and its other wordings. `tag` marks a wording that only counts in a short keyword line.
+  const tagOnlyNames = new Set(typeof TAG_ONLY_NAMES === 'undefined' ? [] : TAG_ONLY_NAMES);
+  const tagOnly = typeof TAG_ONLY_ALIASES === 'undefined' ? {} : TAG_ONLY_ALIASES;
+  const skillTerms = allSkills.map(s => {
+    const sure = [...new Set([...(tagOnlyNames.has(s) ? [] : [norm(s)]), ...(SKILL_ALIASES[s] || []).map(norm)])].filter(Boolean);
+    const loose = [...new Set([...(tagOnlyNames.has(s) ? [norm(s)] : []), ...(tagOnly[s] || []).map(norm)])].filter(k => k && !sure.includes(k));
+    return [s, [...sure.map(k => prep(k)), ...loose.map(k => ({ ...prep(k), tag: true }))]];
+  });
 
   const districtDiv = {}, placeIndex = []; // placeIndex: [key, district, area|null]
   const areaGroup = {};                    // "Dhaka/Mirpur" → group number
@@ -187,9 +194,11 @@ const Engine = (() => {
     return { field: null, role: null, how: 'none', also: null };
   }
 
-  function findSkills(text) {
+  /** The skills a text names. `strict` is for running text (a full description): wordings that are only
+      safe in a short keyword line are skipped. */
+  function findSkills(text, strict) {
     const out = [], toks = tokensOf(text);
-    for (const [name, terms] of skillTerms) if (terms.some(p => found(text, toks, p))) out.push(name);
+    for (const [name, terms] of skillTerms) if (terms.some(p => !(strict && p.tag) && found(text, toks, p))) out.push(name);
     return out;
   }
 

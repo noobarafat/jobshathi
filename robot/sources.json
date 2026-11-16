@@ -5,7 +5,10 @@
     "Types: nextjobz, alljobs, remote_boards, company_pages (the four original sources),",
     "       smartrecruiters, lever, freshteam, trakstar (a company's own job board; 'company' is the board's name in its web address).",
     "Optional for a company board: name (company name to show), site (company website, used for the logo), onlyPlaces (keep only posts whose place contains one of these words), location (SmartRecruiters only: the board's own location filter, e.g. 'Dhaka, BD').",
-    "The pilot run reads only the sources listed under 'pilot'. The daily robot starts using this file once the pilot is approved.",
+    "The daily robot and the pilot run both read this file. The pilot run reads only the sources listed under 'pilot'.",
+    "A company board's posts stay on the site for as long as the board lists them, and are removed when the board removes them.",
+    "Switching a source off (enabled: false) also removes its posts from the site at the next run.",
+    "'ai' is the optional Gemini step. It is OFF: with enabled false it never runs, and the GEMINI_API_KEY secret is not needed. To turn it on: add the secret, then set enabled to true. 'summaries' adds the English and Bangla summaries (off).",
     "'notRead' is the list of places the robot deliberately does not read, with the reason. It is shown in every report."
   ],
 
@@ -35,7 +38,8 @@
   ],
 
   "ai": {
-    "enabled": true,
+    "enabled": false,
+    "summaries": false,
     "models": ["gemini-3.5-flash-lite", "gemini-3.1-flash-lite", "gemini-2.5-flash-lite"],
     "postsPerCall": 6,
     "maxCallsPerRun": 12,
