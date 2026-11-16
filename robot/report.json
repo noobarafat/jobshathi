@@ -1,36 +1,36 @@
 {
  "run": {
-  "startedAt": "2026-11-15T08:59:55+06:00",
-  "finishedAt": "2026-11-15T09:08:45+06:00",
-  "newPostsCollected": 135,
-  "postsInFile": 1645,
-  "fileBytes": 1564329
+  "startedAt": "2026-11-16T08:59:34+06:00",
+  "finishedAt": "2026-11-16T09:03:47+06:00",
+  "newPostsCollected": 20,
+  "postsInFile": 1643,
+  "fileBytes": 1560381
  },
  "collectedPerSource": {
-  "nextjobz": 123,
-  "alljobs": 8,
-  "remote": 4,
+  "nextjobz": 0,
+  "alljobs": 15,
+  "remote": 5,
   "companies": 0
  },
  "postsInFilePerSource": {
-  "Alljobs (Teletalk)": 308,
+  "Alljobs (Teletalk)": 322,
   "Himalayas": 1,
-  "NextJobz": 1332,
+  "NextJobz": 1317,
   "Jobicy": 1,
-  "Remote OK": 3
+  "Remote OK": 2
  },
  "removed": {
-  "expired": 89,
-  "too_old": 42,
+  "expired": 15,
+  "too_old": 5,
   "asks_for_money": 0,
-  "merged": 65,
+  "merged": 2,
   "no_title": 0,
   "over_size_limit": 0
  },
  "sourceFailures": {},
  "pagesRead": {
-  "nextjobz.com.bd": 185,
-  "alljobs.teletalk.com.bd": 10,
+  "nextjobz.com.bd": 0,
+  "alljobs.teletalk.com.bd": 17,
   "jobicy.com": 1,
   "remoteok.com": 1,
   "himalayas.app": 1,
@@ -43,25 +43,27 @@
   "chaldal.com": 6
  },
  "blockedByRobotsTxt": [],
- "requestsFailed": [],
+ "requestsFailed": [
+  "https://nextjobz.com.bd/sitemap-job-details.xml"
+ ],
  "matching": {
-  "postsRead": 1645,
+  "postsRead": 1643,
   "postsPerSource": {
-   "Alljobs (Teletalk)": 308,
+   "Alljobs (Teletalk)": 322,
    "Himalayas": 1,
-   "NextJobz": 1332,
+   "NextJobz": 1317,
    "Jobicy": 1,
-   "Remote OK": 3
+   "Remote OK": 2
   },
   "classifiedHow": {
-   "category": 569,
-   "title": 811,
-   "none": 130,
+   "category": 567,
+   "title": 812,
+   "none": 129,
    "spelling": 129,
    "skills": 6
   },
   "noFieldFound": {
-   "count": 130,
+   "count": 129,
    "percent": 8,
    "examples": [
     {
@@ -117,7 +119,7 @@
    ]
   },
   "noLocationFound": {
-   "count": 223,
+   "count": 231,
    "percent": 14,
    "examples": [
     {
@@ -169,26 +171,26 @@
      "source": "Alljobs (Teletalk)"
     },
     {
-     "title": "Steno-Typist Cum Computer Operator",
-     "company": "Ministry of Defence (MOD)",
+     "title": "Assistant Instructor(Computer)",
+     "company": "National Academy for Computer Training and Research (NACTAR)",
      "loc": "",
      "source": "Alljobs (Teletalk)"
     },
     {
-     "title": "Office Assistant Cum Computer Typist",
-     "company": "Ministry of Defence (MOD)",
+     "title": "Assistant Instructor(English)",
+     "company": "National Academy for Computer Training and Research (NACTAR)",
      "loc": "",
      "source": "Alljobs (Teletalk)"
     }
    ]
   },
   "noDeadline": {
-   "count": 4,
+   "count": 3,
    "percent": 0
   },
   "noSalary": {
-   "count": 1545,
-   "percent": 94
+   "count": 1553,
+   "percent": 95
   },
   "topUnclassifiedTitles": [
    {
