@@ -461,3 +461,14 @@ main { padding-bottom: 118px; }
 .update-bar:focus-visible { outline: 3px solid var(--brand, #3D5AFE); outline-offset: 2px; }
 /* The reCAPTCHA badge would cover the tab bar. Google allows hiding it when the notice is shown in the app (profile page). */
 .grecaptcha-badge { visibility: hidden !important; }
+
+/* ── Filters ── */
+.chip .n { font-weight: 700; font-size: .85em; color: var(--ink-2); margin-left: 2px; }
+.chip[aria-pressed="true"] .n { color: var(--brand-strong); }
+.chip[disabled] { opacity: .45; cursor: default; }
+.fx-btn svg { width: 1.05em; height: 1.05em; }
+.fx-btn[data-on] { border-color: var(--brand); color: var(--brand-strong); font-weight: 600; }
+.fx-btn .n { color: var(--brand-strong); }
+.fx-on { margin-top: 10px; gap: 6px; }
+.fx-sheet select { width: auto; max-width: 100%; min-height: 36px; padding: 4px 12px; border-radius: 999px; font-size: .92rem; }
+.empty-acts { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; }

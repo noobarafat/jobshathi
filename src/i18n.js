@@ -166,3 +166,13 @@ Object.assign(TEXT, {
   recaptcha: ['This site is protected by reCAPTCHA. The Google {p} and {s} apply.', 'এই সাইট reCAPTCHA দিয়ে সুরক্ষিত। Google-এর {p} ও {s} প্রযোজ্য।'],
   recaptchaP: ['Privacy Policy', 'গোপনীয়তা নীতি'], recaptchaS: ['Terms of Service', 'সেবার শর্তাবলি'],
 });
+
+/* ───────── Filters ───────── */
+Object.assign(TEXT, {
+  filters: ['Filters', 'ফিল্টার'], fxIn: ['Counting jobs in “{b}”', '“{b}”-এর চাকরি গোনা হচ্ছে'],
+  fxField: ['Field', 'ক্ষেত্র'], fxLevel: ['Experience the post asks for', 'বিজ্ঞপ্তিতে যত অভিজ্ঞতা চাওয়া হয়েছে'], fxPlace: ['Place', 'জায়গা'],
+  fxDue: ['Deadline', 'আবেদনের শেষ তারিখ'], fxWithin: ['Within {n} days', '{n} দিনের মধ্যে'], fxSalary: ['Salary', 'বেতন'], fxPaid: ['Salary mentioned', 'বেতন উল্লেখ আছে'],
+  fxNA: ['Not mentioned', 'উল্লেখ নেই'], fxMoreDist: ['More districts…', 'আরও জেলা…'],
+  fxShow: ['Show {n} jobs', '{n}টি চাকরি দেখুন'], fxClear: ['Clear all', 'সব মুছুন'],
+  fxWithout: ['Without “{x}”: {n} jobs', '“{x}” ছাড়া: {n}টি চাকরি'],
+});

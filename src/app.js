@@ -35,7 +35,8 @@
   let demoReady = null;
   const demoJobs = () => demoReady || (demoReady = Engine.prepareJobs(SAMPLE_JOBS));
   const emptyMarks = () => ({ saved: {}, applied: {}, dismissed: {} });
-  const newFilter = () => ({ bucket: 'fit', quick: [], sort: 'match', q: '' });
+  const blankMore = () => ({ fields: [], levels: [], places: [], types: [], due: 0, paid: false }); // the Filters sheet's choices
+  const newFilter = () => ({ bucket: 'fit', quick: [], sort: 'match', q: '', more: blankMore() });
   const inFrame = (() => { try { return window.self !== window.top; } catch { return true; } })();
   const S = {
     account: Store.get('account', null), profile: Store.get('profile', null), marks: Object.assign(emptyMarks(), Store.get('marks', {})),
@@ -63,6 +64,7 @@
     bookmark: '<path d="M6 4h12v17l-6-4-6 4z"/>', x: '<path d="M6 6l12 12M18 6L6 18"/>', ext: '<path d="M14 4h6v6"/><path d="M20 4l-9 9"/><path d="M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5"/>',
     search: '<circle cx="11" cy="11" r="6.5"/><path d="M20 20l-4-4"/>', user: '<circle cx="12" cy="8" r="4"/><path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6"/>',
     home: '<path d="M4 11l8-7 8 7v8a1 1 0 0 1-1 1h-4v-6H9v6H5a1 1 0 0 1-1-1z"/>', chevR: '<path d="M9 6l6 6-6 6"/>', chevL: '<path d="M15 6l-6 6 6 6"/>', download: '<path d="M12 4v11M7.5 11l4.5 4.5 4.5-4.5M5 20h14"/>',
+    sliders: '<path d="M4 7h9M17 7h3M4 17h3M11 17h9"/><circle cx="15" cy="7" r="2"/><circle cx="9" cy="17" r="2"/>',
     tracker: '<path d="M10 6h10M10 12h10M10 18h10"/><path d="M3.5 6l1.2 1.2L7 5M3.5 12l1.2 1.2L7 11M3.5 18l1.2 1.2L7 17"/>', spark: '<path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8z"/>',
   };
   const FICON = {
@@ -313,6 +315,82 @@
   }
 
   const QUICK = { new: r => r.job.isNew, remote: r => r.job.loc.remote, soon: r => r.job.daysLeft != null && r.job.daysLeft <= 3, fresher: r => (r.job.exp.stated ? (r.job.exp.fresher || !r.job.exp.min) : !!(r.job.exp.guess && r.job.exp.guess.level === 'fresher')) };
+
+  /* ── Filters (a sheet): field, experience asked for, place, kind of job, deadline, salary ──
+     Inside a group any choice may match (Dhaka or Gazipur); across groups each must (Dhaka and fresher).
+     Each choice shows how many jobs it would give with the other groups' choices, and a choice that would
+     give none cannot be picked, so the filters never empty the list by themselves. */
+  const LEVEL_OF_GUESS = { fresher: 'fresher', junior: '1-3', mid: '3-5', senior: '5+' };
+  /** The experience a post asks for, as one of the profile's levels ('na': the post does not say). */
+  function jobLevel(j) {
+    const e = j.exp;
+    if (e.stated) return e.fresher || !e.min ? 'fresher' : e.min < 3 ? '1-3' : e.min < 5 ? '3-5' : '5+';
+    return (e.guess && LEVEL_OF_GUESS[e.guess.level]) || 'na';
+  }
+  /** Where a post is, as filter keys: its districts, and 'remote', 'anywhere', 'abroad', or 'na' when it does not say. */
+  function placeKeys(j) {
+    if (j._pk) return j._pk;
+    const l = j.loc || {}, k = [...new Set((l.places || []).map(p => p.district))];
+    if (l.remote) k.push('remote'); if (l.anywhere) k.push('anywhere'); if (l.abroad) k.push('abroad');
+    return (j._pk = k.length ? k : ['na']);
+  }
+  const MORE = {
+    fields: (j, v) => v.includes(j.field) || (!!j.also && v.includes(j.also)),
+    levels: (j, v) => v.includes(jobLevel(j)),
+    places: (j, v) => placeKeys(j).some(k => v.includes(k)),
+    types: (j, v) => v.includes(j.type),
+    due: (j, v) => j.daysLeft != null && j.daysLeft <= v,
+    paid: j => !!j.salary,
+  };
+  const moreOn = (m, k) => (Array.isArray(m[k]) ? m[k].length > 0 : !!m[k]);
+  const moreCount = m => Object.keys(MORE).reduce((n, k) => n + (Array.isArray(m[k]) ? m[k].length : m[k] ? 1 : 0), 0);
+  /** Does a job pass the filters (all groups but `skip`)? */
+  const passMore = (j, m, skip) => { for (const k in MORE) if (k !== skip && moreOn(m, k) && !MORE[k](j, m[k])) return false; return true; };
+  const PLACE_WORD = { remote: 'remote', anywhere: 'anywhere', abroad: 'shAbroad', na: 'fxNA' };
+  /** The words for one choice: "Accounts & Finance", "1–3 years", "Dhaka", "Within 7 days"… */
+  function moreLabel(group, v) {
+    if (group === 'fields') return esc(L(Engine.fieldById[v] || { en: v }));
+    if (group === 'levels') { const l = EXP_LEVELS.find(x => x.id === v); return l ? L(l) : t('fxNA'); }
+    if (group === 'places') return PLACE_WORD[v] ? t(PLACE_WORD[v]) : esc(v);
+    if (group === 'types') return esc(typeName(v));
+    if (group === 'due') return t('fxWithin', { n: num(v) });
+    return t('fxPaid');
+  }
+  /** Every choice that is on, as [group, value] pairs. */
+  const moreChoices = m => Object.keys(MORE).flatMap(g => (Array.isArray(m[g]) ? m[g].map(v => [g, v]) : m[g] ? [[g, m[g]]] : []));
+  /* The list before the Filters: "For you" or "All jobs", the search and the quick chips. */
+  function baseList() {
+    const f = S.f, q = Engine.norm(f.q);
+    return (f.bucket === 'fit' ? live() : S.results).filter(r => (!q || findText(r.job).includes(q)) && f.quick.every(k => QUICK[k](r)));
+  }
+  /* The sheet works on a copy (S.fd): nothing changes behind it until "Show N jobs". */
+  function sheetFilters() {
+    const m = S.fd, base = baseList().map(r => r.job);
+    const left = skip => base.filter(j => passMore(j, m, skip));
+    const tally = (jobs, keysOf) => { const c = {}; for (const j of jobs) for (const k of keysOf(j)) c[k] = (c[k] || 0) + 1; return c; };
+    const total = left(null).length;
+    const fc = tally(left('fields'), j => [j.field, j.also].filter(Boolean)), lc = tally(left('levels'), j => [jobLevel(j)]);
+    const pc = tally(left('places'), placeKeys), tc = tally(left('types'), j => [j.type]);
+    const dueJobs = left('due'), paidN = left('paid').filter(j => j.salary).length;
+    const fx = (g, v, on, n) => `<button type="button" class="chip sm" data-a="fx" data-v="${g}|${esc(v)}" data-fid="fx:${g}:${esc(v)}" aria-pressed="${!!on}" ${!on && !n ? 'disabled' : ''}>${moreLabel(g, v)}<span class="n">${num(n || 0)}</span></button>`;
+    const group = (title, chips) => `<div><div class="group-title"><span>${title}</span></div><div class="chips">${chips}</div></div>`;
+    const fields = FIELDS.filter(f => fc[f.id] || m.fields.includes(f.id)).sort((a, b) => (fc[b.id] || 0) - (fc[a.id] || 0));
+    const districts = Object.keys(pc).filter(k => !PLACE_WORD[k]).sort((a, b) => pc[b] - pc[a] || a.localeCompare(b));
+    const shown = districts.slice(0, 8).concat(m.places.filter(p => !PLACE_WORD[p] && !districts.slice(0, 8).includes(p)));
+    const rest = districts.filter(d => !shown.includes(d));
+    const body = [
+      group(t('fxField'), fields.map(f => fx('fields', f.id, m.fields.includes(f.id), fc[f.id])).join('')),
+      group(t('fxLevel'), EXP_LEVELS.map(l => l.id).concat('na').map(v => fx('levels', v, m.levels.includes(v), lc[v])).join('')),
+      group(t('fxPlace'), shown.map(d => fx('places', d, m.places.includes(d), pc[d])).join('') + ['remote', 'anywhere', 'abroad', 'na'].map(v => fx('places', v, m.places.includes(v), pc[v])).join('')
+        + (rest.length ? `<select id="fx-dist" data-fid="fx-dist" aria-label="${t('fxMoreDist')}"><option value="">${t('fxMoreDist')}</option>${rest.map(d => `<option value="${esc(d)}">${esc(d)} (${num(pc[d])})</option>`).join('')}</select>` : '')),
+      group(t('types'), JOB_TYPES.map(x => fx('types', x.id, m.types.includes(x.id), tc[x.id])).join('')),
+      group(t('fxDue'), [3, 7, 30].map(v => fx('due', v, m.due === v, dueJobs.filter(j => j.daysLeft != null && j.daysLeft <= v).length)).join('')),
+      group(t('fxSalary'), fx('paid', 1, m.paid, paidN)),
+    ].join('');
+    return { label: t('filters'), head: `<div><h2 id="sheet-title">${t('filters')}</h2><div class="hint" style="font-size:1rem">${t('fxIn', { b: t(S.f.bucket === 'fit' ? 'tabForYou' : 'tabAll') })}</div></div>`,
+      body: `<div class="stack fx-sheet">${body}</div>`,
+      foot: `<button type="button" class="btn quiet" data-a="fx-clear" data-fid="fx-clear" ${moreCount(m) ? '' : 'disabled'}>${t('fxClear')}</button><button type="button" class="btn primary" data-a="fx-apply" data-fid="fx-apply">${t('fxShow', { n: num(total) })}</button>` };
+  }
   /* ── the job list: only the cards near the screen are drawn ──
      Drawing a card costs a cheap phone about 10 ms, so drawing 1,600 of them froze the screen for 15 s.
      The list is drawn FEED_CHUNK cards at a time: more appear as the person scrolls (and with a
@@ -378,8 +456,8 @@
   let jobsParts = null;
   const findText = j => j._find || (j._find = Engine.norm(j.title + ' ' + j.company + ' ' + j.loc.text)); // made once per post
   function pageJobs() {
-    const f = S.f, q = Engine.norm(f.q), m = live();
-    let list = (f.bucket === 'fit' ? m : S.results).filter(r => (!q || findText(r.job).includes(q)) && f.quick.every(k => QUICK[k](r)));
+    const f = S.f, q = Engine.norm(f.q), m = live(), nMore = moreCount(f.more), base = baseList();
+    let list = nMore ? base.filter(r => passMore(r.job, f.more)) : base;
     if (f.sort === 'new') list = list.slice().sort((a, b) => b.job.postedAt - a.job.postedAt || b.score - a.score);
     if (f.sort === 'deadline') list = list.slice().sort((a, b) => (a.job.daysLeft == null ? 1e9 : a.job.daysLeft) - (b.job.daysLeft == null ? 1e9 : b.job.daysLeft) || b.score - a.score);
     const segBtn = (id, label, n) => `<button type="button" role="tab" data-a="bucket" data-v="${id}" data-fid="bucket:${id}" aria-selected="${f.bucket === id}">${label}<span class="n">${num(n)}</span></button>`;
@@ -392,14 +470,18 @@
       if (p.length) items.push({ key: 'h:possible', html: () => `<div class="sec-head"><div><h2 class="sec-title">${t('possibleH')}</h2><p class="hint">${t('possibleD')}</p></div></div>` }, ...p.map(card));
     } else items = list.map(card);
     // what the list shows: when this changes the list starts again from the top with the first chunk
-    Feed.plan = items.length ? { qk: JSON.stringify([f.bucket, f.quick, f.sort, q, S.lang, S.updatedAt]), items, cards: list.length } : null;
+    Feed.plan = items.length ? { qk: JSON.stringify([f.bucket, f.quick, f.sort, q, f.more, S.lang, S.updatedAt]), items, cards: list.length } : null;
+    // nothing left with the filters: which one to take off, and how many jobs that would give
+    const drops = !list.length && nMore && !waiting() ? Object.keys(MORE).filter(g => moreOn(f.more, g)).map(g => [g, base.filter(r => passMore(r.job, f.more, g)).length]).filter(([, n]) => n > 0).sort((a, b) => b[1] - a[1]).slice(0, 3) : [];
+    const dropBtns = drops.map(([g, n]) => `<button type="button" class="btn soft" data-a="fx-drop" data-v="${g}">${t('fxWithout', { x: moreChoices({ ...blankMore(), [g]: f.more[g] }).map(([gg, v]) => moreLabel(gg, v)).join(', '), n: num(n) })}</button>`).join('');
     jobsParts = {
       'j-head': `<h1>${t('jobsHead')}</h1><p>${t('summary', { a: num(m.filter(r => r.bucket === 'strong').length), b: num(m.filter(r => r.bucket === 'possible').length), n: num(S.results.length) })}</p>${freshLine()}`,
       'j-tools': `<div class="seg" role="tablist">${segBtn('fit', t('tabForYou'), m.length)}${segBtn('all', t('tabAll'), S.results.length)}</div>
-        <div class="scroller" data-keep="quick">${['new', 'soon', 'fresher', 'remote'].map(k => chip('quick', k, f.quick.includes(k), t({ new: 'fNew', soon: 'fSoon', fresher: 'fFresher', remote: 'fRemote' }[k]), 'sm')).join('')}</div>`,
+        <div class="scroller" data-keep="quick"><button type="button" class="chip sm fx-btn" data-a="filters" data-fid="filters" aria-haspopup="dialog" ${nMore ? 'data-on="1"' : ''}>${ic('sliders')}${t('filters')}${nMore ? `<span class="n">${num(nMore)}</span>` : ''}</button>${['new', 'soon', 'fresher', 'remote'].map(k => chip('quick', k, f.quick.includes(k), t({ new: 'fNew', soon: 'fSoon', fresher: 'fFresher', remote: 'fRemote' }[k]), 'sm')).join('')}</div>
+        ${nMore ? `<div class="chips fx-on">${moreChoices(f.more).map(([g, v]) => `<button type="button" class="chip sm token" data-a="fx-del" data-v="${g}|${esc(v)}" data-fid="fxdel:${g}:${esc(v)}" aria-label="${t('remove')}: ${esc(moreLabel(g, v).replace(/<[^>]+>/g, ''))}">${moreLabel(g, v)} ${ic('x')}</button>`).join('')}</div>` : ''}`,
       'j-banner': demoBanner(),
       'j-bar': `<span>${t('nJobs', { n: num(list.length) })}</span><label><span class="sr">${t('sortBy')}</span><select data-in="sort" data-fid="in:sort" aria-label="${t('sortBy')}">${[['match', 'sMatch'], ['new', 'sNew'], ['deadline', 'sDeadline']].map(([v, k]) => `<option value="${v}" ${f.sort === v ? 'selected' : ''}>${t(k)}</option>`).join('')}</select></label>`,
-      'j-empty': waiting() ? loadingBlock(4) : list.length ? '' : (q || f.quick.length) ? emptyBlock(t('emptyFilter'), t('emptyFilterD'), `<button type="button" class="btn soft" data-a="clear-filters">${t('clearFilters')}</button>`) : emptyBlock(t('emptyForYou'), t('emptyForYouD'), `<button type="button" class="btn soft" data-a="bucket" data-v="all">${t('seeAll')}</button>`),
+      'j-empty': waiting() ? loadingBlock(4) : list.length ? '' : (q || f.quick.length || nMore) ? emptyBlock(t('emptyFilter'), t('emptyFilterD'), `<div class="empty-acts">${dropBtns}<button type="button" class="btn soft" data-a="clear-filters">${t('clearFilters')}</button></div>`) : emptyBlock(t('emptyForYou'), t('emptyForYouD'), `<button type="button" class="btn soft" data-a="bucket" data-v="all">${t('seeAll')}</button>`),
     };
     // the frame: the same every time (the search box carries no value here; render sets it when the frame is new)
     return `<div class="page-head" id="j-head"></div>
@@ -474,6 +556,7 @@
     if (!S.sheet) return { frame: '', body: '' };
     let c;
     if (S.sheet.kind === 'job') { const r = S.results.find(r => r.job.id === S.sheet.id); if (!r) { S.sheet = null; return { frame: '', body: '' }; } c = sheetJob(r); }
+    else if (S.sheet.kind === 'filters') { if (!S.fd) S.fd = JSON.parse(JSON.stringify(S.f.more)); c = sheetFilters(); }
     else c = { label: t('installTitle'), head: `<div><h2 id="sheet-title">${t('installTitle')}</h2><div class="hint" style="font-size:1rem">${t('installLead')}</div></div>`, body: `<div class="howto"><p>${t('installAndroid')}</p><p>${t('installIos')}</p><p>${t('installPc')}</p></div>${inFrame ? `<div class="banner">${ic('info')}<span>${t('installPreview')}</span></div>` : ''}`, foot: '' };
     const anim = sheetShown ? 'style="animation:none"' : '';
     return { body: c.body, frame: `<div class="scrim" data-a="close" ${anim}></div><div class="sheet" role="dialog" aria-modal="true" aria-labelledby="sheet-title" ${anim}>
@@ -871,7 +954,18 @@
       case 'tok-del': { const i = v.indexOf('|'), key = v.slice(0, i), val = v.slice(i + 1); d[key] = d[key].filter(x => x !== val); break; }
       case 'bucket': S.f.bucket = v; break;
       case 'quick': toggle(S.f.quick, v); break;
-      case 'clear-filters': S.f.quick = []; S.f.q = ''; break;
+      case 'clear-filters': S.f.quick = []; S.f.q = ''; S.f.more = blankMore(); break;
+      case 'filters': opener = 'filters'; S.fd = JSON.parse(JSON.stringify(S.f.more)); openSheet({ kind: 'filters' }); break;
+      case 'fx': { // a choice in the Filters sheet (on its copy)
+        const i = v.indexOf('|'), g = v.slice(0, i), val = v.slice(i + 1);
+        if (!S.fd) break;
+        if (g === 'due') S.fd.due = S.fd.due === +val ? 0 : +val; else if (g === 'paid') S.fd.paid = !S.fd.paid; else if (S.fd[g]) toggle(S.fd[g], val);
+        break;
+      }
+      case 'fx-clear': S.fd = blankMore(); break;
+      case 'fx-apply': if (S.fd) S.f.more = S.fd; S.fd = null; closeSheet(); return;
+      case 'fx-del': { const i = v.indexOf('|'), g = v.slice(0, i), val = v.slice(i + 1); const mm = S.f.more; if (g === 'due') mm.due = 0; else if (g === 'paid') mm.paid = false; else if (mm[g]) mm[g] = mm[g].filter(x => x !== val); break; }
+      case 'fx-drop': if (v in S.f.more) S.f.more[v] = blankMore()[v]; break;
       case 'quick-go': S.f = newFilter(); if (v) S.f.quick = [v]; go('jobs'); return;
       case 'tracker-go': S.stab = v; go('tracker'); return;
       case 'stab': S.stab = v; break;
@@ -914,6 +1008,7 @@
   document.addEventListener('change', e => {
     const el = e.target;
     if (el.id === 'distSel' && el.value && S.draft) { if (!S.draft.districts.includes(el.value)) S.draft.districts.push(el.value); render(); }
+    if (el.id === 'fx-dist' && el.value && S.fd) { if (!S.fd.places.includes(el.value)) S.fd.places.push(el.value); render(); }
   });
   document.addEventListener('keydown', e => {
     if (e.key === 'Escape' && S.sheet) { closeSheet(); return; }
