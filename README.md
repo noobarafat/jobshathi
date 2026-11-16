@@ -145,7 +145,15 @@ A plain list of posts also works. One post:
 
 Only `title` is required. See the comment at the top of `src/jobs-sample.js` for every field.
 
-`req` is never the full description: it holds only the keywords the matcher needs (skills, "freshers can apply", an age limit, "only females"), capped at 300 characters. The site always links to the original post.
+`req` is never the full description: it holds only the keywords the matcher needs (skills, "freshers can apply", an age limit, "only females"), capped at 300 characters, with the requirement signals always first so they are never the part that is cut. The site always links to the original post.
+
+`edu` is one short line (at most 120 characters). `site` (the company website) is left out when the post has a logo, because the site uses the website only to find a logo.
+
+### Download size
+
+A phone downloads `jobs.json` compressed (GitHub Pages uses gzip level 5). The budget is 350 KB; every run's `report.json` has the real figure under `size`, and the daily run's summary shows it.
+
+The app asks for `jobs.json` with `cache: 'no-cache'`: the browser asks GitHub Pages whether the file has changed since the copy it holds, and gets "304 Not Modified" (nothing downloaded) when it has not. A person who opens the app many times a day downloads the list only after a robot run. Offline, the copy saved by the service worker is shown.
 
 ## The job robot
 
@@ -203,8 +211,9 @@ Every host's robots.txt is read again at run time and any disallowed path is ski
 5. Gives a government post a place only from `org-places.json` or from a place the organisation's own name states.
 6. Drops posts whose deadline has passed, posts older than 30 days (not company-board posts: those stay while listed), posts with no apply link, and posts that ask candidates for money.
 7. Merges the same job from two sources into one entry and lists the others in `alsoOn`.
-8. Keeps the file under 3 MB, oldest posts first to go.
-9. Runs the site's own engine over the result and writes `robot/report.json`.
+8. Slims every post (`slim` in `run.py`): an education field longer than 120 characters becomes a short line that gives the same education level, the skills only it named move into `req`, and the website is left out when there is a logo. The site's own engine then reads each changed post as it was and as it would be; a post whose reading would change in any way keeps its long field.
+9. Keeps the file under 3 MB, oldest posts first to go.
+10. Runs the site's own engine over the result and writes `robot/report.json`.
 
 `report.json` shows every source (on or off, posts collected, jobs listed, any failure), what was removed, which requests failed, how many posts the matcher could not give a field, a role, a place, an experience level or a skill, and the 50 most common titles it could not classify, each with a suggested line for `src/taxonomy.js`. The robot never edits `src/taxonomy.js` itself.
 

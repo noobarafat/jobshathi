@@ -45,6 +45,7 @@ DHAKA = timezone(timedelta(hours=6))
 KEEP_DAYS = 30
 MAX_BYTES = 3 * 1024 * 1024
 DOWNLOAD_BUDGET = 350 * 1024       # what a phone may have to download for the job list
+EDU_MAX = 120                      # characters: a longer education field is made into a short line (see slim)
 PAGES_GZIP_LEVEL = 5               # how GitHub Pages compresses what it serves
 JOBS_FILE = ROOT / "jobs.json"
 REPORT_FILE = HERE / "report.json"
@@ -235,6 +236,72 @@ def clean(jobs: list[dict], today, keep_while_listed: tuple[str, ...] = ()) -> t
     out = [kept[k] for k in order]
     out.sort(key=lambda j: (N.iso_date(j.get("postedAt")) or "0000-00-00"), reverse=True)
     return out, counts
+
+
+def repair(jobs: list[dict]) -> dict:
+    """Fix posts collected before a reader was corrected, so they need not wait to expire.
+
+    NextJobz government pages carry no category of their own. The reader now files them under
+    Government; posts collected before that are given the same category here.
+    """
+    government = 0
+    for j in jobs:
+        if not j.get("cat") and "/gov-jobs/" in str(j.get("url") or "") and str(j.get("id") or "").startswith("nextjobz:"):
+            j["cat"] = "Government"
+            government += 1
+    return {"governmentCategoryAdded": government}
+
+
+def slim(jobs: list[dict], ask=None) -> dict:
+    """Keep jobs.json small without changing what the site makes of any post.
+
+    1. A company website is left out when the post has a logo: the site uses the website only to find
+       a logo, so with a logo it is never used.
+    2. An education field longer than EDU_MAX (some posts carry a whole eligibility section) becomes a
+       short line that gives the engine the same education level. Skills that only the long text named
+       move into the keyword line. Done by the site's own dictionary (keywords.mjs), so the robot and
+       the site agree.
+    3. Then the site's own engine reads every changed post twice, as it was and as it would be. A post
+       is changed only when the two readings are identical (field, role, place, experience, education,
+       type, skills). Otherwise it keeps its long field. When the dictionary step cannot run, nothing
+       is changed.
+    Runs on every post at every run, so posts already in jobs.json are slimmed too. Doing it twice changes nothing.
+    """
+    ask = ask or ask_dictionary
+    website = 0
+    for j in jobs:
+        if j.get("site") and str(j.get("logo") or "").lower().startswith(("http://", "https://")):
+            del j["site"]
+            website += 1
+    long = [j for j in jobs if j.get("id") and len(str(j.get("edu") or "")) > EDU_MAX]
+    found = ask([{"id": j["id"], "slim": {k: j.get(k, "") for k in ("title", "req", "exp", "edu")}, "max": EDU_MAX} for j in long]) if long else {}
+    pending = []
+    for j in long:
+        s = (found.get(j["id"]) or {}).get("slim")
+        if not s:
+            continue
+        short = dict(j)
+        if s.get("edu"):
+            short["edu"] = s["edu"]
+        else:
+            short.pop("edu", None)                   # the long text named no education level at all
+        if s.get("skills"):
+            short["req"] = N.keywords_req(s["skills"], j.get("req", ""))
+        pending.append((j, short, len(s.get("skills") or [])))
+    readings = ask([{"id": f"{j['id']}\u0001{side}", "post": p} for j, short, _ in pending for side, p in (("was", j), ("now", short))]) if pending else {}
+    shortened = kept_long = moved = 0
+    for j, short, n in pending:
+        was = (readings.get(f"{j['id']}\u0001was") or {}).get("read", "missing")
+        now = (readings.get(f"{j['id']}\u0001now") or {}).get("read", "missing")
+        if was == "missing" or was != now:
+            kept_long += 1                           # the site would read it differently: leave it as it is
+            continue
+        j.clear()
+        j.update(short)
+        shortened += 1
+        moved += n
+    return {"websiteLeftOut": website, "educationShortened": shortened,
+            "educationLeftLong": len(long) - shortened, "keptLongToKeepMatching": kept_long, "skillsMovedToKeywords": moved}
 
 
 def download_size(file_bytes: bytes) -> dict:
@@ -441,8 +508,10 @@ def main() -> int:
     flagged = held + newly_flagged
 
     boards = tuple(p for s in switched_on if is_board(s) for p in prefixes(s))
+    repaired = repair(existing + fresh)
     merged, counts = clean(existing + fresh, today, keep_while_listed=boards)
     merged = [N.public(j) for j in merged]          # descriptions are never written to jobs.json
+    slimmed = slim(merged)                           # a smaller download, the same matching
 
     def payload_for(rows):
         return {"updatedAt": started.isoformat(timespec="seconds"),
@@ -479,6 +548,8 @@ def main() -> int:
         "notRead": cfg.get("notRead", []),
         "keywords": keywords,
         "governmentPlaces": places,
+        "slim": slimmed,
+        "repaired": repaired,
         "ai": ai_report,
         "flagged": flagged[-100:],                   # the review queue: not on the site until a person approves them
         "pagesRead": fetcher.pages_read(),

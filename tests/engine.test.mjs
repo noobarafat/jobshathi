@@ -111,6 +111,25 @@ test('search: the fast lookup agrees with the plain whole-word search', () => {
   for (const text of texts) for (const term of terms) assert.equal(found(text, tokensOf(text), prep(term)), Engine.hasTerm(text, term), `${term} in ${text}`);
 });
 
+test('typed words: a word that names a job title finds that role in either language', () => {
+  const name = w => [...Engine.rolesNamed(w)].sort().join(',');
+  assert.equal(name('কম্পিউটার অপারেটর'), 'data-entry');
+  assert.equal(name('computer operator'), 'data-entry');
+  assert.equal(name('Senior Computer Operator'), 'data-entry');
+  assert.equal(name('অফিস সহায়ক'), 'govt-support,office-assistant');    // a wording two roles share gives both
+  assert.equal(name('factory'), '');                                     // a word that is no job title gives no role
+  assert.equal(name('accountent'), '');                                  // and nothing is guessed from a misspelling
+  const person = { fields: ['sales'], roles: [], keywords: ['কম্পিউটার অপারেটর'], skills: [], level: 'fresher', locations: ['bd'], avoid: [] };
+  const r = Engine.match(Engine.expandProfile(person), one({ title: 'Data Entry Operator', loc: 'Dhaka' }));
+  const line = r.checks.find(c => c.k === 'role');
+  assert.deepEqual([line.code, line.label], ['keyword', 'কম্পিউটার অপারেটর']);           // "why this matches" shows the word as typed
+  assert.notEqual(r.bucket, 'hidden');                                                      // shown, although the person chose another field
+  // "don't show" words stay literal: they hide only what names them
+  const avoid = { fields: ['office'], roles: [], keywords: [], skills: [], level: 'fresher', locations: ['bd'], avoid: ['computer operator'] };
+  assert.equal(Engine.match(Engine.expandProfile(avoid), one({ title: 'Data Entry Operator', loc: 'Dhaka' })).hiddenWhy, null);
+  assert.equal(Engine.match(Engine.expandProfile(avoid), one({ title: 'Computer Operator', loc: 'Dhaka' })).hiddenWhy, 'avoid');
+});
+
 test('location: spellings, Bangla names, towns and industrial areas', () => {
   for (const [text, want] of [
     ['Mirpur, Dhaka', 'Mirpur, Dhaka'], ['Chittagong', 'Chattogram'], ['চট্টগ্রাম', 'Chattogram'], ['ব্রাহ্মণবাড়িয়া', 'Brahmanbaria'], ['কুড়িগ্রাম', 'Kurigram'],
@@ -173,6 +192,31 @@ test('skills: the tags portals use and Bangla terms are understood', () => {
   assert.deepEqual(skills('কম্পিউটার জ্ঞান ও বাংলা টাইপিং'), ['Bangla Typing', 'MS Office', 'Typing']);
   assert.deepEqual(skills('React, Node.js, TypeScript and AWS'), ['AWS', 'JavaScript', 'Node.js', 'React', 'TypeScript']);   // "Node.js" also says JavaScript
   assert.deepEqual(skills('BBA in Business Administration'), []);                             // a degree is not a skill
+});
+
+test('robot dictionary step: a long education field becomes a short line with the same level', async () => {
+  const { spawnSync } = await import('node:child_process');
+  const ask = posts => JSON.parse(spawnSync(process.execPath, [join(ROOT, 'robot/keywords.mjs')], { input: JSON.stringify(posts), encoding: 'utf8' }).stdout);
+  const filler = 'সকল পদের প্রার্থীর বয়স ১৮ থেকে ৩২ বছর হতে হবে। '.repeat(8);
+  const cases = [
+    { id: 'hsc', edu: filler + 'শিক্ষাগত যোগ্যতা: স্বীকৃত বোর্ড হতে এইচএসসি পাস। কম্পিউটার জ্ঞান থাকতে হবে।', level: 2 },
+    { id: 'two-levels', edu: 'Post 1: Bachelor degree in any discipline. ' + filler + 'Post 2: SSC pass with MS Office skills.', level: 1 },
+    { id: 'bachelor', edu: "Bachelor's degree in Computer Science or a related field from a reputed university. " + 'Strong knowledge of JavaScript and React. '.repeat(4), level: 4 },
+    { id: 'no-level', edu: filler, level: null },
+  ];
+  const out = ask(cases.map(c => ({ id: c.id, slim: { title: 'Officer', req: '', exp: '', edu: c.edu }, max: 120 })));
+  for (const c of cases) {
+    const s = out[c.id].slim;
+    assert.ok(s, c.id);
+    assert.ok(s.edu.length <= 120, `${c.id}: ${s.edu.length} characters`);
+    assert.equal(Engine.parseEducation(s.edu, ''), c.level, `${c.id}: "${s.edu}"`);
+    assert.equal(s.level, c.level, c.id);
+  }
+  assert.equal(out['no-level'].slim.edu, '');                                                // nothing to keep
+  assert.ok(out['two-levels'].slim.edu.includes('SSC'));                                      // the lowest level a post accepts is kept
+  assert.ok(out.hsc.slim.skills.includes('MS Office'));                                        // "কম্পিউটার জ্ঞান" leaves the field, so it is handed back as a skill
+  assert.ok([...out.bachelor.slim.skills].includes('JavaScript') && [...out.bachelor.slim.skills].includes('React'));
+  assert.equal(ask([{ id: 'short', slim: { title: 'Officer', edu: 'HSC' }, max: 120 }]).short.slim, null);   // a short field is left alone
 });
 
 test('speed: reading every real post stays fast enough for a phone', { skip: !existsSync(join(ROOT, 'jobs.json')) }, () => {
