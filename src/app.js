@@ -483,16 +483,84 @@
 
   /* ── shell ── */
   const ROUTES = ['welcome', 'setup', 'home', 'jobs', 'tracker', 'profile'];
-  function resolveRoute() {
-    let r = (location.hash || '').replace(/^#/, '');
-    const ready = S.account && S.profile;
-    if (!ROUTES.includes(r)) r = ready ? 'home' : 'welcome';
-    if (!ready && r !== 'welcome' && r !== 'setup') r = 'welcome';
-    if (r === 'setup' && !S.draft && !S.done) { S.draft = S.profile ? draftFromProfile(S.profile) : blankDraft(); S.editOne = false; S.step = 0; }
-    if (r !== 'setup') S.done = false;
-    S.route = r;
+  const hashRoute = () => (location.hash || '').replace(/^#/, '');
+
+  /* ── the Back button (Android's, or the browser's) ──
+     Every place a person can step back from is an entry in the browser's history, so Back does what an
+     Android app does:
+     - Home is the bottom. Jobs, Tracker and Profile sit one entry above it; moving between them replaces
+       that entry, so Back from any of them goes Home, and Back on Home leaves the app.
+     - An open job (or the install help) and the "Delete my account?" question sit one entry above the
+       page: Back closes them.
+     - Each setup question is an entry: Back goes to the question before. Changing one part of the profile
+       sits one entry above the page it was opened from: Back cancels it.
+     - Finishing the setup, signing in or out and deleting the account go back to the first entry and put
+       the new page there, so Back never returns to a page that no longer applies.
+     Entries are only ever added on a tap or key press: Chrome skips entries a page adds by itself.
+     Each entry made here carries this page's mark (NAV) and its depth (d: 0 for the first one). An entry
+     left from before a reload has another mark and is treated as a plain page. */
+  const NAV = Math.random().toString(36).slice(2);
+  const TABS = ['jobs', 'tracker', 'profile'];
+  const here = () => (history.state && history.state.nav === NAV ? history.state : null);
+  const depth = () => { const h = here(); return h ? h.d : 0; };
+  const overlay = h => !!(h && (h.sheet || h.ask || h.edit));
+  const newWiz = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
+  let landing = null, pending = null;
+  /** Adds (push) or rewrites (replace) the current history entry; `hash` null keeps the address. */
+  function entry(push, st, hash) {
+    const url = hash == null ? location.href : location.pathname + location.search + '#' + hash;
+    try { history[push ? 'pushState' : 'replaceState'](Object.assign({}, st, { nav: NAV, d: push ? depth() + 1 : depth() }), '', url); } catch { /* Back then works as a plain page would */ }
   }
-  function go(r) { if ((location.hash || '') === '#' + r) { resolveRoute(); render(); } else location.hash = r; window.scrollTo(0, 0); }
+
+  function resolveRoute(want) {
+    let r = want != null ? want : hashRoute();
+    const ready = S.account && S.profile;
+    if (!ROUTES.includes(r) || (ready && r === 'welcome')) r = ready ? 'home' : 'welcome';
+    if (!ready && r !== 'welcome' && r !== 'setup') r = 'welcome';
+    // the setup address with nothing being set up: a new person starts it; for anyone else it is over (a reload)
+    let fresh = false;
+    if (r === 'setup' && !S.draft && !S.done) { if (ready) r = 'home'; else { S.draft = blankDraft(); S.editOne = false; S.step = 0; S.wizId = newWiz(); fresh = true; } }
+    if (r !== 'setup') { S.done = false; S.draft = null; S.editOne = false; S.wizId = null; }
+    S.route = r;
+    if (fresh && want == null) entry(false, { wiz: S.wizId, step: 0 }, null); // this entry is the first question
+    if (want == null && hashRoute() && hashRoute() !== r) entry(false, here() || {}, r); // the address says what is shown
+  }
+  function go(r) {
+    const h = here();
+    if (overlay(h)) { pending = () => go(r); history.back(); return; }          // close what is open first
+    if (r === 'welcome') { reset('welcome'); return; }                           // the welcome page is always the bottom
+    if (r === 'home' && h && h.overHome && S.route !== 'home') { history.back(); return; } // Home is right below
+    if (r === S.route && hashRoute() === r) { resolveRoute(); render(); window.scrollTo(0, 0); return; }
+    if (TABS.includes(r) && S.route === 'home') entry(true, { overHome: true }, r);
+    else if (TABS.includes(r) && TABS.includes(S.route)) entry(false, { overHome: !!(h && h.overHome) }, r);
+    else if (r === 'setup') entry(true, S.editOne ? { edit: true } : { wiz: S.wizId, step: S.step }, r);
+    else entry(false, {}, r);
+    resolveRoute(); render(); window.scrollTo(0, 0);
+  }
+  /** Back to the first entry, which becomes `r`: what came before no longer applies. */
+  function reset(r) {
+    const d = depth();
+    if (d > 0) { landing = r; history.go(-d); } // the popstate below finishes it
+    else entry(false, {}, r);
+    resolveRoute(r); render(); window.scrollTo(0, 0);
+  }
+  /* The open job or install help: one entry above the page. */
+  function openSheet(sheet) {
+    const h = here();
+    if (h && h.sheet) entry(false, h, null); // another job in place of the open one
+    else entry(true, { sheet: true, overHome: !!(h && h.overHome) }, null);
+    S.sheet = sheet;
+  }
+  function closeSheet() {
+    const h = here();
+    if (h && h.sheet) { history.back(); return; } // the popstate below closes it
+    S.sheet = null; render();
+  }
+  /* Leaving an editing page or a question: the page it came from, else `fallback`. */
+  function backOr(fallback) {
+    if (depth() > 0) { history.back(); return; }
+    go(fallback);
+  }
 
   /* The screen is drawn in regions: the side rail, the top bar, the page, the bottom tab bar, the update bar
      and the job sheet. Each render works out every region's HTML, but only a region whose HTML changed is
@@ -507,6 +575,7 @@
     return true;
   }
   function render() {
+    if (S.route === 'setup' && !S.draft && !S.done) resolveRoute(); // the setup just ended (Back is on its way)
     const root = document.getElementById('app'), act = document.activeElement;
     let fid = act && act.dataset ? act.dataset.fid : null;
     const keep = {}; root.querySelectorAll('[data-keep]').forEach(el => (keep[el.dataset.keep] = [el.scrollLeft, el.scrollTop]));
@@ -708,10 +777,10 @@
     const got = await Cloud.load(r.user.uid);
     S.busy = '';
     if (!got.ok) { render(); toast(cloudError(got.code) || t('errCloud')); return; }
-    if (got.data && got.data.account && got.data.profile) { applyRemote(got.data); markUser(r.user); S.draft = null; S.sheet = null; go('home'); toast(t('tWelcomeBack', { name: esc(S.account.name.split(/\s+/)[0]) })); return; }
+    if (got.data && got.data.account && got.data.profile) { applyRemote(got.data); markUser(r.user); S.draft = null; S.sheet = null; reset('home'); toast(t('tWelcomeBack', { name: esc(S.account.name.split(/\s+/)[0]) })); return; }
     if (S.account && S.profile) { markUser(r.user); Sync.push(); render(); toast(t('tLinked')); return; }
     S.draft = blankDraft(); S.draft.name = (r.user.displayName || '').slice(0, 40); S.draft.contact = (r.user.email || '').slice(0, 80);
-    S.editOne = false; S.done = false; S.step = 0; S.err = ''; S.wq = ''; go('setup'); toast(t('tNoAccount'));
+    S.editOne = false; S.done = false; S.step = 0; S.err = ''; S.wq = ''; S.wizId = newWiz(); go('setup'); toast(t('tNoAccount'));
   }
   /* "Continue with Google" on the profile page: the same account, now with Google. */
   async function googleLink() {
@@ -738,7 +807,7 @@
     const lang = S.lang, theme = S.theme;
     Store.clear(); keep('lang', lang); keep('theme', theme);
     S.account = null; S.profile = null; S.marks = emptyMarks(); S.draft = null; S.delAsk = false; S.delReauth = false; S.busy = ''; S.sheet = null; recompute();
-    Sync.paused = false; go('welcome');
+    Sync.paused = false; reset('welcome');
   }
   /* Deletes users/{uid} and the Firebase user, then this browser's copy. */
   async function deleteAccount(confirmWithGoogle) {
@@ -757,27 +826,34 @@
     const lang = S.lang, theme = S.theme;
     Store.clear(); keep('lang', lang); keep('theme', theme);
     S.account = null; S.profile = null; S.marks = emptyMarks(); S.delAsk = false; S.delReauth = false; S.draft = null; recompute();
-    go('welcome'); toast(t('tDeleted'));
+    reset('welcome'); toast(t('tDeleted'));
   }
 
+  // actions that change the page: an open job, question or edit is closed first (Back), then the action runs
+  const MOVES = ['go', 'edit', 'quick-go', 'tracker-go'];
   function onAction(a, v) {
     const d = S.draft;
+    if (MOVES.includes(a) && overlay(here())) { S.sheet = null; S.delAsk = false; S.delReauth = false; pending = () => onAction(a, v); history.back(); return; }
     switch (a) {
-      case 'go': S.delAsk = false; S.delReauth = false; S.sheet = null; if (v !== 'setup') { S.draft = null; S.done = false; } go(v); return;
+      case 'go': S.delAsk = false; S.delReauth = false; S.sheet = null; go(v); return;
       case 'lang': S.lang = S.lang === 'bn' ? 'en' : 'bn'; Store.set('lang', S.lang); break;
       case 'setlang': S.lang = v; Store.set('lang', v); break;
       case 'theme': S.theme = v; Store.set('theme', v); break;
-      case 'start': S.draft = blankDraft(); S.editOne = false; S.done = false; S.step = 0; S.err = ''; S.wq = ''; go('setup'); return;
+      case 'start': S.draft = blankDraft(); S.editOne = false; S.done = false; S.step = 0; S.err = ''; S.wq = ''; S.wizId = newWiz(); go('setup'); return;
       case 'edit': S.draft = draftFromProfile(S.profile); S.editOne = true; S.done = false; S.step = +v || 0; S.err = ''; S.wq = ''; S.sheet = null; go('setup'); return;
-      case 'wiz-cancel': S.draft = null; go('profile'); return;
-      case 'wiz-back': S.err = ''; S.wq = ''; if (S.step === 0) { S.draft = null; go('welcome'); return; } S.step--; window.scrollTo(0, 0); break;
+      case 'wiz-cancel': backOr('profile'); return;
+      case 'wiz-back': // the question before (Back does the same)
+        S.err = ''; S.wq = '';
+        if (depth() > 0) { history.back(); return; }
+        if (S.step === 0) { go('welcome'); return; }
+        S.step--; window.scrollTo(0, 0); break;
       case 'wiz-next': {
         ['keywords', 'skills', 'avoid'].forEach(k => { const i = document.getElementById('tok-' + k); if (i && i.value.trim()) addToken(k); });
         S.err = validStep(); if (S.err) break;
         S.wq = '';
-        if (S.editOne) { commitDraft(); S.draft = null; S.editOne = false; go('profile'); toast(t('tProfile')); return; }
-        if (S.step < STEPS - 1) { S.step++; window.scrollTo(0, 0); break; }
-        commitDraft(); S.draft = null; S.done = true; S.f = newFilter(); window.scrollTo(0, 0); afterCreate(); break;
+        if (S.editOne) { commitDraft(); toast(t('tProfile')); backOr('profile'); return; }
+        if (S.step < STEPS - 1) { S.step++; entry(true, { wiz: S.wizId, step: S.step }, null); window.scrollTo(0, 0); break; }
+        commitDraft(); S.draft = null; S.done = true; S.f = newFilter(); afterCreate(); reset('setup'); return;
       }
       case 'field':
         if (!d.fields.includes(v) && d.fields.length >= 3) { S.err = t('errMax'); break; }
@@ -799,21 +875,21 @@
       case 'quick-go': S.f = newFilter(); if (v) S.f.quick = [v]; go('jobs'); return;
       case 'tracker-go': S.stab = v; go('tracker'); return;
       case 'stab': S.stab = v; break;
-      case 'open': opener = 'open:' + v; S.sheet = { kind: 'job', id: v }; break;
-      case 'close': S.sheet = null; break;
+      case 'open': opener = 'open:' + v; openSheet({ kind: 'job', id: v }); break;
+      case 'close': closeSheet(); return;
       case 'install':
         if (deferredInstall) { const p = deferredInstall; deferredInstall = null; p.prompt(); if (p.userChoice) p.userChoice.then(c => { if (c && c.outcome === 'accepted') { S.installed = true; render(); } }).catch(() => {}); return; }
-        opener = document.activeElement && document.activeElement.dataset.fid; S.sheet = { kind: 'install' }; break;
+        opener = document.activeElement && document.activeElement.dataset.fid; openSheet({ kind: 'install' }); break;
       case 'save': if (S.marks.saved[v]) { delete S.marks.saved[v]; toast(t('tUnsaved')); } else { S.marks.saved[v] = snapshot(v); toast(t('tSaved')); } saveMarks(); break;
       case 'apply': if (S.marks.applied[v]) { delete S.marks.applied[v]; toast(t('tUnapplied')); } else { S.marks.applied[v] = snapshot(v); toast(t('tApplied')); } saveMarks(); break;
       case 'status': { const i = v.lastIndexOf('|'), id = v.slice(0, i); if (S.marks.applied[id]) { S.marks.applied[id].status = v.slice(i + 1); saveMarks(); } break; }
-      case 'dismiss': S.marks.dismissed[v] = Date.now(); saveMarks(); recompute(); S.sheet = null; toast(t('tDismissed'), () => { delete S.marks.dismissed[v]; saveMarks(); recompute(); render(); }); break;
+      case 'dismiss': S.marks.dismissed[v] = Date.now(); saveMarks(); recompute(); toast(t('tDismissed'), () => { delete S.marks.dismissed[v]; saveMarks(); recompute(); render(); }); closeSheet(); return;
       case 'undismiss': delete S.marks.dismissed[v]; saveMarks(); recompute(); break;
       case 'toast-undo': { const el2 = document.getElementById('toast'), fn = el2._undo; el2.innerHTML = ''; el2._undo = null; if (fn) fn(); return; }
       case 'view-demo': toast(t('tDemo')); return;
       case 'gap-add': if (!S.profile.skills.includes(v)) { S.profile.skills.push(v); Store.set('profile', S.profile); recompute(); toast(t('tSkill', { s: esc(v) })); } break;
-      case 'del-ask': S.delAsk = true; break;
-      case 'del-no': S.delAsk = false; S.delReauth = false; break;
+      case 'del-ask': if (!S.delAsk) entry(true, { ask: true }, null); S.delAsk = true; break;
+      case 'del-no': { const h = here(); if (h && h.ask) { history.back(); return; } S.delAsk = false; S.delReauth = false; break; }
       case 'del-yes': deleteAccount(false); return;
       case 'del-google': deleteAccount(true); return;
       case 'google': googleSignIn(); return;
@@ -840,12 +916,25 @@
     if (el.id === 'distSel' && el.value && S.draft) { if (!S.draft.districts.includes(el.value)) S.draft.districts.push(el.value); render(); }
   });
   document.addEventListener('keydown', e => {
-    if (e.key === 'Escape' && S.sheet) { S.sheet = null; render(); return; }
+    if (e.key === 'Escape' && S.sheet) { closeSheet(); return; }
     if (e.key !== 'Enter' || !e.target.dataset) return;
     if (e.target.dataset.tok) { e.preventDefault(); addToken(e.target.dataset.tok); render(); }
     else if (e.target.dataset.in === 'name' || e.target.dataset.in === 'contact') { e.preventDefault(); onAction('wiz-next'); }
   });
-  window.addEventListener('hashchange', () => { resolveRoute(); render(); });
+  /* Back (or Forward): the screen follows the history entry it lands on. */
+  window.addEventListener('popstate', () => {
+    const before = S.route + ':' + S.step;
+    if (landing != null) { const to = landing; landing = null; entry(false, {}, to); }
+    const h = here();
+    if (S.sheet && !(h && h.sheet)) S.sheet = null;                                   // the open job closes
+    if ((S.delAsk || S.delReauth) && !(h && h.ask)) { S.delAsk = false; S.delReauth = false; } // "Delete?" is cancelled
+    if (S.draft && !S.editOne && S.wizId && h && h.wiz === S.wizId) { S.step = h.step || 0; S.err = ''; S.wq = ''; } // the question before
+    resolveRoute(); render();
+    if (S.route + ':' + S.step !== before) window.scrollTo(0, 0);
+    if (pending) { const next = pending; pending = null; next(); }
+  });
+  // an address typed or changed by hand (popstate above covers Back, Forward and links)
+  window.addEventListener('hashchange', () => { if (hashRoute() !== S.route) { resolveRoute(); render(); } });
   document.addEventListener('error', e => { const el = e.target; if (el && el.tagName === 'IMG' && el.parentNode && el.parentNode.classList.contains('logo')) { badLogos.add(el.getAttribute('src')); el.remove(); } }, true);
   window.addEventListener('beforeinstallprompt', e => { e.preventDefault(); deferredInstall = e; });
   window.addEventListener('appinstalled', () => { S.installed = true; deferredInstall = null; render(); });
@@ -966,6 +1055,9 @@
     if (r.ok && r.data && r.data.account && r.data.profile && (r.data.updatedAt || 0) > Store.get('updatedAt', 0) && !Store.get('dirty', false)) { applyRemote(r.data); resolveRoute(); render(); }
   });
 
+  // the page restores scroll itself (a closed job leaves the list where it was; a new page starts at the top)
+  try { history.scrollRestoration = 'manual'; } catch { /* an old browser: it restores as it likes */ }
+  entry(false, {}, null); // this entry is the first one (d: 0)
   recompute(); resolveRoute(); render(); loadLiveJobs(); connect(); setTimeout(checkVersion, 4000);
 })();
 
