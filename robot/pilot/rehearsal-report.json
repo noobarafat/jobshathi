@@ -1,0 +1,399 @@
+{
+ "run": {
+  "startedAt": "2026-11-16T15:49:58+06:00",
+  "finishedAt": "2026-11-16T15:58:27+06:00",
+  "newPostsCollected": 259,
+  "postsInFile": 1842,
+  "fileBytes": 1308741
+ },
+ "size": {
+  "fileBytes": 1308741,
+  "downloadBytes": 197409,
+  "budgetBytes": 358400,
+  "withinBudget": true
+ },
+ "collectedPerSource": {
+  "nextjobz": 179,
+  "alljobs": 1,
+  "remote": 5,
+  "sr-polygon": 8,
+  "sr-nagorik": 10,
+  "sr-gigalogy": 6,
+  "sr-niftycoders": 1,
+  "sr-portonics": 2,
+  "sr-optimizely": 12,
+  "lever-fieldnation": 11,
+  "ft-shikho": 9,
+  "ft-technext": 4,
+  "ft-6sense": 3,
+  "ft-tezzdigital": 3,
+  "ft-talentedcube": 3,
+  "ts-therap": 3,
+  "ts-kazsoftware": 1
+ },
+ "postsInFilePerSource": {
+  "Alljobs (Teletalk)": 323,
+  "NextJobz": 1439,
+  "SmartRecruiters": 39,
+  "Trakstar Hire": 4,
+  "Himalayas": 1,
+  "Lever": 11,
+  "Jobicy": 1,
+  "Remote OK": 2,
+  "Freshteam": 22
+ },
+ "removed": {
+  "expired": 0,
+  "too_old": 3,
+  "no_apply_link": 0,
+  "asks_for_money": 0,
+  "merged": 57,
+  "no_title": 0,
+  "closed_on_company_board": 0,
+  "source_switched_off": 0,
+  "held_for_review": 2,
+  "over_size_limit": 0
+ },
+ "sourceFailures": {},
+ "sources": [
+  {
+   "id": "nextjobz",
+   "type": "nextjobz",
+   "enabled": true,
+   "collected": 179
+  },
+  {
+   "id": "alljobs",
+   "type": "alljobs",
+   "enabled": true,
+   "collected": 1
+  },
+  {
+   "id": "remote",
+   "type": "remote_boards",
+   "enabled": true,
+   "collected": 5
+  },
+  {
+   "id": "companies",
+   "type": "company_pages",
+   "enabled": false
+  },
+  {
+   "id": "sr-polygon",
+   "type": "smartrecruiters",
+   "enabled": true,
+   "how": "public career page, then each job page's schema.org data",
+   "listed": 8,
+   "collected": 8
+  },
+  {
+   "id": "sr-nagorik",
+   "type": "smartrecruiters",
+   "enabled": true,
+   "how": "public career page, then each job page's schema.org data",
+   "listed": 10,
+   "collected": 10
+  },
+  {
+   "id": "sr-gigalogy",
+   "type": "smartrecruiters",
+   "enabled": true,
+   "how": "public career page, then each job page's schema.org data",
+   "listed": 6,
+   "collected": 6
+  },
+  {
+   "id": "sr-niftycoders",
+   "type": "smartrecruiters",
+   "enabled": true,
+   "how": "public career page, then each job page's schema.org data",
+   "listed": 1,
+   "collected": 1
+  },
+  {
+   "id": "sr-portonics",
+   "type": "smartrecruiters",
+   "enabled": true,
+   "how": "public career page, then each job page's schema.org data",
+   "listed": 2,
+   "collected": 2
+  },
+  {
+   "id": "sr-optimizely",
+   "type": "smartrecruiters",
+   "enabled": true,
+   "how": "public career page, then each job page's schema.org data",
+   "listed": 12,
+   "collected": 12
+  },
+  {
+   "id": "lever-fieldnation",
+   "type": "lever",
+   "enabled": true,
+   "how": "public postings API",
+   "listed": 11,
+   "collected": 11
+  },
+  {
+   "id": "ft-shikho",
+   "type": "freshteam",
+   "enabled": true,
+   "how": "career page, then each job page's schema.org data",
+   "listed": 9,
+   "collected": 9
+  },
+  {
+   "id": "ft-technext",
+   "type": "freshteam",
+   "enabled": true,
+   "how": "career page, then each job page's schema.org data",
+   "listed": 4,
+   "collected": 4
+  },
+  {
+   "id": "ft-6sense",
+   "type": "freshteam",
+   "enabled": true,
+   "how": "career page, then each job page's schema.org data",
+   "listed": 3,
+   "collected": 3
+  },
+  {
+   "id": "ft-tezzdigital",
+   "type": "freshteam",
+   "enabled": true,
+   "how": "career page, then each job page's schema.org data",
+   "listed": 3,
+   "collected": 3
+  },
+  {
+   "id": "ft-talentedcube",
+   "type": "freshteam",
+   "enabled": true,
+   "how": "career page, then each job page's schema.org data",
+   "listed": 3,
+   "collected": 3
+  },
+  {
+   "id": "ts-therap",
+   "type": "trakstar",
+   "enabled": true,
+   "how": "the board's own openings feed",
+   "listed": 3,
+   "collected": 3
+  },
+  {
+   "id": "ts-kazsoftware",
+   "type": "trakstar",
+   "enabled": true,
+   "how": "the board's own openings feed",
+   "listed": 1,
+   "collected": 1
+  }
+ ],
+ "notRead": [
+  {
+   "name": "BDJobs",
+   "why": "robots.txt blocks every robot"
+  },
+  {
+   "name": "LinkedIn",
+   "why": "terms forbid scraping, and it blocks robots"
+  },
+  {
+   "name": "Facebook",
+   "why": "terms forbid scraping, and it blocks robots"
+  },
+  {
+   "name": "Skill.jobs",
+   "why": "terms forbid aggregating or linking to its content"
+  },
+  {
+   "name": "Shomvob",
+   "why": "its jobs sit behind /api/, which its robots.txt disallows"
+  },
+  {
+   "name": "Remotive",
+   "why": "terms ask that its jobs are not passed to other job sites"
+  },
+  {
+   "name": "SmartRecruiters Posting API (api.smartrecruiters.com)",
+   "why": "that host's robots.txt disallows all robots; the public career pages are read instead"
+  }
+ ],
+ "keywords": {
+  "postsRead": 255,
+  "postsWithSkills": 195,
+  "ran": true
+ },
+ "governmentPlaces": {
+  "withoutPlace": 207,
+  "fromOrgPlacesFile": 66,
+  "fromOrganisationName": 15,
+  "stillWithoutPlace": 126
+ },
+ "slim": {
+  "websiteLeftOut": 1154,
+  "educationShortened": 357,
+  "educationLeftLong": 8,
+  "keptLongToKeepMatching": 8,
+  "skillsMovedToKeywords": 442
+ },
+ "ai": {
+  "enabled": false
+ },
+ "flagged": [
+  {
+   "id": "nextjobz:IJOB202683198",
+   "title": "Executive - Rent (Property Acquisition)",
+   "company": "Building technology & Ideas Ltd.",
+   "source": "NextJobz",
+   "url": "https://nextjobz.com.bd/jobs/executive-rent-property-acquisition-dhaka-IJOB202683198",
+   "why": "asks candidates for money (rule)",
+   "since": "2026-11-16"
+  },
+  {
+   "id": "nextjobz:IJOB202676729",
+   "title": "Assistant Executive - Accounts & Finance, ABG Sports City",
+   "company": "Anvir Bashundhara Group",
+   "source": "NextJobz",
+   "url": "https://nextjobz.com.bd/jobs/assistant-executive-accounts-finance-abg-sports-city-dhaka-IJOB202676729",
+   "why": "asks candidates for money (rule)",
+   "since": "2026-11-16"
+  }
+ ],
+ "pagesRead": {
+  "nextjobz.com.bd": 182,
+  "alljobs.teletalk.com.bd": 3,
+  "jobicy.com": 1,
+  "remoteok.com": 1,
+  "himalayas.app": 1,
+  "careers.smartrecruiters.com": 13,
+  "jobs.smartrecruiters.com": 39,
+  "api.lever.co": 1,
+  "shikho.freshteam.com": 10,
+  "technext.freshteam.com": 5,
+  "6sensehq.freshteam.com": 4,
+  "tezzdigital.freshteam.com": 4,
+  "talentedcube.freshteam.com": 4,
+  "jsapi.recruiterbox.com": 2
+ },
+ "blockedByRobotsTxt": [],
+ "requestsFailed": [],
+ "matching": {
+  "postsRead": 1842,
+  "engineReadMs": 1384,
+  "postsPerSource": {
+   "Alljobs (Teletalk)": 323,
+   "NextJobz": 1439,
+   "SmartRecruiters": 39,
+   "Trakstar Hire": 4,
+   "Himalayas": 1,
+   "Lever": 11,
+   "Jobicy": 1,
+   "Remote OK": 2,
+   "Freshteam": 22
+  },
+  "classifiedHow": {
+   "keyword": 251,
+   "title": 1422,
+   "category": 146,
+   "spelling": 12,
+   "skills": 11
+  },
+  "noFieldFound": {
+   "count": 0,
+   "percent": 0,
+   "examples": []
+  },
+  "noRoleFound": {
+   "count": 190,
+   "percent": 10
+  },
+  "noLocationFound": {
+   "count": 170,
+   "percent": 9,
+   "examples": [
+    {
+     "title": "Field & Market Inspector",
+     "company": "Department of Agricultural Marketing (DAM)",
+     "loc": "",
+     "source": "Alljobs (Teletalk)"
+    },
+    {
+     "title": "Stenographer-Cum-Computer Operator",
+     "company": "Department of Agricultural Marketing (DAM)",
+     "loc": "",
+     "source": "Alljobs (Teletalk)"
+    },
+    {
+     "title": "Computer Operator",
+     "company": "Department of Agricultural Marketing (DAM)",
+     "loc": "",
+     "source": "Alljobs (Teletalk)"
+    },
+    {
+     "title": "Driver (Heavy)",
+     "company": "Department of Agricultural Marketing (DAM)",
+     "loc": "",
+     "source": "Alljobs (Teletalk)"
+    },
+    {
+     "title": "Office Assistant-Cum-Computer Typist",
+     "company": "Department of Agricultural Marketing (DAM)",
+     "loc": "",
+     "source": "Alljobs (Teletalk)"
+    },
+    {
+     "title": "Cashier",
+     "company": "Department of Agricultural Marketing (DAM)",
+     "loc": "",
+     "source": "Alljobs (Teletalk)"
+    },
+    {
+     "title": "Office Support Staff",
+     "company": "Department of Agricultural Marketing (DAM)",
+     "loc": "",
+     "source": "Alljobs (Teletalk)"
+    },
+    {
+     "title": "Accountant",
+     "company": "Department of Agricultural Marketing (DAM)",
+     "loc": "",
+     "source": "Alljobs (Teletalk)"
+    },
+    {
+     "title": "Steno-Typist Cum Computer Operator",
+     "company": "Ministry of Defence (MOD)",
+     "loc": "",
+     "source": "Alljobs (Teletalk)"
+    },
+    {
+     "title": "Office Assistant Cum Computer Typist",
+     "company": "Ministry of Defence (MOD)",
+     "loc": "",
+     "source": "Alljobs (Teletalk)"
+    }
+   ]
+  },
+  "noExperienceLevel": {
+   "count": 439,
+   "percent": 24
+  },
+  "noSkillFound": {
+   "count": 426,
+   "percent": 23
+  },
+  "noDeadline": {
+   "count": 79,
+   "percent": 4
+  },
+  "noSalary": {
+   "count": 1705,
+   "percent": 93
+  },
+  "topUnclassifiedTitles": [],
+  "note": "suggestion lines are proposals only; src/taxonomy.js is never changed by the robot"
+ }
+}

@@ -1,0 +1,31 @@
+INFO robot: jobs.json holds 1643 posts
+INFO robot.nextjobz: sitemap lists 1489 job pages
+INFO robot.nextjobz: NextJobz: 179 posts from 181 pages read
+INFO robot.alljobs: Alljobs (Teletalk): 1 jobs not yet in jobs.json
+INFO robot.alljobs: Alljobs (Teletalk): 1 posts
+INFO robot.remote: Jobicy: 0 entry-level posts open to Bangladesh
+INFO robot.remote: Remote OK: 5 entry-level posts open to Bangladesh
+INFO robot.remote: Himalayas: 0 entry-level posts open to Bangladesh
+INFO robot.ats: sr-polygon: 8 listed, 8 read
+INFO robot.ats: sr-nagorik: 10 listed, 10 read
+INFO robot.ats: sr-gigalogy: 6 listed, 6 read
+INFO robot.ats: sr-niftycoders: 1 listed, 1 read
+INFO robot.ats: sr-portonics: 2 listed, 2 read
+INFO robot.ats: sr-optimizely: 12 listed, 12 read
+INFO robot.ats: lever-fieldnation: 11 listed, 11 read
+INFO robot.ats: ft-shikho: 9 listed, 9 read
+INFO robot.ats: ft-technext: 4 listed, 4 read
+INFO robot.ats: ft-6sense: 3 listed, 3 read
+INFO robot.ats: ft-tezzdigital: 3 listed, 3 read
+INFO robot.ats: ft-talentedcube: 3 listed, 3 read
+INFO robot.ats: ts-therap: 3 listed, 3 read
+INFO robot.ats: ts-kazsoftware: 1 listed, 1 read
+INFO robot: held for review (asks candidates for money (rule)): Executive - Rent (Property Acquisition) at Building technology & Ideas Ltd.
+INFO robot: held for review (asks candidates for money (rule)): Assistant Executive - Accounts & Finance, ABG Sports City at Anvir Bashundhara Group
+INFO robot: wrote jobs.json with 1842 posts: 1278 KB, 192 KB to download (budget 350 KB)
+INFO robot: per source: {'nextjobz': 179, 'alljobs': 1, 'remote': 5, 'sr-polygon': 8, 'sr-nagorik': 10, 'sr-gigalogy': 6, 'sr-niftycoders': 1, 'sr-portonics': 2, 'sr-optimizely': 12, 'lever-fieldnation': 11, 'ft-shikho': 9, 'ft-technext': 4, 'ft-6sense': 3, 'ft-tezzdigital': 3, 'ft-talentedcube': 3, 'ts-therap': 3, 'ts-kazsoftware': 1}
+INFO robot: removed: {'expired': 0, 'too_old': 3, 'no_apply_link': 0, 'asks_for_money': 0, 'merged': 57, 'no_title': 0, 'closed_on_company_board': 0, 'source_switched_off': 0, 'held_for_review': 2, 'over_size_limit': 0}
+matching: 1842 posts readable, 0 without a field (0%), 170 without a location (9%)
+classified how: { keyword: 251, title: 1422, category: 146, spelling: 12, skills: 11 }
+size, measured with the gzip program: 1308741 bytes as a file, 197241 bytes compressed the way GitHub Pages serves it (gzip level 5); the budget is 358400 bytes
+jobs.json and robot/report.json were not touched

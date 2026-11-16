@@ -1,0 +1,129 @@
+Built dist/ (index.html 308 KB, version fcf5c24bce35)
+Built site (dist/)
+  ok   dist/index.html exists
+  ok   every @inline line was replaced
+  ok   the page has its app root and a title
+  ok   every script in the page parses
+  ok   no secret key in the page
+  ok   manifest is valid and its icons exist
+  ok   version.json matches the page
+  ok   service worker parses
+Matching engine
+  ok   example posts are readable
+  ok   SQA fresher: scores are 0-100 and something matches
+  ok   digital marketer: scores are 0-100 and something matches
+  ok   network engineer: scores are 0-100 and something matches
+jobs.json
+  ok   jobs.json is valid JSON with posts
+  ok   every post has a title and a safe link
+  ok   the engine reads the real posts
+  ok   dist/jobs.json was copied
+
+16 passed, 0 failed
+TAP version 13
+# Subtest: dictionary: role ids are unique and every field is complete
+ok 1 - dictionary: role ids are unique and every field is complete
+  ---
+  duration_ms: 1.365022
+  ...
+# Subtest: title: an exact wording gives the role
+ok 2 - title: an exact wording gives the role
+  ---
+  duration_ms: 6.80694
+  ...
+# Subtest: title: Bangla wordings
+ok 3 - title: Bangla wordings
+  ---
+  duration_ms: 1.852023
+  ...
+# Subtest: title: a loose word counts unless the category points to another field
+ok 4 - title: a loose word counts unless the category points to another field
+  ---
+  duration_ms: 22.747168
+  ...
+# Subtest: title: production and quality jobs become garments jobs in a garments post
+ok 5 - title: production and quality jobs become garments jobs in a garments post
+  ---
+  duration_ms: 1.978108
+  ...
+# Subtest: title: a government circular also counts under Government
+ok 6 - title: a government circular also counts under Government
+  ---
+  duration_ms: 9.912954
+  ...
+# Subtest: spelling: a mistake inside a long word is forgiven, a different short word is not
+ok 7 - spelling: a mistake inside a long word is forgiven, a different short word is not
+  ---
+  duration_ms: 12.893629
+  ...
+# Subtest: spelling: the fast distance agrees with the plain one
+ok 8 - spelling: the fast distance agrees with the plain one
+  ---
+  duration_ms: 43.953987
+  ...
+# Subtest: search: the fast lookup agrees with the plain whole-word search
+ok 9 - search: the fast lookup agrees with the plain whole-word search
+  ---
+  duration_ms: 2.008336
+  ...
+# Subtest: location: spellings, Bangla names, towns and industrial areas
+ok 10 - location: spellings, Bangla names, towns and industrial areas
+  ---
+  duration_ms: 3.695849
+  ...
+# Subtest: location: a job abroad is recognised and never counts as a place match
+ok 11 - location: a job abroad is recognised and never counts as a place match
+  ---
+  duration_ms: 3.617139
+  ...
+# Subtest: location: read from the title only when the post gives no place
+ok 12 - location: read from the title only when the post gives no place
+  ---
+  duration_ms: 8.027749
+  ...
+# Subtest: experience: English and Bangla wordings
+ok 13 - experience: English and Bangla wordings
+  ---
+  duration_ms: 1.520844
+  ...
+# Subtest: experience: the title gives a level when the post states nothing
+ok 14 - experience: the title gives a level when the post states nothing
+  ---
+  duration_ms: 1.703575
+  ...
+# Subtest: skills: the tags portals use and Bangla terms are understood
+ok 15 - skills: the tags portals use and Bangla terms are understood
+  ---
+  duration_ms: 8.454786
+  ...
+# Subtest: robot dictionary step: a long education field becomes a short line with the same level
+ok 16 - robot dictionary step: a long education field becomes a short line with the same level
+  ---
+  duration_ms: 153.411465
+  ...
+# Subtest: speed: reading every real post stays fast enough for a phone
+ok 17 - speed: reading every real post stays fast enough for a phone
+  ---
+  duration_ms: 1179.848931
+  ...
+1..17
+# tests 17
+# suites 0
+# pass 17
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 1579.124428
+...............model-a / interactions+schema: HTTP 403: API key *** is not valid
+.model-a / interactions+schema: HTTP 400: Unknown field schema
+.model-a / interactions+schema: HTTP 404: model not found
+model-a / generateContent: HTTP 404: model not found
+......model-a / interactions+schema: HTTP 404: no such method
+...............................sources.json not usable (Expecting property name enclosed in double quotes: line 1 column 3 (char 2)): using the built-in sources
+sources.json not usable ([Errno 2] No such file or directory: '/tmp/tmp_aa11c07/absent.json'): using the built-in sources
+.....
+----------------------------------------------------------------------
+Ran 59 tests in 0.028s
+
+OK
