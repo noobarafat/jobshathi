@@ -7,7 +7,8 @@
    without any change here. */
 const CACHE = 'jobshathi-v3';
 const SLOW_MS = 3500;
-const SHELL = ['./', 'index.html', 'manifest.webmanifest', 'icons/icon-192.png', 'icons/icon-512.png'];
+// '__WORKER_URL__' is replaced by build.py with this build's worker address (worker.js?v=...).
+const SHELL = ['index.html', 'manifest.webmanifest', 'icons/icon-192.png', 'icons/icon-512.png', '__WORKER_URL__'];
 
 self.addEventListener('install', e => { e.waitUntil(caches.open(CACHE).then(c => c.addAll(SHELL)).then(() => self.skipWaiting())); });
 self.addEventListener('activate', e => { e.waitUntil(caches.keys().then(keys => Promise.all(keys.filter(k => k !== CACHE).map(k => caches.delete(k)))).then(() => self.clients.claim())); });
@@ -17,18 +18,22 @@ self.addEventListener('fetch', e => {
   if (req.method !== 'GET' || new URL(req.url).origin !== location.origin) return;
   if (/\/version\.json$/.test(new URL(req.url).pathname)) return; // always straight from the network, never saved
   const isPage = req.mode === 'navigate';
+  // The page is saved under one name only, whatever was added to its address (a link shared on LinkedIn
+  // carries ?utm_source=...): offline, the newest page is always the one shown.
+  const PAGE = new URL('index.html', self.registration.scope).href;
+  const key = isPage ? PAGE : req;
 
   // always ask the network, and keep a copy of every good answer. When the answer is the very file
   // already saved (the same ETag: jobs.json that has not changed), it is not written again.
-  const keep = res => caches.open(CACHE).then(c => c.match(req).then(old => {
+  const keep = res => caches.open(CACHE).then(c => c.match(key).then(old => {
     const tag = res.headers.get('etag');
-    if (!(tag && old && old.headers.get('etag') === tag)) return c.put(req, res);
+    if (!(tag && old && old.headers.get('etag') === tag)) return c.put(key, res);
   })).catch(() => {});
   const fresh = fetch(req).then(res => {
     if (res.ok) keep(res.clone());
     return res;
   });
-  const saved = () => caches.match(req, { ignoreSearch: isPage }).then(hit => hit || (isPage ? caches.match('index.html') : undefined));
+  const saved = () => caches.match(key);
 
   if (!isPage) { // jobs.json, icons, manifest: the network first, the saved copy when offline
     e.respondWith(fresh.catch(() => saved().then(hit => hit || Response.error())));

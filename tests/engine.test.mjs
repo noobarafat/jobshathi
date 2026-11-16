@@ -130,6 +130,12 @@ test('typed words: a word that names a job title finds that role in either langu
   assert.equal(Engine.match(Engine.expandProfile(avoid), one({ title: 'Computer Operator', loc: 'Dhaka' })).hiddenWhy, 'avoid');
 });
 
+test('dictionary: which typed words it knows (the rest are counted anonymously)', () => {
+  for (const w of ['computer operator', 'কম্পিউটার অপারেটর', 'Excel', 'ms excel', 'accountent', 'garments', 'react', 'SEO']) assert.ok(Engine.knows(w), w);
+  assert.ok(Engine.knows('blockchain auditor'));                       // "auditor" is a job title: known
+  for (const w of ['blockchain', 'drone pilot', 'ফটোকপি']) assert.ok(!Engine.knows(w), w);
+});
+
 test('location: spellings, Bangla names, towns and industrial areas', () => {
   for (const [text, want] of [
     ['Mirpur, Dhaka', 'Mirpur, Dhaka'], ['Chittagong', 'Chattogram'], ['চট্টগ্রাম', 'Chattogram'], ['ব্রাহ্মণবাড়িয়া', 'Brahmanbaria'], ['কুড়িগ্রাম', 'Kurigram'],

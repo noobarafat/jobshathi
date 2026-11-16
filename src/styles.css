@@ -41,6 +41,8 @@ svg.i { width: 1.15em; height: 1.15em; flex: none; stroke: currentColor; fill: n
 
 /* ── app shell ── */
 .shell { min-height: 100vh; min-height: 100dvh; }
+/* the screen is drawn in regions (see render in app.js); a region wrapper takes no space of its own */
+.region { display: contents; }
 .rail { display: none; }
 .mtop { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 12; background: color-mix(in srgb, var(--bg) 88%, transparent); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); }
 .mtop-in { display: flex; align-items: center; gap: 10px; padding: 10px 16px; max-width: 1180px; margin: 0 auto; }
@@ -174,6 +176,18 @@ input:focus, select:focus { border-color: var(--brand); outline: 3px solid var(-
 .stat span { color: var(--ink-2); font-size: .92rem; display: inline-flex; gap: 6px; align-items: center; }
 .home-grid { display: grid; gap: 18px; margin-top: 20px; }
 .feed { display: grid; gap: 12px; align-content: start; min-width: 0; }
+.feed-list { display: grid; gap: 12px; align-content: start; min-width: 0; }
+.feed-more { display: grid; }
+.feed-more:empty { display: none; }
+.more-btn { justify-self: center; min-height: 44px; }
+/* placeholder cards while the jobs are read (the worker); a soft pulse, none with reduced motion */
+.loading { display: grid; gap: 12px; }
+.skel { padding: 16px; display: grid; gap: 10px; box-shadow: none; }
+.skel i { display: block; height: 14px; border-radius: 8px; background: var(--line); animation: skel 1.4s ease-in-out infinite; }
+.skel i:first-child { width: 62%; height: 18px; }
+.skel i:nth-child(2) { width: 40%; }
+.skel i:last-child { width: 85%; }
+@keyframes skel { 50% { opacity: .45; } }
 .side { display: grid; gap: 14px; align-content: start; }
 .meter { height: 10px; border-radius: 99px; background: var(--line); overflow: hidden; margin: 10px 0 12px; }
 .meter i { display: block; height: 100%; background: var(--ok); border-radius: 99px; }

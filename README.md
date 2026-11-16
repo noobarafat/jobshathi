@@ -22,6 +22,7 @@ src/maker-photo.js      the maker's photo as a data URI, so the build stays one 
 src/firebase-config.js  Firebase web app settings (public values)
 src/cloud.js            Firebase sign-in and the users/{uid} document
 src/app.js              the app: Store, pages, actions
+src/worker.js           the job reader that runs away from the screen (a Web Worker)
 pwa/                    manifest.webmanifest, sw.js, icons/ (install as an app)
 build.py                builds dist/
 firestore.rules         Firestore security rules
@@ -36,7 +37,7 @@ robot/                  the job robot (see "The job robot" below)
 python3 build.py
 ```
 
-This writes `dist/`: one self-contained `index.html`, plus `manifest.webmanifest`, `sw.js` and `icons/`. If a `jobs.json` sits in the repo root it is copied too. Open `dist/index.html` through any static server, for example `python3 -m http.server -d dist`.
+This writes `dist/`: one self-contained `index.html`, `worker.js` (the dictionary, the engine and `src/worker.js` in one file), plus `manifest.webmanifest`, `sw.js` and `icons/`. The page loads `worker.js?v=<build fingerprint>`, and `sw.js` is told that address so the app opens offline with it. If a `jobs.json` sits in the repo root it is copied too. Open `dist/index.html` through any static server, for example `python3 -m http.server -d dist`.
 
 Every push to `main` runs the same build in GitHub Actions and publishes `dist/` to GitHub Pages.
 
@@ -109,6 +110,20 @@ Every path in the site, the manifest and the service worker is relative, so the 
 2. Firebase console: Authentication, Settings, Authorized domains: add the new domain.
 3. Google Cloud console: the browser API key's website restrictions: add the new domain.
 4. People who never connected Google keep their account only in the old address's browser storage. Ask them to connect Google before the move.
+
+## Speed on cheap phones
+
+The goal: no single action freezes the screen for more than 0.2 s with the CPU slowed 6x (about a cheap Android phone). How:
+
+- **The jobs are read in a worker** (`src/worker.js`), away from the screen. It sends them to the page in parts of 150, one at a time. Until they arrive the pages show placeholder cards and stay usable. A browser that cannot run a worker reads them on the page.
+- **The reading is kept** in IndexedDB under a key of the job file's time stamp and size, today's date and the build fingerprint. When all four match, the jobs appear without being read again; any change (a robot run, a new day, a new dictionary or engine) and they are read again.
+- **The screen is drawn in regions** (side rail, top bar, page, tab bar, update bar, job sheet) and the jobs page in parts. Only a part whose content changed is redrawn. Opening a job redraws only the sheet; the list and its scroll position stay.
+- **The job list draws 6 cards at a time.** More appear as you scroll (within 400 px of the end) and with "Show more jobs". Counts and search always cover every post.
+- **Search runs once typing pauses** (0.25 s), and the search box itself is never redrawn while someone types.
+
+## Anonymous word counting
+
+Profile words (typed job titles and skills) that the dictionary does not know are counted in Firestore, `wordStats/{word}`: the document's name is the word and it holds one number. No user id, no time. The app never sends a word with 3 digits in a row, with `@`, `://` or `www.`, or one shorter than 2 or longer than 40 characters or with more than 4 words, and sends each word once from a device. `firestore.rules` allows only adding 1 and keeps the same limits on the word; nobody can read the counts from the app. The admin page (later) may list only words counted 3 or more times. The Privacy Policy must mention this counting.
 
 ## Accounts and data
 

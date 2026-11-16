@@ -118,5 +118,16 @@ const Cloud = (() => {
 
   async function signOut() { if (ready()) { try { await fb.signOut(auth); } catch { /* already out */ } } }
 
-  return { start, ready, user, googleEmail, ensureUser, load, save, signInGoogle, linkGoogle, removeAccount, signOut, get status() { return status; } };
+  /** Adds 1 to the anonymous count of each word (wordStats/{word}: the word and a number, nothing else:
+      no user id, no time). Returns the words that were counted. Rules: firestore.rules. */
+  async function countWords(words) {
+    if (!ready() || !auth.currentUser || !words.length) return [];
+    const done = [];
+    for (const w of words) {
+      try { await withTimeout(fb.setDoc(fb.doc(db, 'wordStats', w), { count: fb.increment(1) }, { merge: true }), 8000); done.push(w); } catch { /* left for another time */ }
+    }
+    return done;
+  }
+
+  return { start, ready, user, googleEmail, ensureUser, load, save, signInGoogle, linkGoogle, removeAccount, signOut, countWords, get status() { return status; } };
 })();

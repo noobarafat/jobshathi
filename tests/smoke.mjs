@@ -54,6 +54,15 @@ check('version.json matches the page', () => {
   need(page.includes(`const APP_VERSION = '${v}'`), 'the page carries a different version');
   need(!page.includes('__APP_VERSION__'), 'the version marker was not replaced');
 });
+check('the job reader (worker.js) is built, parses, and is the one the page and the service worker name', () => {
+  const v = JSON.parse(read('dist/version.json')).v;
+  const worker = read('dist/worker.js');
+  new vm.Script(worker, { filename: 'worker.js' });
+  need(worker.includes(`const BUILD = '${v}'`), 'the worker carries another version');
+  need(page.includes(`const WORKER_URL = 'worker.js?v=${v}'`), 'the page names another worker');
+  need(read('dist/sw.js').includes(`'worker.js?v=${v}'`), 'the service worker does not save the worker for offline use');
+  need(!/__(APP_VERSION|WORKER_URL)__/.test(worker + page + read('dist/sw.js')), 'a build marker was left');
+});
 check('service worker parses', () => { new vm.Script(read('dist/sw.js'), { filename: 'sw.js' }); });
 
 /* ── 2. the matching engine ── */
