@@ -238,6 +238,20 @@ def clean(jobs: list[dict], today, keep_while_listed: tuple[str, ...] = ()) -> t
     return out, counts
 
 
+def repair(jobs: list[dict]) -> dict:
+    """Fix posts collected before a reader was corrected, so they need not wait to expire.
+
+    NextJobz government pages carry no category of their own. The reader now files them under
+    Government; posts collected before that are given the same category here.
+    """
+    government = 0
+    for j in jobs:
+        if not j.get("cat") and "/gov-jobs/" in str(j.get("url") or "") and str(j.get("id") or "").startswith("nextjobz:"):
+            j["cat"] = "Government"
+            government += 1
+    return {"governmentCategoryAdded": government}
+
+
 def slim(jobs: list[dict], ask=None) -> dict:
     """Keep jobs.json small without changing what the site makes of any post.
 
@@ -494,6 +508,7 @@ def main() -> int:
     flagged = held + newly_flagged
 
     boards = tuple(p for s in switched_on if is_board(s) for p in prefixes(s))
+    repaired = repair(existing + fresh)
     merged, counts = clean(existing + fresh, today, keep_while_listed=boards)
     merged = [N.public(j) for j in merged]          # descriptions are never written to jobs.json
     slimmed = slim(merged)                           # a smaller download, the same matching
@@ -534,6 +549,7 @@ def main() -> int:
         "keywords": keywords,
         "governmentPlaces": places,
         "slim": slimmed,
+        "repaired": repaired,
         "ai": ai_report,
         "flagged": flagged[-100:],                   # the review queue: not on the site until a person approves them
         "pagesRead": fetcher.pages_read(),

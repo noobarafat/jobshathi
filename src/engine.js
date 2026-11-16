@@ -378,15 +378,33 @@ const Engine = (() => {
   }
 
   /* ── one person against one job ── */
+  /** The roles a typed word names: every role with the longest job-title wording found in it.
+      “কম্পিউটার অপারেটর” and “computer operator” both name Data Entry / Computer Operator, so either one
+      also finds posts titled in the other language. A word that names no job title gives no role. */
+  function rolesNamed(word) {
+    const t = normTitle(word), toks = tokensOf(t);
+    let best = 0; const out = [];
+    for (const s of synIndex) {
+      if (s.k.length < best) break;                        // synIndex is longest first
+      if (!found(t, toks, s.p)) continue;
+      best = s.k.length;
+      if (!out.includes(s.role)) out.push(s.role);
+    }
+    return out;
+  }
+
   function expandProfile(p) {
     const roles = new Set(p.roles || []);
+    // typed words that name a job title: role → the word as the person typed it (for “why this matches”)
+    const kwRoles = new Map();
+    (p.keywords || []).forEach(k => rolesNamed(k).forEach(r => { if (!kwRoles.has(r)) kwRoles.set(r, norm(k)); }));
     const fields = new Set(p.fields || []);
     roles.forEach(r => roleById[r] && fields.add(roleById[r].field));
     const fieldsAllRoles = new Set([...fields].filter(f => ![...roles].some(r => roleById[r] && roleById[r].field === f))); // a field chosen with no role: every role in it
     const level = EXP_LEVELS.find(l => l.id === p.level) || EXP_LEVELS[0];
     const locs = (p.locations || []).slice();
     return {
-      roles, fields, fieldsAllRoles, years: level.years,
+      roles, kwRoles, fields, fieldsAllRoles, years: level.years,
       keywords: (p.keywords || []).map(norm).filter(Boolean), avoid: (p.avoid || []).map(norm).filter(Boolean),
       skills: new Set(p.skills || []), customSkills: (p.skills || []).filter(s => !skillFields[s]).map(norm),
       edu: p.edu == null ? null : +p.edu, age: p.age ? +p.age : null, minSalary: p.minSalary ? +p.minSalary : null,
@@ -432,6 +450,7 @@ const Engine = (() => {
     const kwText = !kwTitle && x.keywords.find(k => hasTerm(job.text, k));
     if (job.role && x.roles.has(job.role)) { rolePts = 40; roleCode = 'role'; roleLabel = roleById[job.role].en; }
     else if (kwTitle) { rolePts = 40; roleCode = 'keyword'; roleLabel = kwTitle; }
+    else if (job.role && x.kwRoles && x.kwRoles.has(job.role)) { rolePts = 40; roleCode = 'keyword'; roleLabel = x.kwRoles.get(job.role); } // the typed word names this job's role
     else if (job.field && x.fieldsAllRoles.has(job.field)) { rolePts = 34; roleCode = 'field'; roleLabel = fieldById[job.field].en; }
     else if (job.field && x.fields.has(job.field)) { rolePts = 24; roleCode = 'sameField'; roleLabel = job.role ? roleById[job.role].en : fieldById[job.field].en; }
     else if (job.also && x.fields.has(job.also)) { const all = x.fieldsAllRoles.has(job.also); rolePts = all ? 34 : 24; roleCode = all ? 'field' : 'sameField'; roleLabel = fieldById[job.also].en; }
@@ -516,6 +535,6 @@ const Engine = (() => {
   }
 
   return { prepareJobs, rank, skillGaps, classify, parseLocation, parseExperience, parseEducation, findSkills, expandProfile, match, fieldById, roleById, allSkills, skillFields, districtDiv, norm, hasTerm,
-    _internals: { found, prep, tokensOf, within } }; // for tests/engine.test.mjs
+    rolesNamed, _internals: { found, prep, tokensOf, within } }; // _internals: for tests/engine.test.mjs
 })();
 

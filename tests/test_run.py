@@ -126,6 +126,16 @@ class Size(unittest.TestCase):
         self.assertIs(run.download_size(os.urandom(400 * 1024))["withinBudget"], False)     # 400 KB that does not compress
 
 
+class Repair(unittest.TestCase):
+    def test_nextjobz_government_pages_collected_earlier_are_filed_under_government(self):
+        jobs = [job("nextjobz:SSR1", url="https://nextjobz.com.bd/gov-jobs/office-assistant-bd-government-job-SSR1"),
+                job("nextjobz:IJOB1", url="https://nextjobz.com.bd/jobs/officer-IJOB1"),
+                job("nextjobz:SSR2", cat="Accounting / Finance", url="https://nextjobz.com.bd/gov-jobs/accountant-SSR2")]
+        self.assertEqual(run.repair(jobs), {"governmentCategoryAdded": 1})
+        self.assertEqual([j.get("cat") for j in jobs], ["Government", None, "Accounting / Finance"])
+        self.assertEqual(run.repair(jobs), {"governmentCategoryAdded": 0})
+
+
 class Slim(unittest.TestCase):
     LONG = "১। সকল পদের প্রার্থীর ক্ষেত্রেই বয়স ১৮ থেকে ৩২ বছর। " * 6 + "শিক্ষাগত যোগ্যতা: এইচএসসি পাস। Computer skills required."
 

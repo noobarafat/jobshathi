@@ -111,6 +111,25 @@ test('search: the fast lookup agrees with the plain whole-word search', () => {
   for (const text of texts) for (const term of terms) assert.equal(found(text, tokensOf(text), prep(term)), Engine.hasTerm(text, term), `${term} in ${text}`);
 });
 
+test('typed words: a word that names a job title finds that role in either language', () => {
+  const name = w => [...Engine.rolesNamed(w)].sort().join(',');
+  assert.equal(name('কম্পিউটার অপারেটর'), 'data-entry');
+  assert.equal(name('computer operator'), 'data-entry');
+  assert.equal(name('Senior Computer Operator'), 'data-entry');
+  assert.equal(name('অফিস সহায়ক'), 'govt-support,office-assistant');    // a wording two roles share gives both
+  assert.equal(name('factory'), '');                                     // a word that is no job title gives no role
+  assert.equal(name('accountent'), '');                                  // and nothing is guessed from a misspelling
+  const person = { fields: ['sales'], roles: [], keywords: ['কম্পিউটার অপারেটর'], skills: [], level: 'fresher', locations: ['bd'], avoid: [] };
+  const r = Engine.match(Engine.expandProfile(person), one({ title: 'Data Entry Operator', loc: 'Dhaka' }));
+  const line = r.checks.find(c => c.k === 'role');
+  assert.deepEqual([line.code, line.label], ['keyword', 'কম্পিউটার অপারেটর']);           // "why this matches" shows the word as typed
+  assert.notEqual(r.bucket, 'hidden');                                                      // shown, although the person chose another field
+  // "don't show" words stay literal: they hide only what names them
+  const avoid = { fields: ['office'], roles: [], keywords: [], skills: [], level: 'fresher', locations: ['bd'], avoid: ['computer operator'] };
+  assert.equal(Engine.match(Engine.expandProfile(avoid), one({ title: 'Data Entry Operator', loc: 'Dhaka' })).hiddenWhy, null);
+  assert.equal(Engine.match(Engine.expandProfile(avoid), one({ title: 'Computer Operator', loc: 'Dhaka' })).hiddenWhy, 'avoid');
+});
+
 test('location: spellings, Bangla names, towns and industrial areas', () => {
   for (const [text, want] of [
     ['Mirpur, Dhaka', 'Mirpur, Dhaka'], ['Chittagong', 'Chattogram'], ['চট্টগ্রাম', 'Chattogram'], ['ব্রাহ্মণবাড়িয়া', 'Brahmanbaria'], ['কুড়িগ্রাম', 'Kurigram'],
