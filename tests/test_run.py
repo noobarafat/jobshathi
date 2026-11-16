@@ -114,6 +114,18 @@ class Clean(unittest.TestCase):
         self.assertEqual((kept[0]["alsoOn"], kept[0]["salary"], counts["merged"]), (["Two"], "Tk. 20,000", 1))
 
 
+class Size(unittest.TestCase):
+    def test_the_download_size_is_measured_the_way_the_site_serves_the_file(self):
+        import gzip
+        data = (json.dumps({"jobs": [job(f"a:{i}", title=f"Officer {i}") for i in range(200)]}, indent=1) + "\n").encode("utf-8")
+        size = run.download_size(data)
+        self.assertEqual(size["fileBytes"], len(data))
+        self.assertEqual(size["downloadBytes"], len(gzip.compress(data, 5)))
+        self.assertEqual((size["budgetBytes"], size["withinBudget"]), (350 * 1024, True))
+        import os
+        self.assertIs(run.download_size(os.urandom(400 * 1024))["withinBudget"], False)     # 400 KB that does not compress
+
+
 class Keywords(unittest.TestCase):
     def test_skills_found_in_the_text_go_first_and_the_text_is_never_written(self):
         fresh = [job("a:1", req="Freshers are encouraged", _text="We use Excel and Tally every day."), job("a:2", req="x")]

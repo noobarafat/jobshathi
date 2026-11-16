@@ -23,6 +23,7 @@ Run from the repository root:  python3 robot/run.py
 from __future__ import annotations
 
 import argparse
+import gzip
 import json
 import logging
 import os
@@ -43,6 +44,8 @@ from sources import alljobs, ats, company_pages, nextjobz, remote_boards   # noq
 DHAKA = timezone(timedelta(hours=6))
 KEEP_DAYS = 30
 MAX_BYTES = 3 * 1024 * 1024
+DOWNLOAD_BUDGET = 350 * 1024       # what a phone may have to download for the job list
+PAGES_GZIP_LEVEL = 5               # how GitHub Pages compresses what it serves
 JOBS_FILE = ROOT / "jobs.json"
 REPORT_FILE = HERE / "report.json"
 SOURCES_FILE = HERE / "sources.json"
@@ -232,6 +235,13 @@ def clean(jobs: list[dict], today, keep_while_listed: tuple[str, ...] = ()) -> t
     out = [kept[k] for k in order]
     out.sort(key=lambda j: (N.iso_date(j.get("postedAt")) or "0000-00-00"), reverse=True)
     return out, counts
+
+
+def download_size(file_bytes: bytes) -> dict:
+    """What a phone downloads for jobs.json. GitHub Pages serves it compressed with gzip level 5
+    (checked against the live site: the same file gives the same number of bytes)."""
+    n = len(gzip.compress(file_bytes, PAGES_GZIP_LEVEL))
+    return {"fileBytes": len(file_bytes), "downloadBytes": n, "budgetBytes": DOWNLOAD_BUDGET, "withinBudget": n <= DOWNLOAD_BUDGET}
 
 
 def fit_size(jobs: list[dict], payload_for) -> tuple[list[dict], int]:
@@ -440,6 +450,10 @@ def main() -> int:
 
     merged, over_size = fit_size(merged, payload_for)
     payload = payload_for(merged)
+    file_bytes = (json.dumps(payload, ensure_ascii=False, indent=1) + "\n").encode("utf-8")   # exactly what is written
+    size = download_size(file_bytes)
+    if not size["withinBudget"]:
+        log.warning("jobs.json is %d KB to download, over the %d KB budget", size["downloadBytes"] // 1024, DOWNLOAD_BUDGET // 1024)
 
     by_source: dict[str, int] = {}
     for j in merged:
@@ -451,8 +465,9 @@ def main() -> int:
             "finishedAt": datetime.now(DHAKA).isoformat(timespec="seconds"),
             "newPostsCollected": len(fresh),
             "postsInFile": len(merged),
-            "fileBytes": len(json.dumps(payload, ensure_ascii=False).encode()),
+            "fileBytes": size["fileBytes"],
         },
+        "size": size,                                # what a phone downloads, against the budget
         "collectedPerSource": {sid: i.get("collected", 0) for sid, i in infos.items()},
         "postsInFilePerSource": by_source,
         "removed": {**counts, "closed_on_company_board": closed, "source_switched_off": switched_off,
@@ -474,8 +489,9 @@ def main() -> int:
     if args.dry_run:
         log.info("dry run: jobs.json not written")
     else:
-        jobs_file.write_text(json.dumps(payload, ensure_ascii=False, indent=1) + "\n", encoding="utf-8")
-        log.info("wrote %s with %d posts", jobs_file.name, len(merged))
+        jobs_file.write_bytes(file_bytes)
+        log.info("wrote %s with %d posts: %d KB, %d KB to download (budget %d KB)", jobs_file.name, len(merged),
+                 size["fileBytes"] // 1024, size["downloadBytes"] // 1024, DOWNLOAD_BUDGET // 1024)
     report_file.write_text(json.dumps(report, ensure_ascii=False, indent=1) + "\n", encoding="utf-8")
 
     log.info("per source: %s", report["collectedPerSource"])

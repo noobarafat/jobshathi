@@ -51,8 +51,9 @@ jobs:
       #     GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
       # and set "enabled": true in robot/sources.json. The key then exists only inside this
       # step, is never printed, and is never written to a file or the report.
+      # A push whose last commit message holds "[rehearsal only]" skips this step and runs only the rehearsal below.
       - name: Pilot run
-        if: always()
+        if: always() && !contains(github.event.head_commit.message, '[rehearsal only]')
         env:
           PILOT: '1'
         run: |
@@ -71,6 +72,7 @@ jobs:
             python3 robot/run.py --limit 40 --out "$RUNNER_TEMP/rehearsal/jobs.json" &&
             node robot/classify.mjs "$RUNNER_TEMP/rehearsal/jobs.json" "$RUNNER_TEMP/rehearsal/report.json" &&
             cp "$RUNNER_TEMP/rehearsal/report.json" robot/pilot/rehearsal-report.json &&
+            echo "size, measured with the gzip program: $(wc -c < "$RUNNER_TEMP/rehearsal/jobs.json") bytes as a file, $(gzip -5 -c "$RUNNER_TEMP/rehearsal/jobs.json" | wc -c) bytes compressed the way GitHub Pages serves it (gzip level 5); the budget is $((350 * 1024)) bytes" &&
             git diff --quiet -- jobs.json robot/report.json && echo "jobs.json and robot/report.json were not touched"
           } 2>&1 | grep -v "^INFO robot.fetch" | tee robot/pilot/rehearsal-log.txt
 

@@ -92,8 +92,12 @@ jobs:
           import json, pathlib
           r = json.loads(pathlib.Path('robot/report.json').read_text())
           m = r.get('matching', {})
+          z = r.get('size') or {}
           print(f"- posts in jobs.json: **{r['run']['postsInFile']}** "
                 f"({r['run']['fileBytes'] // 1024} KB)")
+          if z:
+              print(f"- a phone downloads: **{z['downloadBytes'] // 1024} KB** of a {z['budgetBytes'] // 1024} KB budget"
+                    + ("" if z['withinBudget'] else " — **OVER THE BUDGET**"))
           print(f"- new this run: {r['run']['newPostsCollected']}")
           print(f"- per source: `{r.get('postsInFilePerSource')}`")
           print(f"- removed: `{r.get('removed')}`")

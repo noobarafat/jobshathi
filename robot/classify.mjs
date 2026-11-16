@@ -48,7 +48,9 @@ function nearestRole(title, roles) {
 
 const Engine = loadEngine();
 const raw = loadJobs();
+const readStarted = Date.now();
 const jobs = Engine.prepareJobs(raw);
+const engineReadMs = Date.now() - readStarted;   // the same work a visitor's phone does when the job list loads
 /* the engine does not carry the portal's own category through, so read it from the raw post */
 const rawById = new Map(raw.filter(r => r && r.id).map(r => [String(r.id), r]));
 
@@ -100,6 +102,7 @@ const top = [...unknownTitles.values()].sort((a, b) => b.count - a.count).slice(
 const pct = n => (jobs.length ? Math.round((n / jobs.length) * 100) : 0);
 const matching = {
   postsRead: jobs.length,
+  engineReadMs,                             // on this machine; a phone is several times slower
   postsPerSource: perSource,
   classifiedHow: how,                       // title | spelling | keyword | category | skills | none
   noFieldFound: { count: noField.length, percent: pct(noField.length), examples: noField.slice(0, 10) },
