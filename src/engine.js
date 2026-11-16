@@ -393,6 +393,14 @@ const Engine = (() => {
     return out;
   }
 
+  /** Does the dictionary know this word: a job title, a field word or a skill (in any of its wordings)? */
+  function knows(word) {
+    const w = norm(word);
+    if (!w) return true;
+    if (rolesNamed(w).length || findSkills(' ' + w + ' ').length) return true;
+    return !!classify(w, '', [], w).field;
+  }
+
   function expandProfile(p) {
     const roles = new Set(p.roles || []);
     // typed words that name a job title: role → the word as the person typed it (for “why this matches”)
@@ -535,6 +543,6 @@ const Engine = (() => {
   }
 
   return { prepareJobs, rank, skillGaps, classify, parseLocation, parseExperience, parseEducation, findSkills, expandProfile, match, fieldById, roleById, allSkills, skillFields, districtDiv, norm, hasTerm,
-    rolesNamed, _internals: { found, prep, tokensOf, within } }; // _internals: for tests/engine.test.mjs
+    rolesNamed, knows, _internals: { found, prep, tokensOf, within } }; // _internals: for tests/engine.test.mjs
 })();
 

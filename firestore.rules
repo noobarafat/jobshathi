@@ -50,6 +50,24 @@ service cloud.firestore {
         && validUser(request.resource.data);
     }
 
+    // wordStats/{word}: an anonymous count of profile words the dictionary does not know, so they can be
+    // added to it. The document holds one number and nothing else: no user id, no time.
+    // The word (the document's name): 2 to 40 characters of small English letters, Bangla, digits, space
+    // and . + # & -, never 3 digits in a row (so no phone number). A signed-in person can only add 1.
+    // Nobody can read the counts from the app. The admin page (Phase 6) will be allowed to list only words
+    // counted 3 or more times, so one person's name or private word never appears there.
+    function validWord(w) {
+      return w.size() >= 2 && w.size() <= 40
+        && w.matches('^[a-z0-9ঀ-৿ .+#&-]+$')
+        && !w.matches('.*[0-9০-৯][0-9০-৯][0-9০-৯].*');
+    }
+    match /wordStats/{word} {
+      allow create: if request.auth != null && validWord(word)
+        && request.resource.data.keys().hasOnly(['count']) && request.resource.data.count == 1;
+      allow update: if request.auth != null && validWord(word)
+        && request.resource.data.keys().hasOnly(['count']) && request.resource.data.count == resource.data.count + 1;
+    }
+
     // Anything not named above: nobody can read or write it.
     match /{document=**} {
       allow read, write: if false;

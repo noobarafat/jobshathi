@@ -306,23 +306,97 @@
   }
 
   const QUICK = { new: r => r.job.isNew, remote: r => r.job.loc.remote, soon: r => r.job.daysLeft != null && r.job.daysLeft <= 3, fresher: r => (r.job.exp.stated ? (r.job.exp.fresher || !r.job.exp.min) : !!(r.job.exp.guess && r.job.exp.guess.level === 'fresher')) };
+  /* ── the job list: only the cards near the screen are drawn ──
+     Drawing a card costs a cheap phone about 10 ms, so drawing 1,600 of them froze the screen for 15 s.
+     The list is drawn FEED_CHUNK cards at a time: more appear as the person scrolls (and with a
+     "Load more" button). The cards already drawn are kept from one render to the next, so opening a job
+     and closing it again redraws nothing and the scroll position stays. When something changes (a job
+     saved, a filter), only the cards whose content changed are redrawn. */
+  const FEED_CHUNK = 8; // about two screens of cards on a phone
+  const Feed = { el: null, qk: '', shown: FEED_CHUNK, nodes: new Map(), plan: null };
+  let moreWatch = null;
+  const nodeFrom = html => { const tpl = document.createElement('template'); tpl.innerHTML = html.trim(); return tpl.content.firstElementChild; };
+  /** Brings the drawn list in line with Feed.plan: the first Feed.shown cards, with their section heads. */
+  function syncFeed() {
+    const plan = Feed.plan || { items: [], cards: 0 }, next = new Map();
+    if (!Feed.el) return;
+    let cardsLeft = Feed.shown, prev = null;
+    for (const it of plan.items) {
+      if (it.card && cardsLeft-- <= 0) break;
+      const html = it.html();
+      let rec = Feed.nodes.get(it.key);
+      if (rec && rec.html !== html) { const n = nodeFrom(html); rec.node.replaceWith(n); rec = { html, node: n }; }
+      if (!rec) rec = { html, node: nodeFrom(html) };
+      Feed.nodes.delete(it.key);
+      const want = prev ? prev.nextSibling : Feed.el.firstChild;
+      if (rec.node !== want) Feed.el.insertBefore(rec.node, want);
+      next.set(it.key, rec); prev = rec.node;
+    }
+    Feed.nodes.forEach(r => r.node.remove());
+    Feed.nodes = next;
+    const more = document.getElementById('feed-more'), left = plan.cards - Math.min(Feed.shown, plan.cards);
+    if (more) more.innerHTML = left > 0 ? `<button type="button" class="btn soft more-btn" data-a="more" data-fid="more">${t('loadMore', { n: num(left) })}</button>` : '';
+    watchMore();
+  }
+  /** Puts the list in place after a render. The same list stays (with its scroll position) while only other
+      things change; a new filter, sort, search or job file starts a new list from the top. */
+  function placeFeed(root) {
+    const slot = root.querySelector('#feed-slot');
+    if (!slot && !(Feed.el && Feed.el.isConnected)) { Feed.el = null; Feed.nodes = new Map(); Feed.qk = ''; if (moreWatch) moreWatch.disconnect(); return; } // not on the jobs page
+    const qk = Feed.plan ? Feed.plan.qk : '';
+    if (!Feed.el || Feed.qk !== qk) {
+      const el = document.createElement('div'); el.className = 'feed-list';
+      (slot || Feed.el).replaceWith(el);
+      Object.assign(Feed, { el, qk, shown: FEED_CHUNK, nodes: new Map() });
+    } else if (slot) slot.replaceWith(Feed.el);
+    syncFeed();
+  }
+  function loadMore() {
+    if (!Feed.el || !Feed.el.isConnected || !Feed.plan || Feed.shown >= Feed.plan.cards) return;
+    Feed.shown += FEED_CHUNK; syncFeed();
+  }
+  /* More cards when the "Load more" button comes near the screen. Each chunk is its own short task;
+     after a fast scroll the next one follows in a later task, so the screen never waits on all of them. */
+  function watchMore() {
+    if (!('IntersectionObserver' in window)) return;
+    if (!moreWatch) moreWatch = new IntersectionObserver(entries => { if (entries.some(e => e.isIntersecting)) setTimeout(loadMore, 0); }, { rootMargin: '0px 0px 400px 0px' });
+    moreWatch.disconnect();
+    const btn = document.querySelector('#feed-more .more-btn');
+    if (btn) moreWatch.observe(btn);
+  }
+
+  /* The jobs page is drawn in parts too (see render): the frame below never changes, so the search box is
+     never redrawn while someone types (that also keeps a Bangla keyboard's half-typed letter intact), and
+     typing redraws only the count line and the list. */
+  let jobsParts = null;
+  const findText = j => j._find || (j._find = Engine.norm(j.title + ' ' + j.company + ' ' + j.loc.text)); // made once per post
   function pageJobs() {
     const f = S.f, q = Engine.norm(f.q), m = live();
-    let list = (f.bucket === 'fit' ? m : S.results).filter(r => (!q || Engine.norm(r.job.title + ' ' + r.job.company + ' ' + r.job.loc.text).includes(q)) && f.quick.every(k => QUICK[k](r)));
+    let list = (f.bucket === 'fit' ? m : S.results).filter(r => (!q || findText(r.job).includes(q)) && f.quick.every(k => QUICK[k](r)));
     if (f.sort === 'new') list = list.slice().sort((a, b) => b.job.postedAt - a.job.postedAt || b.score - a.score);
     if (f.sort === 'deadline') list = list.slice().sort((a, b) => (a.job.daysLeft == null ? 1e9 : a.job.daysLeft) - (b.job.daysLeft == null ? 1e9 : b.job.daysLeft) || b.score - a.score);
     const segBtn = (id, label, n) => `<button type="button" role="tab" data-a="bucket" data-v="${id}" data-fid="bucket:${id}" aria-selected="${f.bucket === id}">${label}<span class="n">${num(n)}</span></button>`;
-    let feed = '';
-    if (!list.length) feed = (q || f.quick.length) ? emptyBlock(t('emptyFilter'), t('emptyFilterD'), `<button type="button" class="btn soft" data-a="clear-filters">${t('clearFilters')}</button>`) : emptyBlock(t('emptyForYou'), t('emptyForYouD'), `<button type="button" class="btn soft" data-a="bucket" data-v="all">${t('seeAll')}</button>`);
-    else if (f.bucket === 'fit' && f.sort === 'match') {
+    const card = r => ({ key: 'j:' + r.job.id, card: true, html: () => jobCard(r) });
+    let items = [];
+    if (f.bucket === 'fit' && f.sort === 'match') {
       const s = list.filter(r => r.bucket === 'strong'), p = list.filter(r => r.bucket === 'possible');
-      feed = (s.length ? `<div class="sec-head"><h2 class="sec-title">${t('bestH')}</h2></div>${s.map(jobCard).join('')}` : '') + (p.length ? `<div class="sec-head"><div><h2 class="sec-title">${t('possibleH')}</h2><p class="hint">${t('possibleD')}</p></div></div>${p.map(jobCard).join('')}` : '');
-    } else feed = list.map(jobCard).join('');
-    return `<div class="page-head"><h1>${t('jobsHead')}</h1><p>${t('summary', { a: num(m.filter(r => r.bucket === 'strong').length), b: num(m.filter(r => r.bucket === 'possible').length), n: num(S.results.length) })}</p>${freshLine()}</div>
-      <div class="toolbar">${searchBox('q', 'q', f.q, t('search'))}
-        <div class="seg" role="tablist">${segBtn('fit', t('tabForYou'), m.length)}${segBtn('all', t('tabAll'), S.results.length)}</div>
-        <div class="scroller" data-keep="quick">${['new', 'soon', 'fresher', 'remote'].map(k => chip('quick', k, f.quick.includes(k), t({ new: 'fNew', soon: 'fSoon', fresher: 'fFresher', remote: 'fRemote' }[k]), 'sm')).join('')}</div></div>
-      <div class="feed">${demoBanner()}<div class="result-bar"><span>${t('nJobs', { n: num(list.length) })}</span><label><span class="sr">${t('sortBy')}</span><select data-in="sort" data-fid="in:sort" aria-label="${t('sortBy')}">${[['match', 'sMatch'], ['new', 'sNew'], ['deadline', 'sDeadline']].map(([v, k]) => `<option value="${v}" ${f.sort === v ? 'selected' : ''}>${t(k)}</option>`).join('')}</select></label></div>${feed}</div>`;
+      if (s.length) items.push({ key: 'h:strong', html: () => `<div class="sec-head"><h2 class="sec-title">${t('bestH')}</h2></div>` }, ...s.map(card));
+      if (p.length) items.push({ key: 'h:possible', html: () => `<div class="sec-head"><div><h2 class="sec-title">${t('possibleH')}</h2><p class="hint">${t('possibleD')}</p></div></div>` }, ...p.map(card));
+    } else items = list.map(card);
+    // what the list shows: when this changes the list starts again from the top with the first chunk
+    Feed.plan = items.length ? { qk: JSON.stringify([f.bucket, f.quick, f.sort, q, S.lang, S.updatedAt]), items, cards: list.length } : null;
+    jobsParts = {
+      'j-head': `<h1>${t('jobsHead')}</h1><p>${t('summary', { a: num(m.filter(r => r.bucket === 'strong').length), b: num(m.filter(r => r.bucket === 'possible').length), n: num(S.results.length) })}</p>${freshLine()}`,
+      'j-tools': `<div class="seg" role="tablist">${segBtn('fit', t('tabForYou'), m.length)}${segBtn('all', t('tabAll'), S.results.length)}</div>
+        <div class="scroller" data-keep="quick">${['new', 'soon', 'fresher', 'remote'].map(k => chip('quick', k, f.quick.includes(k), t({ new: 'fNew', soon: 'fSoon', fresher: 'fFresher', remote: 'fRemote' }[k]), 'sm')).join('')}</div>`,
+      'j-banner': demoBanner(),
+      'j-bar': `<span>${t('nJobs', { n: num(list.length) })}</span><label><span class="sr">${t('sortBy')}</span><select data-in="sort" data-fid="in:sort" aria-label="${t('sortBy')}">${[['match', 'sMatch'], ['new', 'sNew'], ['deadline', 'sDeadline']].map(([v, k]) => `<option value="${v}" ${f.sort === v ? 'selected' : ''}>${t(k)}</option>`).join('')}</select></label>`,
+      'j-empty': list.length ? '' : (q || f.quick.length) ? emptyBlock(t('emptyFilter'), t('emptyFilterD'), `<button type="button" class="btn soft" data-a="clear-filters">${t('clearFilters')}</button>`) : emptyBlock(t('emptyForYou'), t('emptyForYouD'), `<button type="button" class="btn soft" data-a="bucket" data-v="all">${t('seeAll')}</button>`),
+    };
+    // the frame: the same every time (the search box carries no value here; render sets it when the frame is new)
+    return `<div class="page-head" id="j-head"></div>
+      <div class="toolbar"><div class="region" id="j-search">${searchBox('q', 'q', '', t('search'))}</div><div class="region" id="j-tools"></div></div>
+      <div class="feed"><div class="region" id="j-banner"></div><div class="result-bar" id="j-bar"></div><div class="region" id="j-empty"></div><div id="feed-slot"></div><div id="feed-more" class="feed-more"></div></div>`;
   }
 
   const STATUS = [['applied', 'stApplied'], ['interview', 'stInterview'], ['offer', 'stOffer'], ['rejected', 'stRejected']];
@@ -386,15 +460,16 @@
           ${dismissed ? `<button type="button" class="btn quiet" data-a="undismiss" data-v="${esc(j.id)}">${t('undo')}: ${t('notForMe')}</button>` : `<button type="button" class="btn quiet" data-a="dismiss" data-v="${esc(j.id)}">${ic('x')} ${t('notForMe')}</button>`}</div>`,
       foot: `${link}<button type="button" class="icon-btn ${saved ? 'on' : ''}" style="width:46px;height:46px" data-a="save" data-v="${esc(j.id)}" data-fid="sheet-save" aria-pressed="${saved}" aria-label="${saved ? t('saved') : t('save')}">${ic('bookmark')}</button>` };
   }
-  function sheetHtml() {
-    if (!S.sheet) return '';
+  /** The sheet in two parts: the frame (head and foot, drawn at once) and the body (drawn right after). */
+  function sheetParts() {
+    if (!S.sheet) return { frame: '', body: '' };
     let c;
-    if (S.sheet.kind === 'job') { const r = S.results.find(r => r.job.id === S.sheet.id); if (!r) { S.sheet = null; return ''; } c = sheetJob(r); }
+    if (S.sheet.kind === 'job') { const r = S.results.find(r => r.job.id === S.sheet.id); if (!r) { S.sheet = null; return { frame: '', body: '' }; } c = sheetJob(r); }
     else c = { label: t('installTitle'), head: `<div><h2 id="sheet-title">${t('installTitle')}</h2><div class="hint" style="font-size:1rem">${t('installLead')}</div></div>`, body: `<div class="howto"><p>${t('installAndroid')}</p><p>${t('installIos')}</p><p>${t('installPc')}</p></div>${inFrame ? `<div class="banner">${ic('info')}<span>${t('installPreview')}</span></div>` : ''}`, foot: '' };
     const anim = sheetShown ? 'style="animation:none"' : '';
-    return `<div class="scrim" data-a="close" ${anim}></div><div class="sheet" role="dialog" aria-modal="true" aria-labelledby="sheet-title" ${anim}>
+    return { body: c.body, frame: `<div class="scrim" data-a="close" ${anim}></div><div class="sheet" role="dialog" aria-modal="true" aria-labelledby="sheet-title" ${anim}>
       <div class="sheet-head"><span class="grab" aria-hidden="true"></span>${c.head}<button type="button" class="icon-btn" data-a="close" data-fid="sheet-close" aria-label="${t('close')}">${ic('x')}</button></div>
-      <div class="sheet-body" data-keep="sheet">${c.body}</div>${c.foot ? `<div class="sheet-foot">${c.foot}</div>` : ''}</div>`;
+      <div class="sheet-body" id="s-body" data-keep="sheet"></div>${c.foot ? `<div class="sheet-foot">${c.foot}</div>` : ''}</div>` };
   }
 
   /* ── shell ── */
@@ -410,36 +485,84 @@
   }
   function go(r) { if ((location.hash || '') === '#' + r) { resolveRoute(); render(); } else location.hash = r; window.scrollTo(0, 0); }
 
+  /* The screen is drawn in regions: the side rail, the top bar, the page, the bottom tab bar, the update bar
+     and the job sheet. Each render works out every region's HTML, but only a region whose HTML changed is
+     redrawn. Opening a job therefore redraws the sheet alone; saving a job redraws one card and a counter.
+     (Redrawing the whole screen made a cheap phone lay out every element again: up to a second each time.) */
+  const drawn = {};
+  let shellFor = null;
+  const restoreKeep = keep => document.querySelectorAll('#app [data-keep]').forEach(el => { const k = keep[el.dataset.keep]; if (k && (k[0] || k[1]) && !el.scrollLeft && !el.scrollTop) { el.scrollLeft = k[0]; el.scrollTop = k[1]; } });
+  function region(id, html) {
+    if (drawn[id] === html) return false;
+    document.getElementById(id).innerHTML = html; drawn[id] = html;
+    return true;
+  }
   function render() {
     const root = document.getElementById('app'), act = document.activeElement;
     let fid = act && act.dataset ? act.dataset.fid : null;
     const keep = {}; root.querySelectorAll('[data-keep]').forEach(el => (keep[el.dataset.keep] = [el.scrollLeft, el.scrollTop]));
-    document.documentElement.lang = S.lang; document.title = APP_NAME[S.lang];
-    if (S.theme === 'auto') document.documentElement.removeAttribute('data-theme'); else document.documentElement.setAttribute('data-theme', S.theme);
+    if (document.documentElement.lang !== S.lang) document.documentElement.lang = S.lang;
+    if (document.title !== APP_NAME[S.lang]) document.title = APP_NAME[S.lang];
+    const theme = S.theme === 'auto' ? null : S.theme;
+    if (document.documentElement.getAttribute('data-theme') !== theme) { if (theme) document.documentElement.setAttribute('data-theme', theme); else document.documentElement.removeAttribute('data-theme'); }
     const app = !!(S.account && S.profile) && S.route !== 'setup' && S.route !== 'welcome';
     const NAV = [['home', 'navHome', 'home'], ['jobs', 'navJobs', 'bag'], ['tracker', 'navTracker', 'tracker'], ['profile', 'navProfile', 'user']];
     const tracked = Object.keys(S.marks.saved).length + Object.keys(S.marks.applied).length;
     const navBtns = withCount => NAV.map(([r, k, i]) => `<button type="button" data-a="go" data-v="${r}" ${S.route === r ? 'aria-current="page"' : ''}>${ic(i)}<span>${t(k)}</span>${withCount && r === 'tracker' && tracked ? `<span class="count">${num(tracked)}</span>` : ''}</button>`).join('');
+    jobsParts = null; Feed.plan = null;
     const page = S.route === 'welcome' ? pageWelcome() : S.route === 'setup' ? pageSetup() : S.route === 'jobs' ? pageJobs() : S.route === 'tracker' ? pageTracker() : S.route === 'profile' ? pageProfile() : pageHome();
+    const sheet = sheetParts(), opening = !!S.sheet && !sheetShown;
     const key = S.route + ':' + (S.route === 'setup' ? (S.done ? 'done' : S.step) : '');
     const brand = `<button type="button" class="brand" data-a="go" data-v="${app || (S.account && S.profile) ? 'home' : 'welcome'}"><span class="brand-mark">${ic('check')}</span>${APP_NAME[S.lang]}</button>`;
     const langBtn = `<button type="button" class="pill-btn" data-a="lang" data-fid="lang" lang="${S.lang === 'bn' ? 'en' : 'bn'}">${t('langSwitch')}</button>`;
-    root.innerHTML = `<div class="shell ${app ? 'app' : ''}">
-      ${app ? `<aside class="rail">${brand}<nav aria-label="Main">${navBtns(true)}</nav><span class="grow"></span>${S.installed ? '' : `<button type="button" class="btn soft" data-a="install" data-fid="install-rail">${ic('download')} ${t('installApp')}</button>`}<div style="margin-top:8px">${langBtn}</div>
-        <button type="button" class="me" data-a="go" data-v="profile"><span class="avatar" aria-hidden="true">${esc(initials(S.account.name))}</span><span><b>${esc(S.account.name)}</b><span>${t('navProfile')}</span></span></button></aside>` : ''}
-      <div><header class="mtop"><div class="mtop-in">${brand}<span class="push"></span>${langBtn}${app ? `<button type="button" class="avatar" data-a="go" data-v="profile" aria-label="${t('navProfile')}">${esc(initials(S.account.name))}</button>` : ''}</div></header>
-        <main><div class="${key !== lastKey ? 'view' : ''}">${page}</div></main></div>
-      ${app ? `<nav class="tabbar" aria-label="Main">${navBtns(false)}</nav>` : ''}</div>${updateReady && !S.draft && !S.sheet ? `<button type="button" class="update-bar" data-a="refresh" data-fid="refresh" ${S.busy === 'refresh' ? 'disabled' : ''}>${ic('download')}<span>${S.busy === 'refresh' ? t('wait') : t('updateReady')}</span></button>` : ''}${sheetHtml()}`;
+    if (shellFor !== app) { // the frame of the screen: built again only when it switches between the app and the welcome pages
+      root.innerHTML = `<div class="shell ${app ? 'app' : ''}"><div class="region" id="r-rail"></div>
+        <div><header class="mtop"><div class="mtop-in" id="r-top"></div></header><main><div id="r-page"></div></main></div>
+        <div class="region" id="r-tabbar"></div></div><div class="region" id="r-update"></div><div class="region" id="r-sheet"></div>`;
+      Object.keys(drawn).forEach(k => delete drawn[k]); shellFor = app;
+    }
+    region('r-rail', app ? `<aside class="rail">${brand}<nav aria-label="Main">${navBtns(true)}</nav><span class="grow"></span>${S.installed ? '' : `<button type="button" class="btn soft" data-a="install" data-fid="install-rail">${ic('download')} ${t('installApp')}</button>`}<div style="margin-top:8px">${langBtn}</div>
+        <button type="button" class="me" data-a="go" data-v="profile"><span class="avatar" aria-hidden="true">${esc(initials(S.account.name))}</span><span><b>${esc(S.account.name)}</b><span>${t('navProfile')}</span></span></button></aside>` : '');
+    region('r-top', `${brand}<span class="push"></span>${langBtn}${app ? `<button type="button" class="avatar" data-a="go" data-v="profile" aria-label="${t('navProfile')}">${esc(initials(S.account.name))}</button>` : ''}`);
+    let pageNew = false;
+    if (key !== lastKey) { // a new page: a fresh element, so its entrance animation plays
+      const fresh = document.createElement('div'); fresh.id = 'r-page'; fresh.className = 'view';
+      document.getElementById('r-page').replaceWith(fresh); delete drawn['r-page'];
+    }
+    pageNew = region('r-page', page);
+    if (jobsParts) { // the jobs page's own parts; all of them are new when its frame was just drawn
+      if (pageNew) Object.keys(drawn).filter(k => k.startsWith('j-')).forEach(k => delete drawn[k]);
+      Object.entries(jobsParts).forEach(([id, html]) => { if (region(id, html)) pageNew = pageNew || id === 'j-tools'; });
+      // the search box is not redrawn: give it the search text when that changed elsewhere ("Clear filters")
+      const box = document.getElementById('q'); if (box && box.value !== S.f.q) box.value = S.f.q;
+    }
+    region('r-tabbar', app ? `<nav class="tabbar" aria-label="Main">${navBtns(false)}</nav>` : '');
+    region('r-update', updateReady && !S.draft && !S.sheet ? `<button type="button" class="update-bar" data-a="refresh" data-fid="refresh" ${S.busy === 'refresh' ? 'disabled' : ''}>${ic('download')}<span>${S.busy === 'refresh' ? t('wait') : t('updateReady')}</span></button>` : '');
+    // the sheet: its frame first; when it is just opening, its body follows right after the first picture,
+    // so the tap is answered at once and the longer body is drawn in a task of its own
+    const sheetNew = region('r-sheet', sheet.frame);
+    if (sheetNew) delete drawn['s-body'];
+    if (sheet.frame) {
+      if (opening) { const want = S.sheet; requestAnimationFrame(() => setTimeout(() => { if (S.sheet === want && region('s-body', sheetParts().body)) restoreKeep(keep); }, 0)); }
+      else region('s-body', sheet.body);
+    }
     lastKey = key;
-    root.querySelectorAll('[data-keep]').forEach(el => { const k = keep[el.dataset.keep]; if (k) { el.scrollLeft = k[0]; el.scrollTop = k[1]; } });
-    document.body.style.overflow = S.sheet ? 'hidden' : ''; document.body.classList.toggle('sheet-open', !!S.sheet);
-    if (S.sheet && !sheetShown) fid = 'sheet-close';
-    if (!S.sheet && sheetShown && opener) { fid = opener; opener = null; }
+    placeFeed(root); // the job list: put back into a page that was just drawn, or brought up to date where it stands
+    // scroll positions inside a region that was just drawn (only when there is one to restore: setting it makes the browser lay out)
+    if (pageNew || sheetNew) restoreKeep(keep);
+    const sheetOpened = !!S.sheet && !sheetShown, sheetClosed = !S.sheet && sheetShown;
+    if (sheetOpened || sheetClosed) { document.body.style.overflow = S.sheet ? 'hidden' : ''; document.body.classList.toggle('sheet-open', !!S.sheet); }
+    if (sheetOpened) fid = 'sheet-close';
+    if (sheetClosed && opener) { fid = opener; opener = null; }
     sheetShown = !!S.sheet;
-    if (fid) { const el = root.querySelector(`[data-fid="${CSS.escape(fid)}"]`); if (el) { el.focus({ preventScroll: true }); if (el.tagName === 'INPUT' && el.type !== 'number') { try { el.setSelectionRange(el.value.length, el.value.length); } catch { /* not a text field */ } } } }
+    // focus: into a sheet that opened, back to what opened it, or back to an element that was redrawn
+    if (fid && (sheetOpened || sheetClosed || !(act && act.isConnected))) {
+      const el = root.querySelector(`[data-fid="${CSS.escape(fid)}"]`);
+      if (el) { el.focus({ preventScroll: true }); if (el.tagName === 'INPUT' && el.type !== 'number') { try { el.setSelectionRange(el.value.length, el.value.length); } catch { /* not a text field */ } } }
+    }
   }
 
-  let toastTimer;
+  let toastTimer, searchTimer;
   function toast(msg, undo) {
     const el = document.getElementById('toast');
     el.innerHTML = `<div class="toast"><span>${msg}</span>${undo ? `<button type="button" data-a="toast-undo">${t('undo')}</button>` : ''}</div>`;
@@ -479,7 +602,37 @@
     S.profile = profileFromDraft(d); Store.set('profile', S.profile);
     S.account = Object.assign({ id: 'u' + Date.now().toString(36) + Math.random().toString(36).slice(2, 8), createdAt: Date.now() }, S.account || {}, { name: d.name.trim(), contact: d.contact.trim() });
     Store.set('account', S.account); recompute();
+    setTimeout(countUnknownWords, 3000); // after the account is online (a new account signs in first)
     return isNew;
+  }
+
+  /* ── anonymous count of words the dictionary does not know ──
+     Words a person typed as job titles or skills that match nothing in the dictionary are counted, so new
+     ones can be added to it. Only the word goes out, with +1: no user id, no time, nothing else.
+     Never sent: a word with 3 or more digits in a row (a phone number), with @ or :// or www (an email or
+     link), shorter than 2 or longer than 40 characters, or more than 4 words. Each word is sent once from
+     a device. The list is shown to the admin only for words counted 3 or more times. */
+  const COUNTED = 'jobshathi:counted';
+  function unknownWords(p) {
+    const typed = [...(p.keywords || []), ...(p.skills || []).filter(s => !Engine.skillFields[s])];
+    const out = [];
+    for (const raw of typed) {
+      const w = Engine.norm(raw).replace(/[^a-z0-9ঀ-৿ .+#&-]/g, ' ').replace(/\s+/g, ' ').trim();
+      if (w.length < 2 || w.length > 40 || w.split(' ').length > 4) continue;
+      if (/\d{3}|@|:\/\/|www\./.test(w) || /^[.\s-]+$/.test(w)) continue;
+      if (Engine.knows(w) || out.includes(w)) continue;
+      out.push(w);
+    }
+    return out;
+  }
+  async function countUnknownWords() {
+    if (!S.profile || !Cloud.ready()) return;
+    let sent = [];
+    try { sent = JSON.parse(localStorage.getItem(COUNTED) || '[]'); } catch { sent = []; }
+    const fresh = unknownWords(S.profile).filter(w => !sent.includes(w));
+    if (!fresh.length) return;
+    const done = await Cloud.countWords(fresh);
+    try { localStorage.setItem(COUNTED, JSON.stringify(sent.concat(done).slice(-300))); } catch { /* the word may be counted again later */ }
   }
   function validStep() {
     const d = S.draft;
@@ -657,6 +810,7 @@
       case 'google': googleSignIn(); return;
       case 'google-link': googleLink(); return;
       case 'sign-out': signOutHere(); return;
+      case 'more': loadMore(); return;
       case 'refresh': if (S.busy) return; busy('refresh'); refreshApp(); return;
       default: return;
     }
@@ -666,7 +820,8 @@
   document.addEventListener('click', e => { const el = e.target.closest('[data-a]'); if (el) onAction(el.dataset.a, el.dataset.v); });
   document.addEventListener('input', e => {
     const el = e.target, k = el.dataset && el.dataset.in; if (!k) return;
-    if (k === 'q') { S.f.q = el.value; render(); return; }
+    // search: the list is filtered once typing pauses, not at every letter
+    if (k === 'q') { S.f.q = el.value; clearTimeout(searchTimer); searchTimer = setTimeout(render, 250); return; }
     if (k === 'sort') { S.f.sort = el.value; render(); return; }
     if (k === 'wq') { S.wq = el.value; render(); return; }
     if (S.draft) { S.draft[k] = el.value; if (k === 'minSalary') { const on = document.querySelector('[data-a="salary"][aria-pressed="true"]'); if (on && +on.dataset.v !== +el.value) on.setAttribute('aria-pressed', 'false'); } }
