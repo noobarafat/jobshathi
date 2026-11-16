@@ -5,10 +5,13 @@
 const Engine = (() => {
   const BN_DIGITS = '০১২৩৪৫৬৭৮৯';
   const latinDigits = s => s.replace(/[০-৯]/g, d => BN_DIGITS.indexOf(d));
-  const norm = s => latinDigits((s == null ? '' : String(s)).toLowerCase()).replace(/[’‘`]/g, "'").replace(/[–—]/g, '-').replace(/\s+/g, ' ').trim();
+  // NFC first: Bangla letters such as য় and ড় can be typed in two ways, and both must compare equal
+  const norm = s => latinDigits((s == null ? '' : String(s)).normalize('NFC').toLowerCase()).replace(/[’‘`]/g, "'").replace(/[–—]/g, '-').replace(/\s+/g, ' ').trim();
   const normTitle = s => norm(s).replace(/[()\[\],:|\/\-]+/g, ' ').replace(/\.(?=\s|$)/g, '').replace(/\s+/g, ' ').trim();
   const escRe = s => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
   const isLatin = s => /^[\x00-\x7f]+$/.test(s);
+  /** A pattern holding Bangla, brought to the same normal form norm() gives the text. */
+  const nfc = rx => new RegExp(rx.source.normalize('NFC'), rx.flags);
   const reCache = new Map();
   /** Is `term` in `text` as a whole word? (Bangla has no word boundary we can trust: a plain search.) */
   function hasTerm(text, term) {
@@ -18,35 +21,81 @@ const Engine = (() => {
     if (!re) { re = new RegExp('(^|[^a-z0-9])' + escRe(term) + '($|[^a-z0-9])'); reCache.set(term, re); }
     return re.test(text);
   }
-  function lev(a, b) {
+
+  /* ── searching fast ──
+     Reading 1,600 posts means hundreds of thousands of "is this term in this text?" questions, on phones
+     too. Most terms are plain words, and a plain word is in a text exactly when it is one of the text's
+     tokens, so a Set lookup answers most of them. `found` always gives the same answer as `hasTerm`. */
+  const prep = k => { const latin = isLatin(k); return { k, latin, simple: latin && /^[a-z0-9]+$/.test(k), toks: latin ? k.split(/[^a-z0-9]+/).filter(Boolean) : null }; };
+  const tokensOf = text => new Set(text.split(/[^a-z0-9]+/));
+  function found(text, toks, p) {
+    if (p.simple) return toks.has(p.k);
+    if (!p.latin) return text.includes(p.k);
+    for (const x of p.toks) if (!toks.has(x)) return false;
+    return hasTerm(text, p.k);
+  }
+
+  /* ── spelling mistakes ──
+     `within(a, b, max)` is the edit distance between a and b when it is at most `max`, else max + 1.
+     `letters` is a bit mask of the characters a string holds: two strings `max` edits apart differ in at
+     most 2 × max of those bits, which rules out nearly every candidate without comparing letters. */
+  const letters = s => { let m = 0; for (let i = 0; i < s.length; i++) { const c = s.charCodeAt(i); m |= 1 << (c >= 97 && c <= 122 ? c - 97 : c === 32 ? 26 : c >= 48 && c <= 57 ? 27 : 28); } return m; };
+  const bits = x => { x = x - ((x >> 1) & 0x55555555); x = (x & 0x33333333) + ((x >> 2) & 0x33333333); return (((x + (x >> 4)) & 0x0F0F0F0F) * 0x01010101) >>> 24; };
+  function within(a, b, max) {
     if (a === b) return 0;
-    const m = a.length, n = b.length; if (!m) return n; if (!n) return m;
-    let prev = Array.from({ length: n + 1 }, (_, i) => i);
+    const m = a.length, n = b.length;
+    if (Math.abs(m - n) > max) return max + 1;
+    if (max === 1) { // one edit: skip the common start, then the rest must line up
+      let i = 0; const min = Math.min(m, n);
+      while (i < min && a.charCodeAt(i) === b.charCodeAt(i)) i++;
+      const ok = m === n ? a.slice(i + 1) === b.slice(i + 1) : (m > n ? a.slice(i + 1) === b.slice(i) : a.slice(i) === b.slice(i + 1));
+      return ok ? 1 : 2;
+    }
+    let prev = new Array(n + 1);
+    for (let j = 0; j <= n; j++) prev[j] = j;
     for (let i = 1; i <= m; i++) {
-      const cur = [i];
-      for (let j = 1; j <= n; j++) cur[j] = Math.min(prev[j] + 1, cur[j - 1] + 1, prev[j - 1] + (a[i - 1] === b[j - 1] ? 0 : 1));
+      const cur = new Array(n + 1), ca = a.charCodeAt(i - 1);
+      let low = cur[0] = i;
+      for (let j = 1; j <= n; j++) {
+        const v = Math.min(prev[j] + 1, cur[j - 1] + 1, prev[j - 1] + (ca === b.charCodeAt(j - 1) ? 0 : 1));
+        cur[j] = v; if (v < low) low = v;
+      }
+      if (low > max) return max + 1; // every way forward already costs more
       prev = cur;
     }
     return prev[n];
   }
 
   /* ── indexes built once ── */
-  const fieldById = {}, roleById = {}, synIndex = [], catIndex = [];
+  // synIndex: exact title wordings · kwIndex: loose single words · catIndex / looseIndex: the portal's categories
+  const fieldById = {}, roleById = {}, synIndex = [], kwIndex = [], catIndex = [], looseIndex = [];
   FIELDS.forEach(f => {
     fieldById[f.id] = f;
-    (f.cats || []).forEach(c => catIndex.push([c, f.id]));
+    (f.cats || []).forEach(c => catIndex.push([norm(c), f.id]));
+    (f.loose || []).forEach(c => looseIndex.push([norm(c), f.id]));
+    (f.words || []).forEach(w => { const k = normTitle(w); if (k) kwIndex.push({ k, p: prep(k), role: null, field: f.id }); });
     f.roles.forEach(r => {
       r.field = f.id; roleById[r.id] = r;
-      [r.en, ...r.syn].forEach(s => { const k = normTitle(s); if (k) synIndex.push({ k, words: k.split(' ').length, role: r.id, field: f.id }); });
+      [r.en, ...r.syn].forEach(s => { const k = normTitle(s); if (k) synIndex.push({ k, p: prep(k), words: k.split(' ').length, role: r.id, field: f.id }); });
+      (r.kw || []).forEach(w => { const k = normTitle(w); if (k) kwIndex.push({ k, p: prep(k), role: r.id, field: f.id }); });
     });
   });
   synIndex.sort((a, b) => b.k.length - a.k.length);
   catIndex.sort((a, b) => b[0].length - a[0].length);
+  looseIndex.sort((a, b) => b[0].length - a[0].length);
+  /* Wordings a misspelt title is compared with. A typing mistake sits inside a long word, so each word gets
+     its own allowance: a word under six letters must match exactly (“Deputy” is not “Duty”, “Tr.” is not “IT”),
+     a longer one may differ by 18% of its letters, two at most. `budget` is the allowance of the whole wording. */
+  const spellIndex = synIndex.filter(s => s.p.latin && s.k.length >= 6).map(s => {
+    const ws = s.k.split(' ').map(w => [w, w.length < 6 ? 0 : Math.min(2, Math.floor(w.length * 0.18))]);
+    return { ...s, ws, budget: ws.reduce((n, w) => n + w[1], 0), mask: letters(s.k) };
+  }).filter(s => s.budget > 0);
+  const maxWords = spellIndex.reduce((n, s) => Math.max(n, s.words), 1);
 
   const skillFields = {}; // skill → the fields that list it
   FIELDS.forEach(f => f.skills.forEach(s => (skillFields[s] = skillFields[s] || []).push(f.id)));
   const allSkills = Object.keys(skillFields).sort((a, b) => a.localeCompare(b));
-  const skillTerms = allSkills.map(s => [s, [...new Set([norm(s), ...(SKILL_ALIASES[s] || []).map(norm)])]]);
+  const skillTerms = allSkills.map(s => [s, [...new Set([norm(s), ...(SKILL_ALIASES[s] || []).map(norm)])].filter(Boolean).map(prep)]);
 
   const districtDiv = {}, placeIndex = []; // placeIndex: [key, district, area|null]
   const areaGroup = {};                    // "Dhaka/Mirpur" → group number
@@ -58,66 +107,136 @@ const Engine = (() => {
     else if (areaDistrict[target]) placeIndex.push([norm(k), areaDistrict[target], target]);
   });
   placeIndex.sort((a, b) => b[0].length - a[0].length);
+  placeIndex.forEach(p => p.push(prep(p[0]))); // [key, district, area|null, prepared key]
 
   /* ── reading one post ── */
-  function fieldFromCat(cat) {
-    const c = norm(cat); if (!c) return null;
-    const hit = catIndex.find(([k]) => hasTerm(c, k));
-    return hit ? hit[1] : null;
+  /** Every field a portal category points to, the longest wording first ("Marketing / Sales" → marketing, sales). */
+  function fieldsOf(cat, index) {
+    const c = norm(cat), out = []; if (!c) return out;
+    for (const [k, f] of index) if (hasTerm(c, k) && !out.includes(f)) out.push(f);
+    return out;
   }
 
-  /** The field and role a job title means: exact wording first, then a near spelling, then the portal's category, then the skills. */
-  function classify(title, cat, skills) {
-    const t = normTitle(title), catField = fieldFromCat(cat);
+  // a production or quality job is a garments job when the post is about garments
+  const GARMENT_WORDS = /(^|[^a-z])(garments?|rmg|apparels?|knit(ting|wear)?|woven|sweaters?|denim|textiles?|spinning|dyeing|lingerie|buying house|composite)($|[^a-z])|গার্মেন্টস/;
+
+  /** The field and role a job title means. In order:
+      1. an exact wording of the title (`syn`), then a near spelling of one;
+      2. a loose word in the title (`kw`, `words`), unless the portal's category points to another field;
+      3. the portal's category; 4. the skills; 5. a vague category (`loose`).
+      `context` is the title, company, category and requirements together. */
+  function classify(title, cat, skills, context) {
+    const t = normTitle(title), catFields = fieldsOf(cat, catIndex), catField = catFields[0] || null;
+    // a production or quality wording also fits a category that says garments (it becomes a garments job below)
+    const inCat = f => catFields.includes(f) || (f === 'production' && catFields.includes('garments'));
+    // a government circular counts under its kind of work AND under “Government”, so people who chose either see it
+    const also = f => (catFields.includes('govt') && f !== 'govt' ? 'govt' : null);
+    const done = out => {
+      if (out.field === 'production' && (catFields.includes('garments') || GARMENT_WORDS.test(' ' + norm(context || title) + ' '))) {
+        const role = out.role && roleById[out.role].garments;
+        out = { field: 'garments', role: role || null, how: out.how };
+      }
+      out.also = also(out.field);
+      return out;
+    };
+    const toks = tokensOf(t);
     let best = null;
     for (const s of synIndex) {
-      if (!hasTerm(t, s.k)) continue;
-      const w = s.k.length + (s.field === catField ? 100 : 0);
+      if (!found(t, toks, s.p)) continue;
+      const w = s.k.length + (inCat(s.field) ? 100 : 0);
       if (!best || w > best.w) best = { w, role: s.role, field: s.field, how: 'title' };
     }
     if (!best) { // a spelling mistake: “Accountent”, “Merchandizer”
-      const words = t.split(' ');
-      for (const s of synIndex) {
-        if (s.k.length < 6 || !isLatin(s.k)) continue;
-        for (let i = 0; i + s.words <= words.length; i++) {
-          const win = words.slice(i, i + s.words).join(' ');
-          if (Math.abs(win.length - s.k.length) > 2) continue;
-          const d = lev(win, s.k);
-          if (d > 0 && d / s.k.length <= 0.18) {
-            const w = s.k.length - d + (s.field === catField ? 100 : 0);
+      const words = t.split(' '), runs = []; // runs[n] = every run of n words in the title: [the words, their length together, their letter mask]
+      for (let n = 1; n <= maxWords; n++) { runs[n] = []; for (let i = 0; i + n <= words.length; i++) { const ws = words.slice(i, i + n), win = ws.join(' '); runs[n].push([ws, win.length, letters(win)]); } }
+      for (const s of spellIndex) {
+        for (const [ws, len, mask] of runs[s.words]) {
+          if (Math.abs(len - s.k.length) > s.budget || bits(mask ^ s.mask) > 2 * s.budget) continue;
+          let d = 0;
+          for (let i = 0; i < ws.length; i++) {
+            const a = ws[i], b = s.ws[i][0], max = s.ws[i][1];
+            if (a === b) continue;
+            // a mistake rarely changes a word's first letter
+            const e = max && a.charCodeAt(0) === b.charCodeAt(0) ? within(a, b, max) : max + 1;
+            if (e > max) { d = -1; break; }
+            d += e;
+          }
+          if (d > 0) {
+            const w = s.k.length - d + (inCat(s.field) ? 100 : 0);
             if (!best || w > best.w) best = { w, role: s.role, field: s.field, how: 'spelling' };
           }
         }
       }
     }
-    if (best) return { field: best.field, role: best.role, how: best.how };
-    if (catField) return { field: catField, role: null, how: 'category' };
+    if (!best) { // a loose word: “Manager Sales”, “Engineer (Quality)”
+      for (const s of kwIndex) {
+        if (!found(t, toks, s.p)) continue;
+        if (catField && !inCat(s.field)) continue; // the portal's category points elsewhere: the category decides
+        const w = s.k.length + (s.role ? 100 : 0);  // a word that names a role (“IE”) beats one that names only a field (“Garments”)
+        if (!best || w > best.w) best = { w, role: s.role, field: s.field, how: 'keyword' };
+      }
+    }
+    if (best) return done({ field: best.field, role: best.role, how: best.how });
+    if (catField) return done({ field: catField, role: null, how: 'category' });
     const votes = {}; // skills only one or two fields use
     (skills || []).forEach(s => { const fs = skillFields[s] || []; if (fs.length <= 2) fs.forEach(f => (votes[f] = (votes[f] || 0) + 1)); });
     const top = Object.entries(votes).sort((a, b) => b[1] - a[1])[0];
-    if (top && top[1] >= 2) return { field: top[0], role: null, how: 'skills' };
-    return { field: null, role: null, how: 'none' };
+    if (top && top[1] >= 2) return done({ field: top[0], role: null, how: 'skills' });
+    const loose = fieldsOf(cat, looseIndex)[0];
+    if (loose) return done({ field: loose, role: null, how: 'category' });
+    return { field: null, role: null, how: 'none', also: null };
   }
 
   function findSkills(text) {
-    const out = [];
-    for (const [name, terms] of skillTerms) if (terms.some(t => hasTerm(text, t))) out.push(name);
+    const out = [], toks = tokensOf(text);
+    for (const [name, terms] of skillTerms) if (terms.some(p => found(text, toks, p))) out.push(name);
     return out;
   }
 
-  function parseExperience(expText, reqText) {
-    const e = norm(expText), r = norm(reqText);
-    const fresher = /fresh|no experience|not required|not needed|^na$|^n\/a$|অভিজ্ঞতা (প্রয়োজন|লাগবে) (নেই|না)|ফ্রেশার/.test(e) || /fresh(er|ers)?\s*(are|can|may)?\s*(also\s*)?(be\s*)?(encouraged|apply|welcome)|no experience (is )?(needed|required)|ফ্রেশার/.test(r);
+  const NUMBER_WORDS = { one: 1, two: 2, three: 3, four: 4, five: 5, six: 6, seven: 7, eight: 8, ten: 10, 'এক': 1, 'দুই': 2, 'তিন': 3, 'চার': 4, 'পাঁচ': 5, 'সাত': 7, 'আট': 8, 'দশ': 10 };
+  const YEAR = '(?:years?|year\\(s\\)|yrs?|বছর|বৎসর)';
+  const RE_RANGE = new RegExp('(\\d+(?:\\.\\d+)?)\\s*(?:to|-|থেকে|হতে)\\s*(\\d+(?:\\.\\d+)?)\\s*\\+?\\s*' + YEAR);
+  const RE_YEARS = new RegExp('(\\d+(?:\\.\\d+)?)\\s*\\+?\\s*' + YEAR);
+  const RE_REQ_AFTER = new RegExp('(?:at least|minimum|min\\.?|কমপক্ষে|ন্যূনতম)?\\s*\\d+(?:\\.\\d+)?(?:\\s*(?:to|-|থেকে|হতে)\\s*\\d+(?:\\.\\d+)?)?\\s*\\+?\\s*(?:years?|year\\(s\\)|yrs?|months?|বছর|বৎসর|মাস)[\'’s]*(?:ের)?\\s*(?:of\\s*)?(?:previous\\s*|relevant\\s*|work(?:ing)?\\s*|professional\\s*|practical\\s*|hands-on\\s*|proven\\s*|বাস্তব\\s*)*(?:experience|অভিজ্ঞতা)');
+  const RE_REQ_BEFORE = new RegExp('(?:experience|অভিজ্ঞতা)[^.\\d]{0,30}(\\d+(?:\\.\\d+)?(?:\\s*(?:to|-|থেকে|হতে)\\s*\\d+(?:\\.\\d+)?)?\\s*\\+?\\s*(?:years?|year\\(s\\)|yrs?|months?|বছর|বৎসর|মাস))');
+  /** “two years” / “দুই বছর” → “2 years”, so one reader handles words and digits. */
+  const wordsToDigits = s => s.replace(/(^|[^a-zঀ-৿])(one|two|three|four|five|six|seven|eight|ten|এক|দুই|তিন|চার|পাঁচ|সাত|আট|দশ)(?=\s*\+?\s*(?:years?|yrs?|বছর|বৎসর))/g, (_, pre, w) => pre + NUMBER_WORDS[w]);
+
+  /* When a post states no experience, the title often still tells the level: “Intern”, “Jr. Officer”, “Sr. Manager”. */
+  const TITLE_LEVELS = [
+    ['fresher', 0, ['intern', 'internship', 'trainee', 'apprentice', 'fresher', 'entry level', 'fresh graduate', 'ইন্টার্ন', 'শিক্ষানবিশ', 'ট্রেইনি']],
+    ['junior', 1, ['junior', 'jr', 'জুনিয়র']],
+    ['senior', 5, ['senior manager', 'sr manager', 'head of', 'head teacher', 'group head', 'agm', 'dgm', 'gm', 'general manager', 'director', 'chief', 'ceo', 'cfo', 'coo', 'cto', 'chro', 'vice president', 'principal', 'professor', 'পরিচালক', 'অধ্যক্ষ']],
+    ['mid', 3, ['assistant manager', 'asst manager', 'deputy manager', 'dy manager', 'senior', 'sr', 'team leader', 'team lead', 'in charge', 'incharge', 'supervisor', 'সিনিয়র', 'ইনচার্জ']],
+    ['senior', 5, ['manager', 'ম্যানেজার']],
+  ].map(([level, min, words]) => [level, min, words.map(w => normTitle(w))]);
+  const FRESH_EXP = nfc(/fresh|no experience|not required|not needed|^na$|^n\/a$|entry[- ]level|অভিজ্ঞতা (প্রয়োজন|লাগবে) (নেই|না)|অভিজ্ঞতার প্রয়োজন নেই|ফ্রেশার/);
+  const FRESH_REQ = nfc(/fresh(er|ers)?\s*(are|can|may)?\s*(also\s*)?(be\s*)?(encouraged|apply|welcome)|no experience (is )?(needed|required)|ফ্রেশার|অভিজ্ঞতা ছাড়াও|অভিজ্ঞতার প্রয়োজন নেই/);
+  function titleLevel(title) {
+    const t = ' ' + normTitle(title) + ' ';
+    for (const [level, min, words] of TITLE_LEVELS) if (words.some(w => hasTerm(t, w))) return { level, min };
+    return null;
+  }
+
+  function parseExperience(expText, reqText, title) {
+    const e = wordsToDigits(norm(expText)), r = wordsToDigits(norm(reqText));
+    const fresher = FRESH_EXP.test(e) || FRESH_REQ.test(r);
     const read = s => {
-      let m = s.match(/(\d+(?:\.\d+)?)\s*(?:to|-|থেকে)\s*(\d+(?:\.\d+)?)\s*\+?\s*(?:years?|yrs?|বছর)/); if (m) return { min: +m[1], max: +m[2] };
-      m = s.match(/(\d+(?:\.\d+)?)\s*\+?\s*(?:years?|yrs?|বছর)/); if (m) return { min: +m[1], max: null };
+      let m = s.match(RE_RANGE); if (m) return { min: +m[1], max: +m[2] };
+      m = s.match(RE_YEARS); if (m) return { min: +m[1], max: null };
       m = s.match(/(\d+)\s*\+?\s*(?:months?|মাস)/); if (m) return { min: Math.round(+m[1] / 12 * 10) / 10, max: null };
       return null;
     };
     let got = read(e);
-    if (!got) { const m = r.match(/(?:at least|minimum|min\.?)?\s*\d+(?:\.\d+)?(?:\s*(?:to|-)\s*\d+(?:\.\d+)?)?\s*\+?\s*(?:years?|yrs?|months?|বছর|মাস)['’s]*\s*(?:of\s*)?(?:previous\s*|relevant\s*|work(?:ing)?\s*|professional\s*|practical\s*)*(?:experience|অভিজ্ঞতা)/); if (m) got = read(m[0]); }
-    if (!got) return fresher ? { min: 0, max: null, fresher: true, stated: true } : { min: null, max: null, fresher: false, stated: false };
-    return { ...got, fresher: fresher || got.min === 0, stated: true };
+    if (!got) { const m = r.match(RE_REQ_AFTER) || r.match(RE_REQ_BEFORE); if (m) got = read(m[1] || m[0]); }
+    if (!got && e && !fresher) { // a level word instead of a number: “Mid-level”, “Senior”
+      if (/junior|associate/.test(e)) got = { min: 1, max: 2 };
+      else if (/mid/.test(e)) got = { min: 3, max: 5 };
+      else if (/senior|lead|principal|expert/.test(e)) got = { min: 5, max: null };
+    }
+    if (got) return { ...got, fresher: fresher || got.min === 0, stated: true };
+    if (fresher) return { min: 0, max: null, fresher: true, stated: true };
+    return { min: null, max: null, fresher: false, stated: false, guess: title ? titleLevel(title) : null };
   }
 
   function parseEducation(eduText, reqText) {
@@ -138,11 +257,14 @@ const Engine = (() => {
     return m ? scan(m[0]) : null;
   }
 
+  const AGE_RANGE = nfc(/(?:age|বয়স|বয়সসীমা)[^.\d]{0,25}(\d{2})\s*(?:to|-|থেকে|হতে)\s*(\d{2})/);
+  const AGE_MAX = nfc(/(?:age|বয়স)[^.\d]{0,30}(?:max(?:imum)?|at most|not (?:over|more than)|below|under|up to|সর্বোচ্চ|অনূর্ধ্ব)\s*(\d{2})/);
+  const AGE_MIN = nfc(/(?:age|বয়স)[^.\d]{0,30}(?:min(?:imum)?|at least|above|over|সর্বনিম্ন)\s*(\d{2})/);
   function parseAge(text) {
     const t = norm(text);
-    let m = t.match(/(?:age|বয়স)[^.\d]{0,25}(\d{2})\s*(?:to|-|থেকে)\s*(\d{2})/); if (m) return { min: +m[1], max: +m[2] };
-    m = t.match(/(?:age|বয়স)[^.\d]{0,30}(?:max(?:imum)?|at most|not (?:over|more than)|below|under|up to|সর্বোচ্চ)\s*(\d{2})/); if (m) return { min: null, max: +m[1] };
-    m = t.match(/(?:age|বয়স)[^.\d]{0,30}(?:min(?:imum)?|at least|above|over|সর্বনিম্ন)\s*(\d{2})/); if (m) return { min: +m[1], max: null };
+    let m = t.match(AGE_RANGE); if (m) return { min: +m[1], max: +m[2] };
+    m = t.match(AGE_MAX); if (m) return { min: null, max: +m[1] };
+    m = t.match(AGE_MIN); if (m) return { min: +m[1], max: null };
     return null;
   }
 
@@ -163,15 +285,27 @@ const Engine = (() => {
     return 'full';
   }
 
-  /** Where a job is: remote, anywhere in Bangladesh, and the districts and areas its location line names. */
-  function parseLocation(locText) {
+  /* Countries a post in Bangladesh sometimes names: the job is abroad. */
+  const ABROAD = [['saudi arabia', 'Saudi Arabia'], ['ksa', 'Saudi Arabia'], ['united arab emirates', 'UAE'], ['uae', 'UAE'], ['dubai', 'UAE'], ['abu dhabi', 'UAE'], ['qatar', 'Qatar'], ['kuwait', 'Kuwait'], ['oman', 'Oman'], ['bahrain', 'Bahrain'],
+    ['malaysia', 'Malaysia'], ['singapore', 'Singapore'], ['maldives', 'Maldives'], ['japan', 'Japan'], ['south korea', 'South Korea'], ['india', 'India'], ['china', 'China'], ['united kingdom', 'UK'], ['united states', 'USA'], ['usa', 'USA'], ['canada', 'Canada'], ['australia', 'Australia'], ['europe', 'Europe'],
+    ['সৌদি আরব', 'Saudi Arabia'], ['দুবাই', 'UAE'], ['কাতার', 'Qatar'], ['কুয়েত', 'Kuwait'], ['ওমান', 'Oman'], ['মালয়েশিয়া', 'Malaysia'], ['সিঙ্গাপুর', 'Singapore'], ['মালদ্বীপ', 'Maldives'], ['জাপান', 'Japan']].map(([k, name]) => [norm(k), name]);
+  /* Area names that are also ordinary words in a job title (“Oxygen Plant Operator”, “Airport Staff”). */
+  const NOT_FROM_TITLE = new Set(['Airport', 'Oxygen', 'EPZ', 'Bandar', 'GEC', 'New Market', 'Chowrasta', 'Board Bazar', 'Wari', 'Turag']);
+  const placeWords = l => l.places.map(p => (p.area ? p.area + ', ' : '') + p.district).join(' / ') || l.abroad || (l.remote ? 'Remote' : (l.anywhere ? 'Anywhere in Bangladesh' : ''));
+
+  /** Where a job is: remote, anywhere in Bangladesh, abroad, and the districts and areas the line names.
+      With `fromTitle` the text is a job title: only names that are safe to read out of a title count. */
+  function parseLocation(locText, fromTitle) {
     let t = norm(locText).replace(/[,;()\/]+/g, ' , ');
-    const out = { text: (locText || '').trim(), remote: false, anywhere: false, places: [] };
+    const out = { text: fromTitle ? '' : (locText || '').trim(), remote: false, anywhere: false, abroad: null, places: [] };
     if (!t) return out;
     if (/remote|work from home|wfh|home[- ]based|রিমোট|বাসা থেকে/.test(t)) out.remote = true;
     if (/anywhere in bangladesh|all over bangladesh|across bangladesh|nationwide|any district|any where in bangladesh|সারা ?দেশ|বাংলাদেশের যেকোনো|যে কোনো জেলা/.test(t)) out.anywhere = true;
-    const named = new Set(), hits = [];
-    for (const [key, district, area] of placeIndex) {
+    const named = new Set(), hits = [], toks = tokensOf(t);
+    for (const [key, district, area, p] of placeIndex) {
+      if (fromTitle && area && NOT_FROM_TITLE.has(area)) continue;
+      // `toks` is from the whole line: a name whose words are not all there cannot match, before or after longer names are taken out
+      if (p.latin && !p.toks.every(x => toks.has(x))) continue;
       if (!hasTerm(t, key)) continue;
       t = t.split(key).join(' # '); // a longer name is taken out so its parts do not match again (“Old Dhaka” → not also “Dhaka”)
       hits.push({ district, area, explicit: !area });
@@ -184,8 +318,10 @@ const Engine = (() => {
       if (!h.area && withArea.has(h.district)) return; // “Mirpur, Dhaka” is Mirpur, not also all of Dhaka
       if (!out.places.some(p => p.district === h.district && p.area === h.area)) out.places.push({ district: h.district, area: h.area });
     });
+    if (!out.places.length && !out.anywhere && !out.remote) { const hit = ABROAD.find(([k]) => hasTerm(t, k)); if (hit) out.abroad = hit[1]; }
     return out;
   }
+  const placed = l => l.places.length > 0 || l.remote || l.anywhere || !!l.abroad;
 
   const DAY = 86400000;
   const startOfDay = d => { const x = new Date(d); x.setHours(0, 0, 0, 0); return x; };
@@ -198,7 +334,12 @@ const Engine = (() => {
       const text = norm([raw.title, raw.req, raw.edu, raw.exp].filter(Boolean).join(' . ')).replace(/tally erp/g, 'tally');
       const padded = ' ' + text + ' ';
       const skills = findSkills(padded);
-      const cls = classify(raw.title, raw.cat, skills);
+      const cls = classify(raw.title, raw.cat, skills, [raw.title, raw.company, raw.cat, raw.req].filter(Boolean).join(' . '));
+      let loc = parseLocation(raw.loc);
+      if (!placed(loc)) { // the place is sometimes only in the title: “Medical Assistant - Noakhali”
+        const fromTitle = parseLocation(raw.title, true);
+        if (placed(fromTitle)) loc = { ...fromTitle, text: loc.text || placeWords(fromTitle), from: 'title' };
+      }
       const postedAt = raw.postedAt ? startOfDay(raw.postedAt).getTime() : today - (raw.posted || 0) * DAY;
       const deadline = raw.deadline ? startOfDay(raw.deadline).getTime() : (raw.deadlineIn != null ? today + raw.deadlineIn * DAY : null);
       if (deadline != null && deadline < today) continue;
@@ -206,10 +347,10 @@ const Engine = (() => {
       const job = {
         id: String(raw.id || (normTitle(raw.title) + '|' + norm(raw.company))),
         title: raw.title.trim(), company: (raw.company || '').trim(), source: raw.source || '', url: raw.url || '', logo: raw.logo || '', site: raw.site || '', vacancies: raw.vacancies || null,
-        field: cls.field, role: cls.role, how: cls.how, skills, text: padded,
-        exp: parseExperience(raw.exp, raw.req), edu: parseEducation(raw.edu, raw.req), eduText: (raw.edu || '').trim(),
+        field: cls.field, role: cls.role, also: cls.also || null, how: cls.how, skills, text: padded,
+        exp: parseExperience(raw.exp, raw.req, raw.title), edu: parseEducation(raw.edu, raw.req), eduText: (raw.edu || '').trim(),
         age: parseAge([raw.age ? 'age ' + raw.age : '', raw.req].filter(Boolean).join(' . ')), salary: parseSalary(raw.salary), salaryText: (raw.salary || '').trim(),
-        type: parseType(raw.type, raw.title), loc: parseLocation(raw.loc),
+        type: parseType(raw.type, raw.title), loc,
         gender: /only females?|female candidates? only|females? only|শুধুমাত্র নারী|শুধু নারী/.test(g) ? 'female' : (/only males?|male candidates? only|(^|[^e])males? only|শুধুমাত্র পুরুষ|শুধু পুরুষ/.test(g) ? 'male' : null),
         scam: SCAM_PATTERNS.some(re => re.test(raw.req || '') || re.test(raw.title || '') || re.test(raw.salary || '')),
         postedAt, deadline, daysLeft: deadline == null ? null : Math.round((deadline - today) / DAY), isNew: today - postedAt < DAY,
@@ -260,6 +401,7 @@ const Engine = (() => {
         }
       }
     }
+    if (L.abroad) take(2, 'maybe', L.abroad, 'abroad'); // a job outside Bangladesh: shown, but never a location match
     if (!best) {
       if (!L.places.length && !L.remote && !L.anywhere) return { pts: 6, state: 'unknown', label: L.text || '', code: 'unknown' };
       return { pts: 0, state: 'no', label: L.places.map(placeName).join(' / ') || L.text, code: 'no' };
@@ -278,6 +420,7 @@ const Engine = (() => {
     else if (kwTitle) { rolePts = 40; roleCode = 'keyword'; roleLabel = kwTitle; }
     else if (job.field && x.fieldsAllRoles.has(job.field)) { rolePts = 34; roleCode = 'field'; roleLabel = fieldById[job.field].en; }
     else if (job.field && x.fields.has(job.field)) { rolePts = 24; roleCode = 'sameField'; roleLabel = job.role ? roleById[job.role].en : fieldById[job.field].en; }
+    else if (job.also && x.fields.has(job.also)) { const all = x.fieldsAllRoles.has(job.also); rolePts = all ? 34 : 24; roleCode = all ? 'field' : 'sameField'; roleLabel = fieldById[job.also].en; }
     else if (kwText) { rolePts = 22; roleCode = 'keywordText'; roleLabel = kwText; }
 
     // 2. skills
@@ -302,6 +445,11 @@ const Engine = (() => {
       if (x.years >= need || (job.exp.fresher && x.years === 0)) { expPts = 10; checks.push({ k: 'exp', state: 'ok', need, max: job.exp.max, fresher: job.exp.fresher }); }
       else if (need - x.years <= 1) { expPts = 4; checks.push({ k: 'exp', state: 'partial', need, max: job.exp.max }); }
       else { expPts = -10; hard = true; checks.push({ k: 'exp', state: 'warn', need, max: job.exp.max }); }
+    } else if (job.exp.guess) { // nothing stated: the title's level is a hint, never a hard rule
+      const g = job.exp.guess;
+      if (g.level === 'fresher') { expPts = x.years <= 2 ? 9 : 6; if (x.years === 0) checks.push({ k: 'exp', state: 'ok', guess: g.level }); }
+      else if (x.years >= g.min) expPts = 8;
+      else { expPts = g.min - x.years <= 2 ? 3 : -3; checks.push({ k: 'exp', state: 'partial', guess: g.level }); }
     }
     // 5. education
     let eduPts = 3;
@@ -353,6 +501,7 @@ const Engine = (() => {
     return Object.entries(count).filter(([, n]) => n >= 2).sort((a, b) => b[1] - a[1]).slice(0, limit).map(([skill, n]) => ({ skill, n, of: pool.length }));
   }
 
-  return { prepareJobs, rank, skillGaps, classify, parseLocation, expandProfile, match, fieldById, roleById, allSkills, skillFields, districtDiv, norm, hasTerm };
+  return { prepareJobs, rank, skillGaps, classify, parseLocation, parseExperience, findSkills, expandProfile, match, fieldById, roleById, allSkills, skillFields, districtDiv, norm, hasTerm,
+    _internals: { found, prep, tokensOf, within } }; // for tests/engine.test.mjs
 })();
 

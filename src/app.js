@@ -71,6 +71,7 @@
     engineering: '<path d="M14.5 6.5a4 4 0 0 0-5.3 5.3L3.5 17.5l3 3 5.7-5.7a4 4 0 0 0 5.3-5.3L15 12l-3-3z"/>', education: '<path d="M2 9l10-5 10 5-10 5z"/><path d="M6 11.5V16c0 1.5 2.7 3 6 3s6-1.5 6-3v-4.5M22 9v6"/>',
     health: '<path d="M12 20s-8-5-8-11a4.5 4.5 0 0 1 8-2.8A4.5 4.5 0 0 1 20 9c0 6-8 11-8 11z"/><path d="M8 12h2l1.5-3 2 5 1.5-2h1.5"/>', design: '<path d="M4 20l1-5L16 4l4 4L9 19z"/><path d="M13.5 6.5l4 4"/>',
     supply: '<path d="M2 6h11v10H2zM13 9h4.5l3.5 3.5V16h-8z"/><circle cx="6.5" cy="17.5" r="2"/><circle cx="16.5" cy="17.5" r="2"/>', ngo: '<circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c3 3.2 3 14.8 0 18M12 3c-3 3.2-3 14.8 0 18"/>',
+    production: '<path d="M3 21V10l5 3V10l5 3V6l8 0v15z"/><path d="M8 17h2M13 17h2M18 17h.01"/>', legal: '<path d="M12 4v16M7 20h10M5 8h14M5 8l-3 6a3 3 0 0 0 6 0zM19 8l-3 6a3 3 0 0 0 6 0z"/>', agro: '<path d="M12 21V11"/><path d="M12 11C12 7 9 5 5 5c0 4 3 6 7 6zM12 14c0-3 2.5-5 7-5 0 4-3 6-7 5z"/>',
     govt: '<path d="M3 10l9-6 9 6"/><path d="M5 10v8M9.5 10v8M14.5 10v8M19 10v8M3 20h18"/><path d="M12 6.6v.2"/>',
     office: '<rect x="2.5" y="6" width="19" height="12" rx="2"/><path d="M6 10h.01M10 10h.01M14 10h.01M18 10h.01M7 14h10"/>', service: '<circle cx="6" cy="17" r="3"/><circle cx="18" cy="17" r="3"/><path d="M6 17l4-8h5l3 8M10 9l-1-3H6.5M15 9l1.5-3H19"/>',
   };
@@ -128,8 +129,9 @@
     } else if (c.k === 'loc') {
       const l = esc(c.label), code = c.code || '';
       if (c.state === 'warn') cls = 'bad';
-      text = code === 'areaUnknown' ? t('cLocAreaUnknown', { l }) : code.startsWith('near:') ? t('cLocNear', { l, u: esc(code.slice(5)) }) : code === 'otherPart' ? t('cLocOther', { l }) : code === 'unknown' ? t('cLocUnknown') : code === 'no' ? t('cLocNo', { l }) : code === 'remoteNotAsked' ? t('cLocRemoteNA') : code === 'remote' ? t('remote') : code === 'anywhere' ? t('anywhere') : l;
-    } else if (c.k === 'exp') { if (c.state === 'warn') cls = 'bad'; text = c.state === 'ok' ? (c.fresher && !c.need ? t('cExpFresher') : t('cExpOk', { x: expWords(c) })) : c.state === 'partial' ? t('cExpPartial', { x: B(expWords(c)) }) : t('cExpWarn', { x: B(expWords(c)) }); }
+      text = code === 'abroad' ? t('cLocAbroad', { l }) : code === 'areaUnknown' ? t('cLocAreaUnknown', { l }) : code.startsWith('near:') ? t('cLocNear', { l, u: esc(code.slice(5)) }) : code === 'otherPart' ? t('cLocOther', { l }) : code === 'unknown' ? t('cLocUnknown') : code === 'no' ? t('cLocNo', { l }) : code === 'remoteNotAsked' ? t('cLocRemoteNA') : code === 'remote' ? t('remote') : code === 'anywhere' ? t('anywhere') : l;
+    } else if (c.k === 'exp' && c.guess) text = c.guess === 'fresher' ? t('cExpGuessEntry') : t('cExpGuess', { x: t('lvl_' + c.guess) });
+    else if (c.k === 'exp') { if (c.state === 'warn') cls = 'bad'; text = c.state === 'ok' ? (c.fresher && !c.need ? t('cExpFresher') : t('cExpOk', { x: expWords(c) })) : c.state === 'partial' ? t('cExpPartial', { x: B(expWords(c)) }) : t('cExpWarn', { x: B(expWords(c)) }); }
     else if (c.k === 'edu') { if (c.state === 'warn') cls = 'bad'; text = c.state === 'ok' ? t('cEduOk', { x: esc(eduName(c.need)) }) : t('cEduWarn', { x: B(eduName(c.need)) }); }
     else if (c.k === 'age') { if (c.state === 'warn') cls = 'bad'; text = t(c.state === 'ok' ? 'cAgeOk' : c.state === 'warn' ? 'cAgeWarn' : 'cAgeInfo', { x: ageWords(c) }); }
     else if (c.k === 'pay') text = t(c.state === 'ok' ? 'cPayOk' : 'cPayWarn', { x: payRange(c) });
@@ -149,8 +151,8 @@
       let s = '';
       if (c.k === 'role') s = t('shRole');
       else if (c.k === 'skills') s = t('shMissing', { x: esc(c.missing.slice(0, 2).join(', ')) + (c.missing.length > 2 ? ' +' + num(c.missing.length - 2) : '') });
-      else if (c.k === 'loc') { const code = c.code || ''; s = code.startsWith('near:') ? t('shNear', { u: esc(code.slice(5)) }) : code === 'areaUnknown' ? t('shAreaNA') : code === 'otherPart' ? t('shOther', { d: esc(c.label.split(', ').pop()) }) : code === 'remoteNotAsked' ? t('remote') : t('shOutside'); }
-      else if (c.k === 'exp') s = t('shNeeds', { x: expWords(c) });
+      else if (c.k === 'loc') { const code = c.code || ''; s = code === 'abroad' ? t('shAbroad') : code.startsWith('near:') ? t('shNear', { u: esc(code.slice(5)) }) : code === 'areaUnknown' ? t('shAreaNA') : code === 'otherPart' ? t('shOther', { d: esc(c.label.split(', ').pop()) }) : code === 'remoteNotAsked' ? t('remote') : t('shOutside'); }
+      else if (c.k === 'exp') s = c.guess ? t('shLikelyExp') : t('shNeeds', { x: expWords(c) });
       else if (c.k === 'edu') s = t('shNeeds', { x: esc(eduShort(c.need)) });
       else if (c.k === 'age') s = t('shAge', { x: ageWords(c) });
       else if (c.k === 'pay') s = t('shPay');
@@ -303,7 +305,7 @@
         <div class="side">${strengthCard()}${gapsCard()}${installCard()}</div></div>`;
   }
 
-  const QUICK = { new: r => r.job.isNew, remote: r => r.job.loc.remote, soon: r => r.job.daysLeft != null && r.job.daysLeft <= 3, fresher: r => r.job.exp.stated && (r.job.exp.fresher || !r.job.exp.min) };
+  const QUICK = { new: r => r.job.isNew, remote: r => r.job.loc.remote, soon: r => r.job.daysLeft != null && r.job.daysLeft <= 3, fresher: r => (r.job.exp.stated ? (r.job.exp.fresher || !r.job.exp.min) : !!(r.job.exp.guess && r.job.exp.guess.level === 'fresher')) };
   function pageJobs() {
     const f = S.f, q = Engine.norm(f.q), m = live();
     let list = (f.bucket === 'fit' ? m : S.results).filter(r => (!q || Engine.norm(r.job.title + ' ' + r.job.company + ' ' + r.job.loc.text).includes(q)) && f.quick.every(k => QUICK[k](r)));

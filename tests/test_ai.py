@@ -214,7 +214,7 @@ class Checks(unittest.TestCase):
         self.assertEqual(len(got["ai"]["skills"]), 10)
 
     def test_fields_come_from_the_sites_own_dictionary(self):
-        self.assertEqual(len(FIELDS), 17)
+        self.assertEqual(len(FIELDS), 20)
         self.assertEqual(FIELDS["it"], "IT & Software")
         self.assertIn("other", ai.schema(FIELDS)["properties"]["jobs"]["items"]["properties"]["field"]["enum"])
 

@@ -154,6 +154,11 @@ Object.assign(TEXT, {
 
 /* ───────── Updates and App Check ───────── */
 Object.assign(TEXT, {
+  cLocAbroad: ['Outside Bangladesh: {l}', 'বাংলাদেশের বাইরে: {l}'], shAbroad: ['Abroad', 'বিদেশে'],
+  cExpGuessEntry: ['Entry-level role (trainee or intern)', 'এন্ট্রি-লেভেল পদ (ট্রেইনি বা ইন্টার্ন)'],
+  cExpGuess: ['Experience is not stated; the title suggests a {x} role', 'অভিজ্ঞতা লেখা নেই; পদের নাম দেখে {x} পদ মনে হচ্ছে'],
+  lvl_junior: ['junior', 'জুনিয়র'], lvl_mid: ['mid-level', 'মধ্যম পর্যায়ের'], lvl_senior: ['senior', 'সিনিয়র'],
+  shLikelyExp: ['May need experience', 'অভিজ্ঞতা লাগতে পারে'],
   deadlineWas: ['Deadline was {d}', 'শেষ তারিখ ছিল {d}'],
   updateReady: ['Update available — tap to refresh', 'নতুন আপডেট এসেছে — রিফ্রেশ করতে ট্যাপ করুন'],
   recaptcha: ['This site is protected by reCAPTCHA. The Google {p} and {s} apply.', 'এই সাইট reCAPTCHA দিয়ে সুরক্ষিত। Google-এর {p} ও {s} প্রযোজ্য।'],
