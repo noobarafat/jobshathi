@@ -1,127 +1,393 @@
 {
  "run": {
-  "startedAt": "2026-11-16T08:59:34+06:00",
-  "finishedAt": "2026-11-16T09:03:47+06:00",
-  "newPostsCollected": 20,
-  "postsInFile": 1643,
-  "fileBytes": 1560381
+  "startedAt": "2026-11-17T11:13:26+06:00",
+  "finishedAt": "2026-11-17T11:23:45+06:00",
+  "newPostsCollected": 311,
+  "postsInFile": 1853,
+  "fileBytes": 1316311
+ },
+ "size": {
+  "fileBytes": 1316311,
+  "downloadBytes": 198310,
+  "budgetBytes": 358400,
+  "withinBudget": true
  },
  "collectedPerSource": {
-  "nextjobz": 0,
-  "alljobs": 15,
+  "nextjobz": 218,
+  "alljobs": 17,
   "remote": 5,
-  "companies": 0
+  "sr-polygon": 8,
+  "sr-nagorik": 10,
+  "sr-gigalogy": 6,
+  "sr-niftycoders": 1,
+  "sr-portonics": 2,
+  "sr-optimizely": 12,
+  "lever-fieldnation": 11,
+  "ft-shikho": 9,
+  "ft-technext": 4,
+  "ft-6sense": 3,
+  "ft-tezzdigital": 3,
+  "ft-talentedcube": 3,
+  "ts-therap": 3,
+  "ts-kazsoftware": 1
  },
  "postsInFilePerSource": {
-  "Alljobs (Teletalk)": 322,
+  "Alljobs (Teletalk)": 339,
+  "Trakstar Hire": 4,
+  "NextJobz": 1435,
+  "SmartRecruiters": 39,
   "Himalayas": 1,
-  "NextJobz": 1317,
+  "Lever": 11,
   "Jobicy": 1,
-  "Remote OK": 2
+  "Remote OK": 1,
+  "Freshteam": 22
  },
  "removed": {
-  "expired": 15,
+  "expired": 40,
   "too_old": 5,
+  "no_apply_link": 0,
   "asks_for_money": 0,
-  "merged": 2,
+  "merged": 56,
   "no_title": 0,
+  "closed_on_company_board": 0,
+  "source_switched_off": 0,
+  "held_for_review": 5,
   "over_size_limit": 0
  },
  "sourceFailures": {},
+ "sources": [
+  {
+   "id": "nextjobz",
+   "type": "nextjobz",
+   "enabled": true,
+   "collected": 218
+  },
+  {
+   "id": "alljobs",
+   "type": "alljobs",
+   "enabled": true,
+   "collected": 17
+  },
+  {
+   "id": "remote",
+   "type": "remote_boards",
+   "enabled": true,
+   "collected": 5
+  },
+  {
+   "id": "companies",
+   "type": "company_pages",
+   "enabled": false
+  },
+  {
+   "id": "sr-polygon",
+   "type": "smartrecruiters",
+   "enabled": true,
+   "how": "public career page, then each job page's schema.org data",
+   "listed": 8,
+   "collected": 8
+  },
+  {
+   "id": "sr-nagorik",
+   "type": "smartrecruiters",
+   "enabled": true,
+   "how": "public career page, then each job page's schema.org data",
+   "listed": 10,
+   "collected": 10
+  },
+  {
+   "id": "sr-gigalogy",
+   "type": "smartrecruiters",
+   "enabled": true,
+   "how": "public career page, then each job page's schema.org data",
+   "listed": 6,
+   "collected": 6
+  },
+  {
+   "id": "sr-niftycoders",
+   "type": "smartrecruiters",
+   "enabled": true,
+   "how": "public career page, then each job page's schema.org data",
+   "listed": 1,
+   "collected": 1
+  },
+  {
+   "id": "sr-portonics",
+   "type": "smartrecruiters",
+   "enabled": true,
+   "how": "public career page, then each job page's schema.org data",
+   "listed": 2,
+   "collected": 2
+  },
+  {
+   "id": "sr-optimizely",
+   "type": "smartrecruiters",
+   "enabled": true,
+   "how": "public career page, then each job page's schema.org data",
+   "listed": 12,
+   "collected": 12
+  },
+  {
+   "id": "lever-fieldnation",
+   "type": "lever",
+   "enabled": true,
+   "how": "public postings API",
+   "listed": 11,
+   "collected": 11
+  },
+  {
+   "id": "ft-shikho",
+   "type": "freshteam",
+   "enabled": true,
+   "how": "career page, then each job page's schema.org data",
+   "listed": 9,
+   "collected": 9
+  },
+  {
+   "id": "ft-technext",
+   "type": "freshteam",
+   "enabled": true,
+   "how": "career page, then each job page's schema.org data",
+   "listed": 4,
+   "collected": 4
+  },
+  {
+   "id": "ft-6sense",
+   "type": "freshteam",
+   "enabled": true,
+   "how": "career page, then each job page's schema.org data",
+   "listed": 3,
+   "collected": 3
+  },
+  {
+   "id": "ft-tezzdigital",
+   "type": "freshteam",
+   "enabled": true,
+   "how": "career page, then each job page's schema.org data",
+   "listed": 3,
+   "collected": 3
+  },
+  {
+   "id": "ft-talentedcube",
+   "type": "freshteam",
+   "enabled": true,
+   "how": "career page, then each job page's schema.org data",
+   "listed": 3,
+   "collected": 3
+  },
+  {
+   "id": "ts-therap",
+   "type": "trakstar",
+   "enabled": true,
+   "how": "the board's own openings feed",
+   "listed": 3,
+   "collected": 3
+  },
+  {
+   "id": "ts-kazsoftware",
+   "type": "trakstar",
+   "enabled": true,
+   "how": "the board's own openings feed",
+   "listed": 1,
+   "collected": 1
+  }
+ ],
+ "notRead": [
+  {
+   "name": "BDJobs",
+   "why": "robots.txt blocks every robot"
+  },
+  {
+   "name": "LinkedIn",
+   "why": "terms forbid scraping, and it blocks robots"
+  },
+  {
+   "name": "Facebook",
+   "why": "terms forbid scraping, and it blocks robots"
+  },
+  {
+   "name": "Skill.jobs",
+   "why": "terms forbid aggregating or linking to its content"
+  },
+  {
+   "name": "Shomvob",
+   "why": "its jobs sit behind /api/, which its robots.txt disallows"
+  },
+  {
+   "name": "Remotive",
+   "why": "terms ask that its jobs are not passed to other job sites"
+  },
+  {
+   "name": "SmartRecruiters Posting API (api.smartrecruiters.com)",
+   "why": "that host's robots.txt disallows all robots; the public career pages are read instead"
+  }
+ ],
+ "keywords": {
+  "postsRead": 294,
+  "postsWithSkills": 225,
+  "ran": true
+ },
+ "governmentPlaces": {
+  "withoutPlace": 220,
+  "fromOrgPlacesFile": 73,
+  "fromOrganisationName": 15,
+  "stillWithoutPlace": 132
+ },
+ "slim": {
+  "websiteLeftOut": 1178,
+  "educationShortened": 358,
+  "educationLeftLong": 8,
+  "keptLongToKeepMatching": 8,
+  "skillsMovedToKeywords": 443
+ },
+ "repaired": {
+  "governmentCategoryAdded": 34
+ },
+ "ai": {
+  "enabled": false
+ },
+ "flagged": [
+  {
+   "id": "nextjobz:IJOB202683544",
+   "title": "একাউন্টস অফিসার",
+   "company": "Shapla Gram Unnayan Sangstha",
+   "source": "NextJobz",
+   "url": "https://nextjobz.com.bd/jobs/একাউন্টস-অফিসার-IJOB202683544",
+   "why": "asks candidates for money (rule)",
+   "since": "2026-11-17"
+  },
+  {
+   "id": "nextjobz:IJOB202683543",
+   "title": "ব্রাঞ্চ ম্যানেজার",
+   "company": "Shapla Gram Unnayan Sangstha",
+   "source": "NextJobz",
+   "url": "https://nextjobz.com.bd/jobs/ব্রাঞ্চ-ম্যানেজার-IJOB202683543",
+   "why": "asks candidates for money (rule)",
+   "since": "2026-11-17"
+  },
+  {
+   "id": "nextjobz:IJOB202683542",
+   "title": "ফিল্ড ম্যানেজার",
+   "company": "Shapla Gram Unnayan Sangstha",
+   "source": "NextJobz",
+   "url": "https://nextjobz.com.bd/jobs/ফিল্ড-ম্যানেজার-IJOB202683542",
+   "why": "asks candidates for money (rule)",
+   "since": "2026-11-17"
+  },
+  {
+   "id": "nextjobz:IJOB202683198",
+   "title": "Executive - Rent (Property Acquisition)",
+   "company": "Building technology & Ideas Ltd.",
+   "source": "NextJobz",
+   "url": "https://nextjobz.com.bd/jobs/executive-rent-property-acquisition-dhaka-IJOB202683198",
+   "why": "asks candidates for money (rule)",
+   "since": "2026-11-17"
+  },
+  {
+   "id": "nextjobz:IJOB202676729",
+   "title": "Assistant Executive - Accounts & Finance, ABG Sports City",
+   "company": "Anvir Bashundhara Group",
+   "source": "NextJobz",
+   "url": "https://nextjobz.com.bd/jobs/assistant-executive-accounts-finance-abg-sports-city-dhaka-IJOB202676729",
+   "why": "asks candidates for money (rule)",
+   "since": "2026-11-17"
+  }
+ ],
  "pagesRead": {
-  "nextjobz.com.bd": 0,
-  "alljobs.teletalk.com.bd": 17,
+  "nextjobz.com.bd": 221,
+  "alljobs.teletalk.com.bd": 20,
   "jobicy.com": 1,
   "remoteok.com": 1,
   "himalayas.app": 1,
-  "www.grameenphone.com": 6,
-  "www.bkash.com": 6,
-  "www.robi.com.bd": 6,
-  "www.brac.net": 6,
-  "waltonbd.com": 6,
-  "pathao.com": 6,
-  "chaldal.com": 6
+  "careers.smartrecruiters.com": 13,
+  "jobs.smartrecruiters.com": 39,
+  "api.lever.co": 1,
+  "shikho.freshteam.com": 10,
+  "technext.freshteam.com": 5,
+  "6sensehq.freshteam.com": 4,
+  "tezzdigital.freshteam.com": 4,
+  "talentedcube.freshteam.com": 4,
+  "jsapi.recruiterbox.com": 2
  },
  "blockedByRobotsTxt": [],
- "requestsFailed": [
-  "https://nextjobz.com.bd/sitemap-job-details.xml"
- ],
+ "requestsFailed": [],
  "matching": {
-  "postsRead": 1643,
+  "postsRead": 1853,
+  "engineReadMs": 846,
   "postsPerSource": {
-   "Alljobs (Teletalk)": 322,
+   "Alljobs (Teletalk)": 339,
+   "Trakstar Hire": 4,
+   "NextJobz": 1435,
+   "SmartRecruiters": 39,
    "Himalayas": 1,
-   "NextJobz": 1317,
+   "Lever": 11,
    "Jobicy": 1,
-   "Remote OK": 2
+   "Remote OK": 1,
+   "Freshteam": 22
   },
   "classifiedHow": {
-   "category": 567,
-   "title": 812,
-   "none": 129,
-   "spelling": 129,
-   "skills": 6
+   "title": 1422,
+   "category": 153,
+   "keyword": 254,
+   "none": 1,
+   "spelling": 12,
+   "skills": 11
   },
   "noFieldFound": {
-   "count": 129,
-   "percent": 8,
+   "count": 1,
+   "percent": 0,
    "examples": [
     {
-     "title": "Senior Oil Movement Operator- Offsite, Utility and Drum Plant, BOGCL",
-     "company": "Anvir Bashundhara Group",
-     "source": "NextJobz"
-    },
-    {
-     "title": "Operator/ Junior Operator (Oil Movement)- Offsite, Utility and Drum Plant, BOGCL",
-     "company": "Anvir Bashundhara Group",
-     "source": "NextJobz"
-    },
-    {
-     "title": "Showroom Manager / In-Charge (Electric Vehicle - EV)",
-     "company": "Group of Company",
-     "source": "NextJobz"
-    },
-    {
-     "title": "Engineer (Quality)",
-     "company": "Ismartu Technology BD Limited",
-     "source": "NextJobz"
-    },
-    {
-     "title": "Analytical Chemist",
-     "company": "United Healthcare Services Limited",
-     "source": "NextJobz"
-    },
-    {
-     "title": "QA Manager (Lingerie Factory CTG)",
-     "company": "Hop Lun (Bangladesh) Ltd",
-     "source": "NextJobz"
-    },
-    {
-     "title": "Phlebotomist (Pathology Sample Collection)",
-     "company": "Ashulia Women and Children Hospital",
-     "source": "NextJobz"
-    },
-    {
-     "title": "Assistant/Deputy Manager – Raw Materials Quality Assurance",
-     "company": "Fashion Step Group",
-     "source": "NextJobz"
-    },
-    {
-     "title": "Medical Assistant, Skin Therapist - Noakhali",
-     "company": "Bio-Xin Cosmeceuticals",
-     "source": "NextJobz"
-    },
-    {
-     "title": "Production Incharge (Foam & Mattress)",
-     "company": "Majesto Limited",
+     "title": "খাদেম",
+     "company": "Islamic Research & Dawah Center",
      "source": "NextJobz"
     }
    ]
   },
+  "noRoleFound": {
+   "count": 198,
+   "percent": 11
+  },
   "noLocationFound": {
-   "count": 231,
-   "percent": 14,
+   "count": 176,
+   "percent": 9,
    "examples": [
+    {
+     "title": "Cook",
+     "company": "Ministry of Defence Constabulary(MODCR)",
+     "loc": "",
+     "source": "Alljobs (Teletalk)"
+    },
+    {
+     "title": "Sub-Assistant Engineer",
+     "company": "Trading Corporation of Bangladesh (TCB)",
+     "loc": "",
+     "source": "Alljobs (Teletalk)"
+    },
+    {
+     "title": "Stenotypist-Cum Computer Operator",
+     "company": "Trading Corporation of Bangladesh (TCB)",
+     "loc": "",
+     "source": "Alljobs (Teletalk)"
+    },
+    {
+     "title": "Telex Operator",
+     "company": "Trading Corporation of Bangladesh (TCB)",
+     "loc": "",
+     "source": "Alljobs (Teletalk)"
+    },
+    {
+     "title": "Office Support Staff",
+     "company": "Trading Corporation of Bangladesh (TCB)",
+     "loc": "",
+     "source": "Alljobs (Teletalk)"
+    },
+    {
+     "title": "Store & Sales Assistant",
+     "company": "Trading Corporation of Bangladesh (TCB)",
+     "loc": "",
+     "source": "Alljobs (Teletalk)"
+    },
     {
      "title": "Field & Market Inspector",
      "company": "Department of Agricultural Marketing (DAM)",
@@ -145,601 +411,36 @@
      "company": "Department of Agricultural Marketing (DAM)",
      "loc": "",
      "source": "Alljobs (Teletalk)"
-    },
-    {
-     "title": "Office Assistant-Cum-Computer Typist",
-     "company": "Department of Agricultural Marketing (DAM)",
-     "loc": "",
-     "source": "Alljobs (Teletalk)"
-    },
-    {
-     "title": "Cashier",
-     "company": "Department of Agricultural Marketing (DAM)",
-     "loc": "",
-     "source": "Alljobs (Teletalk)"
-    },
-    {
-     "title": "Office Support Staff",
-     "company": "Department of Agricultural Marketing (DAM)",
-     "loc": "",
-     "source": "Alljobs (Teletalk)"
-    },
-    {
-     "title": "Accountant",
-     "company": "Department of Agricultural Marketing (DAM)",
-     "loc": "",
-     "source": "Alljobs (Teletalk)"
-    },
-    {
-     "title": "Assistant Instructor(Computer)",
-     "company": "National Academy for Computer Training and Research (NACTAR)",
-     "loc": "",
-     "source": "Alljobs (Teletalk)"
-    },
-    {
-     "title": "Assistant Instructor(English)",
-     "company": "National Academy for Computer Training and Research (NACTAR)",
-     "loc": "",
-     "source": "Alljobs (Teletalk)"
     }
    ]
   },
+  "noExperienceLevel": {
+   "count": 451,
+   "percent": 24
+  },
+  "noSkillFound": {
+   "count": 438,
+   "percent": 24
+  },
   "noDeadline": {
-   "count": 3,
-   "percent": 0
+   "count": 78,
+   "percent": 4
   },
   "noSalary": {
-   "count": 1553,
-   "percent": 95
+   "count": 1715,
+   "percent": 93
   },
   "topUnclassifiedTitles": [
    {
-    "title": "OT In-Charge",
-    "count": 2,
+    "title": "খাদেম",
+    "count": 1,
     "sources": [
      "NextJobz"
     ],
     "portalCategory": [
-     "Production / Operation / Quality Control"
+     "Imam/ Khatib/ Muazzin"
     ],
     "suggestion": "no close role; may need a new role in src/taxonomy.js"
-   },
-   {
-    "title": "Store Assistant",
-    "count": 2,
-    "sources": [
-     "NextJobz"
-    ],
-    "portalCategory": [
-     "Showroom Assistant/Salesman"
-    ],
-    "suggestion": "add \"store assistant\" to syn of role \"pa\" (Executive / Personal Assistant) in src/taxonomy.js"
-   },
-   {
-    "title": "Office Helper",
-    "count": 2,
-    "sources": [
-     "NextJobz"
-    ],
-    "portalCategory": [],
-    "suggestion": "add \"office helper\" to syn of role \"office-assistant\" (Office Assistant) in src/taxonomy.js"
-   },
-   {
-    "title": "Senior Oil Movement Operator- Offsite, Utility and Drum Plant, BOGCL",
-    "count": 1,
-    "sources": [
-     "NextJobz"
-    ],
-    "portalCategory": [
-     "Production / Operation / Quality Control"
-    ],
-    "suggestion": "add \"senior oil movement operator- offsite, utility and drum plant, bogcl\" to syn of role \"data-entry\" (Data Entry / Computer Operator) in src/taxonomy.js"
-   },
-   {
-    "title": "Operator/ Junior Operator (Oil Movement)- Offsite, Utility and Drum Plant, BOGCL",
-    "count": 1,
-    "sources": [
-     "NextJobz"
-    ],
-    "portalCategory": [
-     "Production / Operation / Quality Control"
-    ],
-    "suggestion": "add \"operator/ junior operator (oil movement)- offsite, utility and drum plant, bogcl\" to syn of role \"data-entry\" (Data Entry / Computer Operator) in src/taxonomy.js"
-   },
-   {
-    "title": "Showroom Manager / In-Charge (Electric Vehicle - EV)",
-    "count": 1,
-    "sources": [
-     "NextJobz"
-    ],
-    "portalCategory": [
-     "Showroom Assistant/Salesman"
-    ],
-    "suggestion": "add \"showroom manager / in-charge (electric vehicle - ev)\" to syn of role \"retail\" (Showroom / Retail Sales) in src/taxonomy.js"
-   },
-   {
-    "title": "Engineer (Quality)",
-    "count": 1,
-    "sources": [
-     "NextJobz"
-    ],
-    "portalCategory": [
-     "Production / Operation / Quality Control"
-    ],
-    "suggestion": "add \"engineer (quality)\" to syn of role \"ai-ml\" (AI / ML Engineer) in src/taxonomy.js"
-   },
-   {
-    "title": "Analytical Chemist",
-    "count": 1,
-    "sources": [
-     "NextJobz"
-    ],
-    "portalCategory": [
-     "Pharmaceutical / Biotech / Lab"
-    ],
-    "suggestion": "no close role; may need a new role in src/taxonomy.js"
-   },
-   {
-    "title": "QA Manager (Lingerie Factory CTG)",
-    "count": 1,
-    "sources": [
-     "NextJobz"
-    ],
-    "portalCategory": [
-     "Production / Operation / Quality Control"
-    ],
-    "suggestion": "add \"qa manager (lingerie factory ctg)\" to syn of role \"social\" (Social Media Manager) in src/taxonomy.js"
-   },
-   {
-    "title": "Phlebotomist (Pathology Sample Collection)",
-    "count": 1,
-    "sources": [
-     "NextJobz"
-    ],
-    "portalCategory": [
-     "Pathologist/ Lab Assistant"
-    ],
-    "suggestion": "no close role; may need a new role in src/taxonomy.js"
-   },
-   {
-    "title": "Assistant/Deputy Manager – Raw Materials Quality Assurance",
-    "count": 1,
-    "sources": [
-     "NextJobz"
-    ],
-    "portalCategory": [
-     "Production / Operation / Quality Control"
-    ],
-    "suggestion": "add \"assistant/deputy manager – raw materials quality assurance\" to syn of role \"social\" (Social Media Manager) in src/taxonomy.js"
-   },
-   {
-    "title": "Medical Assistant, Skin Therapist - Noakhali",
-    "count": 1,
-    "sources": [
-     "NextJobz"
-    ],
-    "portalCategory": [
-     "Beauty / Salon / Lifestyle"
-    ],
-    "suggestion": "add \"medical assistant, skin therapist - noakhali\" to syn of role \"pa\" (Executive / Personal Assistant) in src/taxonomy.js"
-   },
-   {
-    "title": "Production Incharge (Foam & Mattress)",
-    "count": 1,
-    "sources": [
-     "NextJobz"
-    ],
-    "portalCategory": [
-     "Production / Operation / Quality Control"
-    ],
-    "suggestion": "add \"production incharge (foam & mattress)\" to syn of role \"ie\" (IE / Production) in src/taxonomy.js"
-   },
-   {
-    "title": "Assistant Manager (BOQ & Estimate Audit)",
-    "count": 1,
-    "sources": [
-     "NextJobz"
-    ],
-    "portalCategory": [
-     "Production / Operation / Quality Control"
-    ],
-    "suggestion": "add \"assistant manager (boq & estimate audit)\" to syn of role \"audit\" (Audit / Internal Control) in src/taxonomy.js"
-   },
-   {
-    "title": "AGM - Quality",
-    "count": 1,
-    "sources": [
-     "NextJobz"
-    ],
-    "portalCategory": [
-     "Production / Operation / Quality Control"
-    ],
-    "suggestion": "add \"agm - quality\" to syn of role \"garments-quality\" (Quality (QC / QA)) in src/taxonomy.js"
-   },
-   {
-    "title": "Optic Shop Assistant",
-    "count": 1,
-    "sources": [
-     "NextJobz"
-    ],
-    "portalCategory": [
-     "Showroom Assistant/Salesman"
-    ],
-    "suggestion": "add \"optic shop assistant\" to syn of role \"pa\" (Executive / Personal Assistant) in src/taxonomy.js"
-   },
-   {
-    "title": "GM - Sample & Technical",
-    "count": 1,
-    "sources": [
-     "NextJobz"
-    ],
-    "portalCategory": [
-     "Production / Operation / Quality Control"
-    ],
-    "suggestion": "no close role; may need a new role in src/taxonomy.js"
-   },
-   {
-    "title": "STP / ETP Operator",
-    "count": 1,
-    "sources": [
-     "NextJobz"
-    ],
-    "portalCategory": [
-     "Production / Operation / Quality Control"
-    ],
-    "suggestion": "add \"stp / etp operator\" to syn of role \"data-entry\" (Data Entry / Computer Operator) in src/taxonomy.js"
-   },
-   {
-    "title": "Officer - Wastage Management",
-    "count": 1,
-    "sources": [
-     "NextJobz"
-    ],
-    "portalCategory": [
-     "Production / Operation / Quality Control"
-    ],
-    "suggestion": "add \"officer - wastage management\" to syn of role \"bank-officer\" (Bank Officer / Trainee Officer) in src/taxonomy.js"
-   },
-   {
-    "title": "Assistant Manager – Quality Assurance",
-    "count": 1,
-    "sources": [
-     "NextJobz"
-    ],
-    "portalCategory": [
-     "Production / Operation / Quality Control"
-    ],
-    "suggestion": "add \"assistant manager – quality assurance\" to syn of role \"social\" (Social Media Manager) in src/taxonomy.js"
-   },
-   {
-    "title": "R&D Chemist - Hygiene Glue",
-    "count": 1,
-    "sources": [
-     "NextJobz"
-    ],
-    "portalCategory": [
-     "Pharmaceutical / Biotech / Lab"
-    ],
-    "suggestion": "no close role; may need a new role in src/taxonomy.js"
-   },
-   {
-    "title": "Senior Executive Shipping Operation",
-    "count": 1,
-    "sources": [
-     "NextJobz"
-    ],
-    "portalCategory": [
-     "Production / Operation / Quality Control"
-    ],
-    "suggestion": "add \"senior executive shipping operation\" to syn of role \"finance\" (Finance Executive / Analyst) in src/taxonomy.js"
-   },
-   {
-    "title": "Deputy Manager / Manager, Labaid Printing & Packaging",
-    "count": 1,
-    "sources": [
-     "NextJobz"
-    ],
-    "portalCategory": [
-     "Pharmaceutical / Biotech / Lab"
-    ],
-    "suggestion": "add \"deputy manager / manager, labaid printing & packaging\" to syn of role \"social\" (Social Media Manager) in src/taxonomy.js"
-   },
-   {
-    "title": "Lead, Agriculture (Agriculture Resilience & Portfolio Transformation)",
-    "count": 1,
-    "sources": [
-     "NextJobz"
-    ],
-    "portalCategory": [
-     "Agriculture / Environment / Forestry"
-    ],
-    "suggestion": "no close role; may need a new role in src/taxonomy.js"
-   },
-   {
-    "title": "Lab Assistant (EEE Lab)",
-    "count": 1,
-    "sources": [
-     "NextJobz"
-    ],
-    "portalCategory": [
-     "Pathologist/ Lab Assistant"
-    ],
-    "suggestion": "add \"lab assistant (eee lab)\" to syn of role \"pa\" (Executive / Personal Assistant) in src/taxonomy.js"
-   },
-   {
-    "title": "Patient Care Attendant (PCA)- Nursing",
-    "count": 1,
-    "sources": [
-     "NextJobz"
-    ],
-    "portalCategory": [
-     "Nurse"
-    ],
-    "suggestion": "no close role; may need a new role in src/taxonomy.js"
-   },
-   {
-    "title": "Assistant Manager, Quality Assurance",
-    "count": 1,
-    "sources": [
-     "NextJobz"
-    ],
-    "portalCategory": [
-     "Production / Operation / Quality Control"
-    ],
-    "suggestion": "add \"assistant manager, quality assurance\" to syn of role \"social\" (Social Media Manager) in src/taxonomy.js"
-   },
-   {
-    "title": "Fire Safety Officer",
-    "count": 1,
-    "sources": [
-     "NextJobz"
-    ],
-    "portalCategory": [
-     "Fire Safety/ Firefighter"
-    ],
-    "suggestion": "add \"fire safety officer\" to syn of role \"bank-officer\" (Bank Officer / Trainee Officer) in src/taxonomy.js"
-   },
-   {
-    "title": "Manager – Operations, Ghoshinga Project",
-    "count": 1,
-    "sources": [
-     "NextJobz"
-    ],
-    "portalCategory": [
-     "Production / Operation / Quality Control"
-    ],
-    "suggestion": "add \"manager – operations, ghoshinga project\" to syn of role \"social\" (Social Media Manager) in src/taxonomy.js"
-   },
-   {
-    "title": "Executive – New Product Development (Fan Product)",
-    "count": 1,
-    "sources": [
-     "NextJobz"
-    ],
-    "portalCategory": [
-     "Production / Operation / Quality Control"
-    ],
-    "suggestion": "add \"executive – new product development (fan product)\" to syn of role \"bde\" (Business Development Executive) in src/taxonomy.js"
-   },
-   {
-    "title": "Warehouse Supervisor",
-    "count": 1,
-    "sources": [
-     "NextJobz"
-    ],
-    "portalCategory": [
-     "Deliveryman/Rider/Picker/Load-Unloader"
-    ],
-    "suggestion": "add \"warehouse supervisor\" to syn of role \"store\" (Store / Warehouse) in src/taxonomy.js"
-   },
-   {
-    "title": "Operations Manager",
-    "count": 1,
-    "sources": [
-     "NextJobz"
-    ],
-    "portalCategory": [
-     "Production / Operation / Quality Control"
-    ],
-    "suggestion": "add \"operations manager\" to syn of role \"social\" (Social Media Manager) in src/taxonomy.js"
-   },
-   {
-    "title": "Assistant Manager / Manager - Fire & Safety",
-    "count": 1,
-    "sources": [
-     "NextJobz"
-    ],
-    "portalCategory": [
-     "Fire Safety/ Firefighter"
-    ],
-    "suggestion": "add \"assistant manager / manager - fire & safety\" to syn of role \"social\" (Social Media Manager) in src/taxonomy.js"
-   },
-   {
-    "title": "Warehouse Assistant (OPPO Brand)",
-    "count": 1,
-    "sources": [
-     "NextJobz"
-    ],
-    "portalCategory": [
-     "Deliveryman/Rider/Picker/Load-Unloader"
-    ],
-    "suggestion": "add \"warehouse assistant (oppo brand)\" to syn of role \"brand\" (Brand Executive) in src/taxonomy.js"
-   },
-   {
-    "title": "Deputy Manager - Quality Assurance (Gazipur Factory)",
-    "count": 1,
-    "sources": [
-     "NextJobz"
-    ],
-    "portalCategory": [
-     "Production / Operation / Quality Control"
-    ],
-    "suggestion": "add \"deputy manager - quality assurance (gazipur factory)\" to syn of role \"social\" (Social Media Manager) in src/taxonomy.js"
-   },
-   {
-    "title": "Head of Program (Solar)",
-    "count": 1,
-    "sources": [
-     "NextJobz"
-    ],
-    "portalCategory": [
-     "Project / Research / Consultancy"
-    ],
-    "suggestion": "add \"head of program (solar)\" to syn of role \"program-officer\" (Program / Project Officer) in src/taxonomy.js"
-   },
-   {
-    "title": "Medical Content Specialist",
-    "count": 1,
-    "sources": [
-     "NextJobz"
-    ],
-    "portalCategory": [
-     "Journalism / Content Writing / Editing"
-    ],
-    "suggestion": "add \"medical content specialist\" to syn of role \"seo\" (SEO Specialist) in src/taxonomy.js"
-   },
-   {
-    "title": "Manager-Planning",
-    "count": 1,
-    "sources": [
-     "NextJobz"
-    ],
-    "portalCategory": [
-     "Production / Operation / Quality Control"
-    ],
-    "suggestion": "add \"manager-planning\" to syn of role \"social\" (Social Media Manager) in src/taxonomy.js"
-   },
-   {
-    "title": "Sr. Consultant - Cardiology",
-    "count": 1,
-    "sources": [
-     "NextJobz"
-    ],
-    "portalCategory": [
-     "Pathologist/ Lab Assistant"
-    ],
-    "suggestion": "no close role; may need a new role in src/taxonomy.js"
-   },
-   {
-    "title": "Sr. Consultant - Endocrinology",
-    "count": 1,
-    "sources": [
-     "NextJobz"
-    ],
-    "portalCategory": [
-     "Project / Research / Consultancy"
-    ],
-    "suggestion": "no close role; may need a new role in src/taxonomy.js"
-   },
-   {
-    "title": "Officer - Legal",
-    "count": 1,
-    "sources": [
-     "NextJobz"
-    ],
-    "portalCategory": [
-     "Legal / Law"
-    ],
-    "suggestion": "add \"officer - legal\" to syn of role \"bank-officer\" (Bank Officer / Trainee Officer) in src/taxonomy.js"
-   },
-   {
-    "title": "Legal Intern (Female)",
-    "count": 1,
-    "sources": [
-     "NextJobz"
-    ],
-    "portalCategory": [
-     "Legal / Law"
-    ],
-    "suggestion": "no close role; may need a new role in src/taxonomy.js"
-   },
-   {
-    "title": "Manager - International Fresh Produce Export",
-    "count": 1,
-    "sources": [
-     "NextJobz"
-    ],
-    "portalCategory": [
-     "Agro (Plant / Animal / Fisheries)"
-    ],
-    "suggestion": "add \"manager - international fresh produce export\" to syn of role \"social\" (Social Media Manager) in src/taxonomy.js"
-   },
-   {
-    "title": "X-Ray In-charge",
-    "count": 1,
-    "sources": [
-     "NextJobz"
-    ],
-    "portalCategory": [
-     "Pathologist/ Lab Assistant"
-    ],
-    "suggestion": "no close role; may need a new role in src/taxonomy.js"
-   },
-   {
-    "title": "RSM/TSM (Bright)",
-    "count": 1,
-    "sources": [
-     "NextJobz"
-    ],
-    "portalCategory": [
-     "Others"
-    ],
-    "suggestion": "no close role; may need a new role in src/taxonomy.js"
-   },
-   {
-    "title": "Manager / Senior Manager - Quality Assurance & Training",
-    "count": 1,
-    "sources": [
-     "NextJobz"
-    ],
-    "portalCategory": [
-     "Production / Operation / Quality Control"
-    ],
-    "suggestion": "add \"manager / senior manager - quality assurance & training\" to syn of role \"social\" (Social Media Manager) in src/taxonomy.js"
-   },
-   {
-    "title": "Phlebotomist (Contractual)",
-    "count": 1,
-    "sources": [
-     "NextJobz"
-    ],
-    "portalCategory": [
-     "Pharmaceutical / Biotech / Lab"
-    ],
-    "suggestion": "no close role; may need a new role in src/taxonomy.js"
-   },
-   {
-    "title": "GM - Quality Control (Garments)",
-    "count": 1,
-    "sources": [
-     "NextJobz"
-    ],
-    "portalCategory": [
-     "Production / Operation / Quality Control"
-    ],
-    "suggestion": "add \"gm - quality control (garments)\" to syn of role \"audit\" (Audit / Internal Control) in src/taxonomy.js"
-   },
-   {
-    "title": "Pathologist (Part Time)",
-    "count": 1,
-    "sources": [
-     "NextJobz"
-    ],
-    "portalCategory": [
-     "Pathologist/ Lab Assistant"
-    ],
-    "suggestion": "no close role; may need a new role in src/taxonomy.js"
-   },
-   {
-    "title": "Assistant Manager - Quality Assurance",
-    "count": 1,
-    "sources": [
-     "NextJobz"
-    ],
-    "portalCategory": [
-     "Production / Operation / Quality Control"
-    ],
-    "suggestion": "add \"assistant manager - quality assurance\" to syn of role \"social\" (Social Media Manager) in src/taxonomy.js"
    }
   ],
   "note": "suggestion lines are proposals only; src/taxonomy.js is never changed by the robot"
