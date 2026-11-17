@@ -1,40 +1,40 @@
 {
  "run": {
-  "startedAt": "2026-11-17T11:13:26+06:00",
-  "finishedAt": "2026-11-17T11:23:45+06:00",
-  "newPostsCollected": 311,
-  "postsInFile": 1853,
-  "fileBytes": 1316311
+  "startedAt": "2026-11-17T23:02:21+06:00",
+  "finishedAt": "2026-11-17T23:04:44+06:00",
+  "newPostsCollected": 54,
+  "postsInFile": 1874,
+  "fileBytes": 1331406
  },
  "size": {
-  "fileBytes": 1316311,
-  "downloadBytes": 198310,
+  "fileBytes": 1331406,
+  "downloadBytes": 200742,
   "budgetBytes": 358400,
   "withinBudget": true
  },
  "collectedPerSource": {
-  "nextjobz": 218,
-  "alljobs": 17,
+  "nextjobz": 42,
+  "alljobs": 7,
   "remote": 5,
-  "sr-polygon": 8,
-  "sr-nagorik": 10,
-  "sr-gigalogy": 6,
-  "sr-niftycoders": 1,
-  "sr-portonics": 2,
-  "sr-optimizely": 12,
-  "lever-fieldnation": 11,
-  "ft-shikho": 9,
-  "ft-technext": 4,
-  "ft-6sense": 3,
-  "ft-tezzdigital": 3,
-  "ft-talentedcube": 3,
-  "ts-therap": 3,
-  "ts-kazsoftware": 1
+  "sr-polygon": 0,
+  "sr-nagorik": 0,
+  "sr-gigalogy": 0,
+  "sr-niftycoders": 0,
+  "sr-portonics": 0,
+  "sr-optimizely": 0,
+  "lever-fieldnation": 0,
+  "ft-shikho": 0,
+  "ft-technext": 0,
+  "ft-6sense": 0,
+  "ft-tezzdigital": 0,
+  "ft-talentedcube": 0,
+  "ts-therap": 0,
+  "ts-kazsoftware": 0
  },
  "postsInFilePerSource": {
-  "Alljobs (Teletalk)": 339,
+  "Alljobs (Teletalk)": 346,
   "Trakstar Hire": 4,
-  "NextJobz": 1435,
+  "NextJobz": 1449,
   "SmartRecruiters": 39,
   "Himalayas": 1,
   "Lever": 11,
@@ -43,15 +43,15 @@
   "Freshteam": 22
  },
  "removed": {
-  "expired": 40,
-  "too_old": 5,
+  "expired": 0,
+  "too_old": 4,
   "no_apply_link": 0,
   "asks_for_money": 0,
-  "merged": 56,
+  "merged": 29,
   "no_title": 0,
   "closed_on_company_board": 0,
   "source_switched_off": 0,
-  "held_for_review": 5,
+  "held_for_review": 0,
   "over_size_limit": 0
  },
  "sourceFailures": {},
@@ -60,13 +60,13 @@
    "id": "nextjobz",
    "type": "nextjobz",
    "enabled": true,
-   "collected": 218
+   "collected": 42
   },
   {
    "id": "alljobs",
    "type": "alljobs",
    "enabled": true,
-   "collected": 17
+   "collected": 7
   },
   {
    "id": "remote",
@@ -85,7 +85,7 @@
    "enabled": true,
    "how": "public career page, then each job page's schema.org data",
    "listed": 8,
-   "collected": 8
+   "collected": 0
   },
   {
    "id": "sr-nagorik",
@@ -93,7 +93,7 @@
    "enabled": true,
    "how": "public career page, then each job page's schema.org data",
    "listed": 10,
-   "collected": 10
+   "collected": 0
   },
   {
    "id": "sr-gigalogy",
@@ -101,7 +101,7 @@
    "enabled": true,
    "how": "public career page, then each job page's schema.org data",
    "listed": 6,
-   "collected": 6
+   "collected": 0
   },
   {
    "id": "sr-niftycoders",
@@ -109,7 +109,7 @@
    "enabled": true,
    "how": "public career page, then each job page's schema.org data",
    "listed": 1,
-   "collected": 1
+   "collected": 0
   },
   {
    "id": "sr-portonics",
@@ -117,7 +117,7 @@
    "enabled": true,
    "how": "public career page, then each job page's schema.org data",
    "listed": 2,
-   "collected": 2
+   "collected": 0
   },
   {
    "id": "sr-optimizely",
@@ -125,7 +125,7 @@
    "enabled": true,
    "how": "public career page, then each job page's schema.org data",
    "listed": 12,
-   "collected": 12
+   "collected": 0
   },
   {
    "id": "lever-fieldnation",
@@ -133,7 +133,7 @@
    "enabled": true,
    "how": "public postings API",
    "listed": 11,
-   "collected": 11
+   "collected": 0
   },
   {
    "id": "ft-shikho",
@@ -141,7 +141,7 @@
    "enabled": true,
    "how": "career page, then each job page's schema.org data",
    "listed": 9,
-   "collected": 9
+   "collected": 0
   },
   {
    "id": "ft-technext",
@@ -149,7 +149,7 @@
    "enabled": true,
    "how": "career page, then each job page's schema.org data",
    "listed": 4,
-   "collected": 4
+   "collected": 0
   },
   {
    "id": "ft-6sense",
@@ -157,7 +157,7 @@
    "enabled": true,
    "how": "career page, then each job page's schema.org data",
    "listed": 3,
-   "collected": 3
+   "collected": 0
   },
   {
    "id": "ft-tezzdigital",
@@ -165,7 +165,7 @@
    "enabled": true,
    "how": "career page, then each job page's schema.org data",
    "listed": 3,
-   "collected": 3
+   "collected": 0
   },
   {
    "id": "ft-talentedcube",
@@ -173,7 +173,7 @@
    "enabled": true,
    "how": "career page, then each job page's schema.org data",
    "listed": 3,
-   "collected": 3
+   "collected": 0
   },
   {
    "id": "ts-therap",
@@ -181,7 +181,7 @@
    "enabled": true,
    "how": "the board's own openings feed",
    "listed": 3,
-   "collected": 3
+   "collected": 0
   },
   {
    "id": "ts-kazsoftware",
@@ -189,7 +189,7 @@
    "enabled": true,
    "how": "the board's own openings feed",
    "listed": 1,
-   "collected": 1
+   "collected": 0
   }
  ],
  "notRead": [
@@ -223,25 +223,25 @@
   }
  ],
  "keywords": {
-  "postsRead": 294,
-  "postsWithSkills": 225,
+  "postsRead": 42,
+  "postsWithSkills": 40,
   "ran": true
  },
  "governmentPlaces": {
-  "withoutPlace": 220,
-  "fromOrgPlacesFile": 73,
-  "fromOrganisationName": 15,
+  "withoutPlace": 132,
+  "fromOrgPlacesFile": 0,
+  "fromOrganisationName": 0,
   "stillWithoutPlace": 132
  },
  "slim": {
-  "websiteLeftOut": 1178,
-  "educationShortened": 358,
+  "websiteLeftOut": 35,
+  "educationShortened": 15,
   "educationLeftLong": 8,
   "keptLongToKeepMatching": 8,
-  "skillsMovedToKeywords": 443
+  "skillsMovedToKeywords": 8
  },
  "repaired": {
-  "governmentCategoryAdded": 34
+  "governmentCategoryAdded": 0
  },
  "ai": {
   "enabled": false
@@ -294,30 +294,29 @@
   }
  ],
  "pagesRead": {
-  "nextjobz.com.bd": 221,
-  "alljobs.teletalk.com.bd": 20,
+  "nextjobz.com.bd": 45,
+  "alljobs.teletalk.com.bd": 10,
   "jobicy.com": 1,
   "remoteok.com": 1,
   "himalayas.app": 1,
   "careers.smartrecruiters.com": 13,
-  "jobs.smartrecruiters.com": 39,
   "api.lever.co": 1,
-  "shikho.freshteam.com": 10,
-  "technext.freshteam.com": 5,
-  "6sensehq.freshteam.com": 4,
-  "tezzdigital.freshteam.com": 4,
-  "talentedcube.freshteam.com": 4,
+  "shikho.freshteam.com": 1,
+  "technext.freshteam.com": 1,
+  "6sensehq.freshteam.com": 1,
+  "tezzdigital.freshteam.com": 1,
+  "talentedcube.freshteam.com": 1,
   "jsapi.recruiterbox.com": 2
  },
  "blockedByRobotsTxt": [],
  "requestsFailed": [],
  "matching": {
-  "postsRead": 1853,
-  "engineReadMs": 846,
+  "postsRead": 1874,
+  "engineReadMs": 1370,
   "postsPerSource": {
-   "Alljobs (Teletalk)": 339,
+   "Alljobs (Teletalk)": 346,
    "Trakstar Hire": 4,
-   "NextJobz": 1435,
+   "NextJobz": 1449,
    "SmartRecruiters": 39,
    "Himalayas": 1,
    "Lever": 11,
@@ -326,11 +325,11 @@
    "Freshteam": 22
   },
   "classifiedHow": {
-   "title": 1422,
-   "category": 153,
-   "keyword": 254,
+   "title": 1439,
+   "spelling": 13,
+   "category": 155,
+   "keyword": 255,
    "none": 1,
-   "spelling": 12,
    "skills": 11
   },
   "noFieldFound": {
@@ -345,7 +344,7 @@
    ]
   },
   "noRoleFound": {
-   "count": 198,
+   "count": 200,
    "percent": 11
   },
   "noLocationFound": {
@@ -415,11 +414,11 @@
    ]
   },
   "noExperienceLevel": {
-   "count": 451,
+   "count": 458,
    "percent": 24
   },
   "noSkillFound": {
-   "count": 438,
+   "count": 446,
    "percent": 24
   },
   "noDeadline": {
@@ -427,7 +426,7 @@
    "percent": 4
   },
   "noSalary": {
-   "count": 1715,
+   "count": 1734,
    "percent": 93
   },
   "topUnclassifiedTitles": [
