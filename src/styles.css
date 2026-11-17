@@ -419,6 +419,8 @@ main { padding-bottom: 118px; }
 .hero > div:last-child { position: relative; }
 .hero > div:last-child::before { content: ""; position: absolute; inset: 8% -6% -6% 6%; border-radius: 40px; background: var(--grad-dawn); opacity: .9; transform: rotate(3deg); z-index: 0; }
 .hero > div:last-child > * { position: relative; z-index: 1; }
+/* On a phone the tilted card behind the example must stay inside the screen (it made the welcome page scroll sideways). */
+@media (max-width: 959px) { .hero > div:last-child::before { inset: 8% 3% -6% 4%; } }
 .demo-card { box-shadow: 0 30px 60px -30px rgba(15, 27, 61, .55); }
 .done .pop { background: var(--grad); color: var(--brand-ink); box-shadow: var(--glow); }
 .done .nums b { background: var(--grad); -webkit-background-clip: text; background-clip: text; color: transparent; }
@@ -472,3 +474,16 @@ main { padding-bottom: 118px; }
 .fx-on { margin-top: 10px; gap: 6px; }
 .fx-sheet select { width: auto; max-width: 100%; min-height: 36px; padding: 4px 12px; border-radius: 999px; font-size: .92rem; }
 .empty-acts { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; }
+
+/* ── a shared job: the invitation, closed jobs and their similar ones; new matches since the last visit ── */
+.join { display: flex; flex-direction: column; gap: 8px; background: var(--brand-soft); border-color: transparent; }
+.mini-job { display: flex; align-items: center; gap: 12px; width: 100%; padding: 12px; border-radius: 16px; border: 1.5px solid var(--line-2); background: var(--surface); text-align: left; }
+.mini-job > span { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+.mini-job b { overflow-wrap: anywhere; }
+.mini-job > span > span:not(.hint) { color: var(--ink-2); font-size: .92rem; }
+.mini-job > svg { width: 18px; height: 18px; flex: none; color: var(--ink-2); }
+.fresh-line { display: flex; align-items: center; gap: 10px; width: 100%; margin-bottom: 14px; padding: 12px 16px; border: 0; border-radius: 16px; background: var(--brand-soft); color: var(--brand-strong); font-weight: 600; text-align: left; }
+.fresh-line > svg { width: 20px; height: 20px; flex: none; }
+.fresh-line span { flex: 1; }
+.fresh-line b { display: inline-flex; align-items: center; gap: 2px; white-space: nowrap; }
+.fresh-line b svg { width: 16px; height: 16px; }

@@ -121,6 +121,13 @@ The goal: no single action freezes the screen for more than 0.2 s with the CPU s
 - **The job list draws 6 cards at a time.** More appear as you scroll (within 400 px of the end) and with "Show more jobs". Counts and search always cover every post.
 - **Search runs once typing pauses** (0.25 s), and the search box itself is never redrawn while someone types.
 
+## Back button, filters, sharing
+
+- **Back** (Android or browser) works like an app. Each place a person can step back from is a history entry (`entry()`, `go()`, `reset()` in `src/app.js`): an open job, the Filters sheet, "Delete my account?", each setup question, and changing one part of the profile sit one entry above their page. Jobs, Tracker and Profile sit one entry above Home, and switching between them replaces that entry, so Back from any of them goes Home and Back on Home leaves the app. Entries are only added on a tap or key press, because Chrome skips entries a page adds by itself.
+- **Filters** (Jobs page): field, the experience a post asks for, place, kind of job, deadline, salary mentioned. Each choice shows how many jobs it gives with the other choices, and a choice that would give none is greyed out.
+- **Sharing a job** makes a link `?job=<id>&t=<title>&r=<role>` (or `&f=<field>`). Opening it shows that job; someone without a profile sees the post and "See jobs like this every day". When the job has closed, the title and role find similar open jobs. The link part is taken off the address once read.
+- **"X new matches since your last visit"** (Home): the browser keeps the ids of the matches seen at the last visit (`jobshathi:seen`, never sent anywhere). A match not among them is new; matches that appear because the profile changed are not counted as new.
+
 ## Anonymous word counting
 
 Profile words (typed job titles and skills) that the dictionary does not know are counted in Firestore, `wordStats/{word}`: the document's name is the word and it holds one number. No user id, no time. The app never sends a word with 3 digits in a row, with `@`, `://` or `www.`, or one shorter than 2 or longer than 40 characters or with more than 4 words, and sends each word once from a device. `firestore.rules` allows only adding 1 and keeps the same limits on the word; nobody can read the counts from the app. The admin page (later) may list only words counted 3 or more times. The Privacy Policy must mention this counting.

@@ -45,6 +45,18 @@
     installed: (window.matchMedia && matchMedia('(display-mode: standalone)').matches) || navigator.standalone === true,
   };
   if (S.profile && !S.account) { S.account = { id: 'u' + Date.now().toString(36), name: S.profile.name || '', contact: '', createdAt: Date.now() }; Store.set('account', S.account); }
+  S.freshIds = new Set(); // matches that are new since the last visit (see noteMatches)
+  /* A shared job link (?job=…&t=…&r=…): read once, then taken off the address so it does not stay on every page. */
+  let shared = (() => {
+    try {
+      const u = new URL(location.href), id = u.searchParams.get('job');
+      if (!id) return null;
+      const out = { id: id.slice(0, 200), title: (u.searchParams.get('t') || '').slice(0, 120), role: (u.searchParams.get('r') || '').slice(0, 60), field: (u.searchParams.get('f') || '').slice(0, 40) };
+      ['job', 't', 'r', 'f'].forEach(k => u.searchParams.delete(k));
+      history.replaceState(history.state, '', u.pathname + u.search + u.hash);
+      return out;
+    } catch { return null; }
+  })();
   let lastKey = '', sheetShown = false, opener = null, deferredInstall = null;
 
   /* ── helpers ── */
@@ -65,6 +77,7 @@
     search: '<circle cx="11" cy="11" r="6.5"/><path d="M20 20l-4-4"/>', user: '<circle cx="12" cy="8" r="4"/><path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6"/>',
     home: '<path d="M4 11l8-7 8 7v8a1 1 0 0 1-1 1h-4v-6H9v6H5a1 1 0 0 1-1-1z"/>', chevR: '<path d="M9 6l6 6-6 6"/>', chevL: '<path d="M15 6l-6 6 6 6"/>', download: '<path d="M12 4v11M7.5 11l4.5 4.5 4.5-4.5M5 20h14"/>',
     sliders: '<path d="M4 7h9M17 7h3M4 17h3M11 17h9"/><circle cx="15" cy="7" r="2"/><circle cx="9" cy="17" r="2"/>',
+    share: '<circle cx="18" cy="5.5" r="2.5"/><circle cx="6" cy="12" r="2.5"/><circle cx="18" cy="18.5" r="2.5"/><path d="M8.2 10.8l7.6-4.1M8.2 13.2l7.6 4.1"/>',
     tracker: '<path d="M10 6h10M10 12h10M10 18h10"/><path d="M3.5 6l1.2 1.2L7 5M3.5 12l1.2 1.2L7 11M3.5 18l1.2 1.2L7 17"/>', spark: '<path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8z"/>',
   };
   const FICON = {
@@ -301,7 +314,7 @@
   function pageHome() {
     const m = live(), strong = m.filter(r => r.bucket === 'strong'), h = new Date().getHours();
     const stat = (n, label, icon, a, v, cls) => `<button type="button" class="stat ${cls}" data-a="${a}" data-v="${v}" data-fid="stat:${v}"><span class="sb">${ic(icon)}</span><b>${num(n)}</b><span class="lb">${label}</span></button>`;
-    const picks = m.slice(0, 3);
+    const picks = m.slice(0, 3), freshN = m.filter(r => S.freshIds.has(r.job.id)).length;
     const greet = `<div class="greet"><p>${fmtDate(Date.now(), true)}</p><h1>${t(h < 12 ? 'gm' : h < 17 ? 'ga' : 'ge')}, ${esc(S.account.name.split(/\s+/)[0])}</h1>${freshLine()}</div>`;
     if (waiting()) return `${greet}<div class="home-grid"><div class="feed">${loadingBlock(3)}</div><div class="side">${strengthCard()}${installCard()}</div></div>`;
     return `${greet}
@@ -309,12 +322,12 @@
         <div><div class="big">${num(strong.length)}</div><div class="cap">${t('heroCount')}</div></div><p class="sub">${t('heroSub', { b: num(m.length - strong.length), n: num(S.results.length) })}</p>
         <button type="button" class="btn" data-a="quick-go" data-v="">${t('seeMatches')}</button></section>
       <div class="stats">${stat(m.filter(r => r.job.isNew).length, t('statNew'), 'spark', 'quick-go', 'new', 's1')}${stat(m.filter(r => r.job.daysLeft != null && r.job.daysLeft <= 3).length, t('statSoon'), 'clock', 'quick-go', 'soon', 's2')}${stat(Object.keys(S.marks.saved).length, t('statSaved'), 'bookmark', 'tracker-go', 'saved', 's3')}${stat(Object.keys(S.marks.applied).length, t('statApplied'), 'check', 'tracker-go', 'applied', 's4')}</div>
-      <div class="home-grid"><div class="feed">${demoBanner()}<div class="sec-head"><h2 class="sec-title">${t('topPicks')}</h2><button type="button" class="link" data-a="quick-go" data-v="">${t('seeAll')}</button></div>
+      <div class="home-grid"><div class="feed">${demoBanner()}${freshN ? `<button type="button" class="fresh-line" data-a="quick-go" data-v="fresh" data-fid="fresh-line">${ic('spark')}<span>${t(freshN === 1 ? 'freshOne' : 'freshMany', { n: num(freshN) })}</span><b>${t('seeThem')}${ic('chevR')}</b></button>` : ''}<div class="sec-head"><h2 class="sec-title">${t('topPicks')}</h2><button type="button" class="link" data-a="quick-go" data-v="">${t('seeAll')}</button></div>
         ${picks.length ? picks.map(jobCard).join('') : emptyBlock(t('emptyForYou'), t('emptyForYouD'), `<button type="button" class="btn soft" data-a="edit" data-v="2">${t('addRoles')}</button>`)}</div>
         <div class="side">${strengthCard()}${gapsCard()}${installCard()}</div></div>`;
   }
 
-  const QUICK = { new: r => r.job.isNew, remote: r => r.job.loc.remote, soon: r => r.job.daysLeft != null && r.job.daysLeft <= 3, fresher: r => (r.job.exp.stated ? (r.job.exp.fresher || !r.job.exp.min) : !!(r.job.exp.guess && r.job.exp.guess.level === 'fresher')) };
+  const QUICK = { fresh: r => S.freshIds.has(r.job.id), new: r => r.job.isNew, remote: r => r.job.loc.remote, soon: r => r.job.daysLeft != null && r.job.daysLeft <= 3, fresher: r => (r.job.exp.stated ? (r.job.exp.fresher || !r.job.exp.min) : !!(r.job.exp.guess && r.job.exp.guess.level === 'fresher')) };
 
   /* ── Filters (a sheet): field, experience asked for, place, kind of job, deadline, salary ──
      Inside a group any choice may match (Dhaka or Gazipur); across groups each must (Dhaka and fresher).
@@ -477,7 +490,7 @@
     jobsParts = {
       'j-head': `<h1>${t('jobsHead')}</h1><p>${t('summary', { a: num(m.filter(r => r.bucket === 'strong').length), b: num(m.filter(r => r.bucket === 'possible').length), n: num(S.results.length) })}</p>${freshLine()}`,
       'j-tools': `<div class="seg" role="tablist">${segBtn('fit', t('tabForYou'), m.length)}${segBtn('all', t('tabAll'), S.results.length)}</div>
-        <div class="scroller" data-keep="quick"><button type="button" class="chip sm fx-btn" data-a="filters" data-fid="filters" aria-haspopup="dialog" ${nMore ? 'data-on="1"' : ''}>${ic('sliders')}${t('filters')}${nMore ? `<span class="n">${num(nMore)}</span>` : ''}</button>${['new', 'soon', 'fresher', 'remote'].map(k => chip('quick', k, f.quick.includes(k), t({ new: 'fNew', soon: 'fSoon', fresher: 'fFresher', remote: 'fRemote' }[k]), 'sm')).join('')}</div>
+        <div class="scroller" data-keep="quick"><button type="button" class="chip sm fx-btn" data-a="filters" data-fid="filters" aria-haspopup="dialog" ${nMore ? 'data-on="1"' : ''}>${ic('sliders')}${t('filters')}${nMore ? `<span class="n">${num(nMore)}</span>` : ''}</button>${(S.freshIds.size || f.quick.includes('fresh') ? ['fresh'] : []).concat(['new', 'soon', 'fresher', 'remote']).map(k => chip('quick', k, f.quick.includes(k), t({ fresh: 'fFresh', new: 'fNew', soon: 'fSoon', fresher: 'fFresher', remote: 'fRemote' }[k]), 'sm')).join('')}</div>
         ${nMore ? `<div class="chips fx-on">${moreChoices(f.more).map(([g, v]) => `<button type="button" class="chip sm token" data-a="fx-del" data-v="${g}|${esc(v)}" data-fid="fxdel:${g}:${esc(v)}" aria-label="${t('remove')}: ${esc(moreLabel(g, v).replace(/<[^>]+>/g, ''))}">${moreLabel(g, v)} ${ic('x')}</button>`).join('')}</div>` : ''}`,
       'j-banner': demoBanner(),
       'j-bar': `<span>${t('nJobs', { n: num(list.length) })}</span><label><span class="sr">${t('sortBy')}</span><select data-in="sort" data-fid="in:sort" aria-label="${t('sortBy')}">${[['match', 'sMatch'], ['new', 'sNew'], ['deadline', 'sDeadline']].map(([v, k]) => `<option value="${v}" ${f.sort === v ? 'selected' : ''}>${t(k)}</option>`).join('')}</select></label>`,
@@ -549,13 +562,45 @@
         ${applied ? `<div><span class="lbl">${t('statusLbl')}</span><div class="chips">${STATUS.map(([v, k]) => chip('status', j.id + '|' + v, (applied.status || 'applied') === v, t(k), 'sm')).join('')}</div></div>` : ''}
         <div style="display:flex;flex-wrap:wrap;gap:8px"><button type="button" class="btn ${applied ? 'on' : ''}" data-a="apply" data-v="${esc(j.id)}" data-fid="apply:${esc(j.id)}" aria-pressed="${!!applied}">${applied ? ic('check') + ' ' + t('applied') : t('markApplied')}</button>
           ${dismissed ? `<button type="button" class="btn quiet" data-a="undismiss" data-v="${esc(j.id)}">${t('undo')}: ${t('notForMe')}</button>` : `<button type="button" class="btn quiet" data-a="dismiss" data-v="${esc(j.id)}">${ic('x')} ${t('notForMe')}</button>`}</div>`,
-      foot: `${link}<button type="button" class="icon-btn ${saved ? 'on' : ''}" style="width:46px;height:46px" data-a="save" data-v="${esc(j.id)}" data-fid="sheet-save" aria-pressed="${saved}" aria-label="${saved ? t('saved') : t('save')}">${ic('bookmark')}</button>` };
+      foot: `${link}${shareBtn(j)}<button type="button" class="icon-btn ${saved ? 'on' : ''}" style="width:46px;height:46px" data-a="save" data-v="${esc(j.id)}" data-fid="sheet-save" aria-pressed="${saved}" aria-label="${saved ? t('saved') : t('save')}">${ic('bookmark')}</button>` };
+  }
+  const shareBtn = j => `<button type="button" class="icon-btn" style="width:46px;height:46px" data-a="share" data-v="${esc(j.id)}" data-fid="sheet-share" aria-label="${t('share')}">${ic('share')}</button>`;
+  const applyLink = j => (/^https?:\/\//i.test(j.url) ? `<a class="btn primary" href="${esc(j.url)}" target="_blank" rel="noopener noreferrer">${t('view')} ${ic('ext')}</a>` : `<button type="button" class="btn primary" data-a="view-demo">${t('view')} ${ic('ext')}</button>`);
+  /* A shared job opened by someone without a profile: the post itself, and an invitation to get matches. */
+  function sheetVisitor(j) {
+    const fact = (k, v) => (v ? `<div><span>${k}</span><b>${v}</b></div>` : '');
+    return { label: j.title, head: `<div class="d-top">${logo(j, 'lg')}<div><h2 id="sheet-title">${esc(j.title)}</h2><div class="hint" style="font-size:1rem">${esc(j.company)}</div></div><span></span></div>`,
+      body: `${j.scam ? `<div class="flag scam">${ic('alert')}<span>${t('scam')}</span></div>` : ''}
+        <div class="d-facts">${fact(t('fLocation'), esc(j.loc.text || t('cLocUnknown')))}${fact(t('fSalary'), payWords(j))}${fact(t('fType'), esc(typeName(j.type)))}${fact(t('fDeadline'), deadlineWords(j))}${fact(t('fEdu'), esc(j.eduText))}${fact(t('fVac'), j.vacancies ? num(j.vacancies) : '')}${fact(t('fSource'), esc([j.source].concat(j.alsoOn).filter(Boolean).join(', ')))}</div>
+        <div class="card panel join"><b>${t('joinTitle')}</b><span class="hint">${t('joinLead')}</span><div><button type="button" class="btn soft" data-a="start" data-fid="join-start">${t('getStarted')}</button></div></div>`,
+      foot: `${applyLink(j)}${shareBtn(j)}` };
+  }
+  /* Similar open jobs for a shared job that has closed: the same role, else the same field, else a word of
+     its title. A person with a profile sees them by match score, anyone else the newest first. */
+  function similarJobs(s) {
+    const pool = S.jobs.filter(j => j.id !== s.id), role = Engine.roleById[s.role] ? s.role : '';
+    const field = role ? Engine.roleById[role].field : (Engine.fieldById[s.field] ? s.field : '');
+    const word = Engine.norm(s.title || '').split(' ').filter(w => w.length > 3).sort((a, b) => b.length - a.length)[0] || '';
+    const tier = j => (role && j.role === role ? 0 : field && (j.field === field || j.also === field) ? 1 : word && findText(j).includes(word) ? 2 : 3);
+    const score = {}; S.results.forEach(r => (score[r.job.id] = r.score));
+    return pool.map(j => [j, tier(j)]).filter(([, k]) => k < 3)
+      .sort((a, b) => a[1] - b[1] || (S.profile ? (score[b[0].id] || 0) - (score[a[0].id] || 0) : b[0].postedAt - a[0].postedAt)).slice(0, 5).map(([j]) => j);
+  }
+  function sheetClosed(s) {
+    const sim = similarJobs(s);
+    const row = j => `<button type="button" class="mini-job" data-a="open" data-v="${esc(j.id)}" data-fid="open:${esc(j.id)}">${logo(j)}<span><b>${esc(j.title)}</b><span>${esc([j.company, j.loc.text].filter(Boolean).join(' · '))}</span><span class="hint">${deadlineWords(j)}</span></span>${ic('chevR')}</button>`;
+    return { label: t('closedTitle'), head: `<div><h2 id="sheet-title">${t('closedTitle')}</h2>${s.title ? `<div class="hint" style="font-size:1rem">${esc(s.title)}</div>` : ''}</div>`,
+      body: `<div class="flag note">${ic('info')}<span>${t('closedLead')}</span></div>
+        <div><div class="group-title"><span>${t('similarTitle')}</span></div>${sim.length ? `<div class="stack-s">${sim.map(row).join('')}</div>` : `<p class="hint">${t('noSimilar')}</p>`}</div>`, foot: '' };
   }
   /** The sheet in two parts: the frame (head and foot, drawn at once) and the body (drawn right after). */
   function sheetParts() {
     if (!S.sheet) return { frame: '', body: '' };
     let c;
-    if (S.sheet.kind === 'job') { const r = S.results.find(r => r.job.id === S.sheet.id); if (!r) { S.sheet = null; return { frame: '', body: '' }; } c = sheetJob(r); }
+    if (S.sheet.kind === 'job') { // a job with its fit; a shared job for someone without a profile; or one that has closed
+      const r = S.results.find(r => r.job.id === S.sheet.id), j = !r && S.jobs.find(j => j.id === S.sheet.id);
+      c = r ? sheetJob(r) : j ? sheetVisitor(j) : sheetClosed(S.sheet);
+    }
     else if (S.sheet.kind === 'filters') { if (!S.fd) S.fd = JSON.parse(JSON.stringify(S.f.more)); c = sheetFilters(); }
     else c = { label: t('installTitle'), head: `<div><h2 id="sheet-title">${t('installTitle')}</h2><div class="hint" style="font-size:1rem">${t('installLead')}</div></div>`, body: `<div class="howto"><p>${t('installAndroid')}</p><p>${t('installIos')}</p><p>${t('installPc')}</p></div>${inFrame ? `<div class="banner">${ic('info')}<span>${t('installPreview')}</span></div>` : ''}`, foot: '' };
     const anim = sheetShown ? 'style="animation:none"' : '';
@@ -762,7 +807,7 @@
     const d = S.draft, isNew = !S.account;
     S.profile = profileFromDraft(d); Store.set('profile', S.profile);
     S.account = Object.assign({ id: 'u' + Date.now().toString(36) + Math.random().toString(36).slice(2, 8), createdAt: Date.now() }, S.account || {}, { name: d.name.trim(), contact: d.contact.trim() });
-    Store.set('account', S.account); recompute();
+    Store.set('account', S.account); recompute(); noteMatches(true);
     setTimeout(countUnknownWords, 3000); // after the account is online (a new account signs in first)
     return isNew;
   }
@@ -817,7 +862,7 @@
     S.account = data.account; S.profile = data.profile; S.marks = Object.assign(emptyMarks(), data.marks || {});
     if (data.lang) S.lang = data.lang; if (data.theme) S.theme = data.theme;
     SYNCED.forEach(k => keep(k, S[k])); keep('updatedAt', data.updatedAt || Date.now()); keep('dirty', false);
-    recompute();
+    recompute(); noteMatches(true);
   }
   /** Ties the local account to the signed-in Firebase user. */
   function markUser(u) {
@@ -913,7 +958,46 @@
   }
 
   // actions that change the page: an open job, question or edit is closed first (Back), then the action runs
-  const MOVES = ['go', 'edit', 'quick-go', 'tracker-go'];
+  const MOVES = ['go', 'edit', 'quick-go', 'tracker-go', 'start'];
+
+  /* ── Share a job ──
+     The link opens JobShathi with that job: ?job=<id>&t=<title>&r=<role> (or &f=<field>). The title and role
+     are there so that, once the job has closed, similar open jobs can still be found. On a phone the
+     share panel opens (WhatsApp, Messenger…); elsewhere the link is copied. */
+  async function shareJob(id) {
+    const j = S.jobs.find(x => x.id === id); if (!j) return;
+    const u = new URL(location.pathname, location.origin);
+    u.searchParams.set('job', j.id); u.searchParams.set('t', j.title.slice(0, 100));
+    if (j.role) u.searchParams.set('r', j.role); else if (j.field) u.searchParams.set('f', j.field);
+    const text = j.company ? t('shareText', { title: j.title, company: j.company }) : j.title;
+    if (navigator.share) { try { await navigator.share({ title: j.title, text, url: u.href }); } catch { /* the panel was closed */ } return; }
+    toast((await copyText(text + '\n' + u.href)) ? t('tLinkCopied') : esc(u.href));
+  }
+  async function copyText(s) {
+    try { await navigator.clipboard.writeText(s); return true; } catch { /* not allowed here: the old way */ }
+    try {
+      const ta = document.createElement('textarea'); ta.value = s; ta.setAttribute('readonly', ''); ta.style.cssText = 'position:fixed;top:0;opacity:0';
+      document.body.appendChild(ta); ta.select(); const ok = document.execCommand('copy'); ta.remove(); return ok;
+    } catch { return false; }
+  }
+  /* A shared link that opened the app: the job is shown once the jobs are read. It is not a history entry
+     (Chrome would make Back skip the page if one were added without a tap): Back leaves, as with any link. */
+  function openShared() {
+    if (!shared || S.jobsPending) return;
+    const want = shared; shared = null;
+    if (S.demo) { toast(t('errShared')); return; }
+    S.sheet = Object.assign({ kind: 'job' }, want); render();
+  }
+
+  /* ── "X new matches since your last visit" ──
+     The matches seen at the last visit are kept in this browser (their ids, nothing else). A match that was
+     not among them is new. A change to the profile does not count: the matches it brings are noted as seen. */
+  function noteMatches(profileChanged) {
+    if (S.demo || !S.profile) return;
+    const now = live().map(r => r.job.id), before = Store.get('seen', null);
+    if (Array.isArray(before) && !profileChanged) { const old = new Set(before); now.forEach(id => { if (!old.has(id)) S.freshIds.add(id); }); }
+    keep('seen', now.slice(0, 3000));
+  }
   function onAction(a, v) {
     const d = S.draft;
     if (MOVES.includes(a) && overlay(here())) { S.sheet = null; S.delAsk = false; S.delReauth = false; pending = () => onAction(a, v); history.back(); return; }
@@ -922,7 +1006,8 @@
       case 'lang': S.lang = S.lang === 'bn' ? 'en' : 'bn'; Store.set('lang', S.lang); break;
       case 'setlang': S.lang = v; Store.set('lang', v); break;
       case 'theme': S.theme = v; Store.set('theme', v); break;
-      case 'start': S.draft = blankDraft(); S.editOne = false; S.done = false; S.step = 0; S.err = ''; S.wq = ''; S.wizId = newWiz(); go('setup'); return;
+      case 'start': S.sheet = null; S.draft = blankDraft(); S.editOne = false; S.done = false; S.step = 0; S.err = ''; S.wq = ''; S.wizId = newWiz(); go('setup'); return;
+      case 'share': shareJob(v); return;
       case 'edit': S.draft = draftFromProfile(S.profile); S.editOne = true; S.done = false; S.step = +v || 0; S.err = ''; S.wq = ''; S.sheet = null; go('setup'); return;
       case 'wiz-cancel': backOr('profile'); return;
       case 'wiz-back': // the question before (Back does the same)
@@ -981,7 +1066,7 @@
       case 'undismiss': delete S.marks.dismissed[v]; saveMarks(); recompute(); break;
       case 'toast-undo': { const el2 = document.getElementById('toast'), fn = el2._undo; el2.innerHTML = ''; el2._undo = null; if (fn) fn(); return; }
       case 'view-demo': toast(t('tDemo')); return;
-      case 'gap-add': if (!S.profile.skills.includes(v)) { S.profile.skills.push(v); Store.set('profile', S.profile); recompute(); toast(t('tSkill', { s: esc(v) })); } break;
+      case 'gap-add': if (!S.profile.skills.includes(v)) { S.profile.skills.push(v); Store.set('profile', S.profile); recompute(); noteMatches(true); toast(t('tSkill', { s: esc(v) })); } break;
       case 'del-ask': if (!S.delAsk) entry(true, { ask: true }, null); S.delAsk = true; break;
       case 'del-no': { const h = here(); if (h && h.ask) { history.back(); return; } S.delAsk = false; S.delReauth = false; break; }
       case 'del-yes': deleteAccount(false); return;
@@ -1042,7 +1127,7 @@
     if (!Array.isArray(list) || !list.length) return false;
     const stamp = (data && data.updatedAt) || '';
     if (!S.demo && stamp && stamp === S.updatedAt) return true; // the same file as on screen
-    S.updatedAt = stamp; S.jobs = Engine.prepareJobs(list); S.demo = false; S.jobsPending = false; recompute(); refreshSnapshots(); render();
+    S.updatedAt = stamp; S.jobs = Engine.prepareJobs(list); S.demo = false; S.jobsPending = false; recompute(); refreshSnapshots(); noteMatches(); render(); openShared();
     return true;
   }
   /* `jobsTag` is the ETag (the file's fingerprint from the web server) of the jobs.json on screen.
@@ -1071,8 +1156,8 @@
           const got = incoming; incoming = null;
           if (!(S.demo || got.stamp !== S.updatedAt)) { S.jobsPending = false; return; }   // the same file as on screen
           S.updatedAt = got.stamp; S.jobs = got.jobs; S.demo = false; S.jobsPending = false;
-          recompute(); refreshSnapshots(); render();
-        } else if (m.type === 'same' || m.type === 'failed') { if (S.jobsPending) { S.jobsPending = false; useDemo(); render(); } }
+          recompute(); refreshSnapshots(); noteMatches(); render(); openShared();
+        } else if (m.type === 'same' || m.type === 'failed') { if (S.jobsPending) { S.jobsPending = false; useDemo(); render(); openShared(); } }
       };
       reader.onerror = () => { readerFailed = true; reader = null; jobsLoading = false; loadOnPage(); };   // the old way
       return reader;
@@ -1099,7 +1184,7 @@
       clearTimeout(timer);
     } catch { /* offline or no jobs.json yet: what is on screen stays */ }
     jobsLoading = false;
-    if (S.jobsPending) { S.jobsPending = false; useDemo(); render(); }
+    if (S.jobsPending) { S.jobsPending = false; useDemo(); render(); openShared(); }
   }
   /** No real jobs could be had (offline on a first visit): the example posts, with the banner saying so. */
   function useDemo() { if (S.demo && !S.jobs.length) { S.jobs = demoJobs(); recompute(); } }

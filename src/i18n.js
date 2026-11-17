@@ -176,3 +176,17 @@ Object.assign(TEXT, {
   fxShow: ['Show {n} jobs', '{n}টি চাকরি দেখুন'], fxClear: ['Clear all', 'সব মুছুন'],
   fxWithout: ['Without “{x}”: {n} jobs', '“{x}” ছাড়া: {n}টি চাকরি'],
 });
+
+/* ───────── Sharing a job, and new matches since the last visit ───────── */
+Object.assign(TEXT, {
+  share: ['Share this job', 'চাকরিটি শেয়ার করুন'], shareText: ['{title} at {company}, found on JobShathi', '{company}-এ {title}, জবসাথীতে পেলাম'], tLinkCopied: ['Link copied', 'লিংক কপি হয়েছে'],
+  errShared: ['Could not open the shared job right now. Check your internet and open the link again.', 'শেয়ার করা চাকরিটি এখন খোলা গেল না। ইন্টারনেট দেখে লিংকটি আবার খুলুন।'],
+  closedTitle: ['This job has closed', 'এই চাকরির আবেদন বন্ধ হয়ে গেছে'],
+  closedLead: ['Its deadline has passed or the post was taken down. Here are open jobs like it.', 'এর শেষ তারিখ পেরিয়ে গেছে বা বিজ্ঞপ্তিটি সরিয়ে নেওয়া হয়েছে। এর মতো খোলা চাকরিগুলো নিচে দেওয়া হলো।'],
+  similarTitle: ['Similar open jobs', 'একই ধরনের খোলা চাকরি'],
+  noSimilar: ['No similar job is open right now. Try the search on the Jobs page.', 'এই মুহূর্তে একই ধরনের কোনো খোলা চাকরি নেই। চাকরি পেজে খুঁজে দেখুন।'],
+  joinTitle: ['See jobs like this every day', 'প্রতিদিন এমন চাকরি দেখুন'],
+  joinLead: ['JobShathi checks each day’s new posts against your skills, education and area. Free, in English and বাংলা.', 'জবসাথী প্রতিদিনের নতুন বিজ্ঞপ্তি আপনার দক্ষতা, শিক্ষা ও এলাকার সাথে মিলিয়ে দেখায়। ফ্রি, বাংলা ও English-এ।'],
+  freshMany: ['{n} new matches since your last visit', 'গতবারের পর {n}টি নতুন ম্যাচ'], freshOne: ['1 new match since your last visit', 'গতবারের পর ১টি নতুন ম্যাচ'],
+  seeThem: ['See them', 'দেখুন'], fFresh: ['New since last visit', 'গতবারের পর নতুন'],
+});
