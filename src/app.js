@@ -578,8 +578,9 @@
   /* Similar open jobs for a shared job that has closed: the same role, else the same field, else a word of
      its title. A person with a profile sees them by match score, anyone else the newest first. */
   function similarJobs(s) {
-    const pool = S.jobs.filter(j => j.id !== s.id), role = Engine.roleById[s.role] ? s.role : '';
-    const field = role ? Engine.roleById[role].field : (Engine.fieldById[s.field] ? s.field : '');
+    const own = (o, k) => !!k && Object.prototype.hasOwnProperty.call(o, k); // the link's words are only names of real roles and fields
+    const pool = S.jobs.filter(j => j.id !== s.id), role = own(Engine.roleById, s.role) ? s.role : '';
+    const field = role ? Engine.roleById[role].field : (own(Engine.fieldById, s.field) ? s.field : '');
     const word = Engine.norm(s.title || '').split(' ').filter(w => w.length > 3).sort((a, b) => b.length - a.length)[0] || '';
     const tier = j => (role && j.role === role ? 0 : field && (j.field === field || j.also === field) ? 1 : word && findText(j).includes(word) ? 2 : 3);
     const score = {}; S.results.forEach(r => (score[r.job.id] = r.score));
