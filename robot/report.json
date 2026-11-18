@@ -1,20 +1,20 @@
 {
  "run": {
-  "startedAt": "2026-11-18T10:40:56+06:00",
-  "finishedAt": "2026-11-18T10:51:42+06:00",
-  "newPostsCollected": 79,
-  "postsInFile": 1796,
-  "fileBytes": 1286072
+  "startedAt": "2026-11-18T22:42:16+06:00",
+  "finishedAt": "2026-11-18T22:45:43+06:00",
+  "newPostsCollected": 85,
+  "postsInFile": 1850,
+  "fileBytes": 1316176
  },
  "size": {
-  "fileBytes": 1286072,
-  "downloadBytes": 196535,
+  "fileBytes": 1316176,
+  "downloadBytes": 199230,
   "budgetBytes": 358400,
   "withinBudget": true
  },
  "collectedPerSource": {
-  "nextjobz": 74,
-  "alljobs": 1,
+  "nextjobz": 32,
+  "alljobs": 49,
   "remote": 4,
   "sr-polygon": 0,
   "sr-nagorik": 0,
@@ -32,24 +32,24 @@
   "ts-kazsoftware": 0
  },
  "postsInFilePerSource": {
-  "Alljobs (Teletalk)": 302,
-  "NextJobz": 1415,
+  "Alljobs (Teletalk)": 351,
+  "NextJobz": 1421,
   "Trakstar Hire": 4,
   "SmartRecruiters": 39,
   "Himalayas": 1,
-  "Lever": 11,
+  "Lever": 10,
   "Jobicy": 1,
   "Remote OK": 1,
   "Freshteam": 22
  },
  "removed": {
-  "expired": 127,
+  "expired": 0,
   "too_old": 3,
   "no_apply_link": 0,
   "asks_for_money": 0,
   "merged": 27,
   "no_title": 0,
-  "closed_on_company_board": 0,
+  "closed_on_company_board": 1,
   "source_switched_off": 0,
   "held_for_review": 0,
   "over_size_limit": 0
@@ -60,13 +60,13 @@
    "id": "nextjobz",
    "type": "nextjobz",
    "enabled": true,
-   "collected": 74
+   "collected": 32
   },
   {
    "id": "alljobs",
    "type": "alljobs",
    "enabled": true,
-   "collected": 1
+   "collected": 49
   },
   {
    "id": "remote",
@@ -132,7 +132,7 @@
    "type": "lever",
    "enabled": true,
    "how": "public postings API",
-   "listed": 11,
+   "listed": 10,
    "collected": 0
   },
   {
@@ -223,22 +223,22 @@
   }
  ],
  "keywords": {
-  "postsRead": 74,
-  "postsWithSkills": 68,
+  "postsRead": 32,
+  "postsWithSkills": 30,
   "ran": true
  },
  "governmentPlaces": {
-  "withoutPlace": 133,
+  "withoutPlace": 146,
   "fromOrgPlacesFile": 0,
   "fromOrganisationName": 0,
-  "stillWithoutPlace": 133
+  "stillWithoutPlace": 146
  },
  "slim": {
-  "websiteLeftOut": 53,
+  "websiteLeftOut": 71,
   "educationShortened": 8,
   "educationLeftLong": 8,
   "keptLongToKeepMatching": 8,
-  "skillsMovedToKeywords": 0
+  "skillsMovedToKeywords": 2
  },
  "repaired": {
   "governmentCategoryAdded": 0
@@ -294,8 +294,8 @@
   }
  ],
  "pagesRead": {
-  "nextjobz.com.bd": 77,
-  "alljobs.teletalk.com.bd": 4,
+  "nextjobz.com.bd": 35,
+  "alljobs.teletalk.com.bd": 52,
   "jobicy.com": 1,
   "remoteok.com": 1,
   "himalayas.app": 1,
@@ -311,24 +311,24 @@
  "blockedByRobotsTxt": [],
  "requestsFailed": [],
  "matching": {
-  "postsRead": 1796,
-  "engineReadMs": 1346,
+  "postsRead": 1850,
+  "engineReadMs": 792,
   "postsPerSource": {
-   "Alljobs (Teletalk)": 302,
-   "NextJobz": 1415,
+   "Alljobs (Teletalk)": 351,
+   "NextJobz": 1421,
    "Trakstar Hire": 4,
    "SmartRecruiters": 39,
    "Himalayas": 1,
-   "Lever": 11,
+   "Lever": 10,
    "Jobicy": 1,
    "Remote OK": 1,
    "Freshteam": 22
   },
   "classifiedHow": {
-   "title": 1388,
+   "title": 1413,
+   "category": 160,
    "spelling": 13,
-   "category": 132,
-   "keyword": 252,
+   "keyword": 253,
    "none": 1,
    "skills": 10
   },
@@ -344,89 +344,89 @@
    ]
   },
   "noRoleFound": {
-   "count": 176,
-   "percent": 10
+   "count": 204,
+   "percent": 11
   },
   "noLocationFound": {
-   "count": 132,
-   "percent": 7,
+   "count": 181,
+   "percent": 10,
    "examples": [
     {
-     "title": "Cook",
-     "company": "Ministry of Defence Constabulary(MODCR)",
+     "title": "Assistant Manager (Accounts)",
+     "company": "Bangladesh Petroleum Corporation(BPC)",
      "loc": "",
      "source": "Alljobs (Teletalk)"
     },
     {
-     "title": "Secretary",
-     "company": "Bangladesh Armed Services Board(BASB)",
+     "title": "Assistant Programmer (IT)",
+     "company": "Bangladesh Petroleum Corporation(BPC)",
      "loc": "",
      "source": "Alljobs (Teletalk)"
     },
     {
-     "title": "Sub-Assistant Engineer",
-     "company": "Trading Corporation of Bangladesh (TCB)",
+     "title": "Junior Officer (Administration)",
+     "company": "Bangladesh Petroleum Corporation(BPC)",
      "loc": "",
      "source": "Alljobs (Teletalk)"
     },
     {
-     "title": "Stenotypist-Cum Computer Operator",
-     "company": "Trading Corporation of Bangladesh (TCB)",
+     "title": "Sub-Assistant Engineer (General Workshop)",
+     "company": "Bangladesh Petroleum Corporation(BPC)",
      "loc": "",
      "source": "Alljobs (Teletalk)"
     },
     {
-     "title": "Telex Operator",
-     "company": "Trading Corporation of Bangladesh (TCB)",
+     "title": "Sub-Assistant Engineer (Planning and Development)",
+     "company": "Bangladesh Petroleum Corporation(BPC)",
      "loc": "",
      "source": "Alljobs (Teletalk)"
     },
     {
-     "title": "Office Support Staff",
-     "company": "Trading Corporation of Bangladesh (TCB)",
+     "title": "Assistant Manager (Distribution and Marketing)",
+     "company": "Bangladesh Petroleum Corporation(BPC)",
      "loc": "",
      "source": "Alljobs (Teletalk)"
     },
     {
-     "title": "Store & Sales Assistant",
-     "company": "Trading Corporation of Bangladesh (TCB)",
+     "title": "Assistant Manager (Finance)",
+     "company": "Bangladesh Petroleum Corporation(BPC)",
      "loc": "",
      "source": "Alljobs (Teletalk)"
     },
     {
-     "title": "Field & Market Inspector",
-     "company": "Department of Agricultural Marketing (DAM)",
+     "title": "Deputy Manager (General Workshop)",
+     "company": "Bangladesh Petroleum Corporation(BPC)",
      "loc": "",
      "source": "Alljobs (Teletalk)"
     },
     {
-     "title": "Stenographer-Cum-Computer Operator",
-     "company": "Department of Agricultural Marketing (DAM)",
+     "title": "Assistant Manager (Administration)",
+     "company": "Bangladesh Petroleum Corporation(BPC)",
      "loc": "",
      "source": "Alljobs (Teletalk)"
     },
     {
-     "title": "Computer Operator",
-     "company": "Department of Agricultural Marketing (DAM)",
+     "title": "Deputy Manager (Planning and Development)",
+     "company": "Bangladesh Petroleum Corporation(BPC)",
      "loc": "",
      "source": "Alljobs (Teletalk)"
     }
    ]
   },
   "noExperienceLevel": {
-   "count": 419,
-   "percent": 23
+   "count": 440,
+   "percent": 24
   },
   "noSkillFound": {
-   "count": 384,
-   "percent": 21
+   "count": 433,
+   "percent": 23
   },
   "noDeadline": {
-   "count": 78,
+   "count": 77,
    "percent": 4
   },
   "noSalary": {
-   "count": 1675,
+   "count": 1728,
    "percent": 93
   },
   "topUnclassifiedTitles": [
