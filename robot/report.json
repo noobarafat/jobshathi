@@ -1,21 +1,21 @@
 {
  "run": {
-  "startedAt": "2026-11-17T23:02:21+06:00",
-  "finishedAt": "2026-11-17T23:04:44+06:00",
-  "newPostsCollected": 54,
-  "postsInFile": 1874,
-  "fileBytes": 1331406
+  "startedAt": "2026-11-18T10:40:56+06:00",
+  "finishedAt": "2026-11-18T10:51:42+06:00",
+  "newPostsCollected": 79,
+  "postsInFile": 1796,
+  "fileBytes": 1286072
  },
  "size": {
-  "fileBytes": 1331406,
-  "downloadBytes": 200742,
+  "fileBytes": 1286072,
+  "downloadBytes": 196535,
   "budgetBytes": 358400,
   "withinBudget": true
  },
  "collectedPerSource": {
-  "nextjobz": 42,
-  "alljobs": 7,
-  "remote": 5,
+  "nextjobz": 74,
+  "alljobs": 1,
+  "remote": 4,
   "sr-polygon": 0,
   "sr-nagorik": 0,
   "sr-gigalogy": 0,
@@ -32,9 +32,9 @@
   "ts-kazsoftware": 0
  },
  "postsInFilePerSource": {
-  "Alljobs (Teletalk)": 346,
+  "Alljobs (Teletalk)": 302,
+  "NextJobz": 1415,
   "Trakstar Hire": 4,
-  "NextJobz": 1449,
   "SmartRecruiters": 39,
   "Himalayas": 1,
   "Lever": 11,
@@ -43,11 +43,11 @@
   "Freshteam": 22
  },
  "removed": {
-  "expired": 0,
-  "too_old": 4,
+  "expired": 127,
+  "too_old": 3,
   "no_apply_link": 0,
   "asks_for_money": 0,
-  "merged": 29,
+  "merged": 27,
   "no_title": 0,
   "closed_on_company_board": 0,
   "source_switched_off": 0,
@@ -60,19 +60,19 @@
    "id": "nextjobz",
    "type": "nextjobz",
    "enabled": true,
-   "collected": 42
+   "collected": 74
   },
   {
    "id": "alljobs",
    "type": "alljobs",
    "enabled": true,
-   "collected": 7
+   "collected": 1
   },
   {
    "id": "remote",
    "type": "remote_boards",
    "enabled": true,
-   "collected": 5
+   "collected": 4
   },
   {
    "id": "companies",
@@ -223,22 +223,22 @@
   }
  ],
  "keywords": {
-  "postsRead": 42,
-  "postsWithSkills": 40,
+  "postsRead": 74,
+  "postsWithSkills": 68,
   "ran": true
  },
  "governmentPlaces": {
-  "withoutPlace": 132,
+  "withoutPlace": 133,
   "fromOrgPlacesFile": 0,
   "fromOrganisationName": 0,
-  "stillWithoutPlace": 132
+  "stillWithoutPlace": 133
  },
  "slim": {
-  "websiteLeftOut": 35,
-  "educationShortened": 15,
+  "websiteLeftOut": 53,
+  "educationShortened": 8,
   "educationLeftLong": 8,
   "keptLongToKeepMatching": 8,
-  "skillsMovedToKeywords": 8
+  "skillsMovedToKeywords": 0
  },
  "repaired": {
   "governmentCategoryAdded": 0
@@ -294,8 +294,8 @@
   }
  ],
  "pagesRead": {
-  "nextjobz.com.bd": 45,
-  "alljobs.teletalk.com.bd": 10,
+  "nextjobz.com.bd": 77,
+  "alljobs.teletalk.com.bd": 4,
   "jobicy.com": 1,
   "remoteok.com": 1,
   "himalayas.app": 1,
@@ -311,12 +311,12 @@
  "blockedByRobotsTxt": [],
  "requestsFailed": [],
  "matching": {
-  "postsRead": 1874,
-  "engineReadMs": 1370,
+  "postsRead": 1796,
+  "engineReadMs": 1346,
   "postsPerSource": {
-   "Alljobs (Teletalk)": 346,
+   "Alljobs (Teletalk)": 302,
+   "NextJobz": 1415,
    "Trakstar Hire": 4,
-   "NextJobz": 1449,
    "SmartRecruiters": 39,
    "Himalayas": 1,
    "Lever": 11,
@@ -325,12 +325,12 @@
    "Freshteam": 22
   },
   "classifiedHow": {
-   "title": 1439,
+   "title": 1388,
    "spelling": 13,
-   "category": 155,
-   "keyword": 255,
+   "category": 132,
+   "keyword": 252,
    "none": 1,
-   "skills": 11
+   "skills": 10
   },
   "noFieldFound": {
    "count": 1,
@@ -344,16 +344,22 @@
    ]
   },
   "noRoleFound": {
-   "count": 200,
-   "percent": 11
+   "count": 176,
+   "percent": 10
   },
   "noLocationFound": {
-   "count": 176,
-   "percent": 9,
+   "count": 132,
+   "percent": 7,
    "examples": [
     {
      "title": "Cook",
      "company": "Ministry of Defence Constabulary(MODCR)",
+     "loc": "",
+     "source": "Alljobs (Teletalk)"
+    },
+    {
+     "title": "Secretary",
+     "company": "Bangladesh Armed Services Board(BASB)",
      "loc": "",
      "source": "Alljobs (Teletalk)"
     },
@@ -404,29 +410,23 @@
      "company": "Department of Agricultural Marketing (DAM)",
      "loc": "",
      "source": "Alljobs (Teletalk)"
-    },
-    {
-     "title": "Driver (Heavy)",
-     "company": "Department of Agricultural Marketing (DAM)",
-     "loc": "",
-     "source": "Alljobs (Teletalk)"
     }
    ]
   },
   "noExperienceLevel": {
-   "count": 458,
-   "percent": 24
+   "count": 419,
+   "percent": 23
   },
   "noSkillFound": {
-   "count": 446,
-   "percent": 24
+   "count": 384,
+   "percent": 21
   },
   "noDeadline": {
    "count": 78,
    "percent": 4
   },
   "noSalary": {
-   "count": 1734,
+   "count": 1675,
    "percent": 93
   },
   "topUnclassifiedTitles": [
