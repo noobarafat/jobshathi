@@ -1,20 +1,20 @@
 {
  "run": {
-  "startedAt": "2026-11-19T22:45:09+06:00",
-  "finishedAt": "2026-11-19T22:48:03+06:00",
-  "newPostsCollected": 69,
-  "postsInFile": 1852,
-  "fileBytes": 1314101
+  "startedAt": "2026-11-20T10:13:55+06:00",
+  "finishedAt": "2026-11-20T10:16:51+06:00",
+  "newPostsCollected": 72,
+  "postsInFile": 1847,
+  "fileBytes": 1311769
  },
  "size": {
-  "fileBytes": 1314101,
-  "downloadBytes": 199540,
+  "fileBytes": 1311769,
+  "downloadBytes": 200268,
   "budgetBytes": 358400,
   "withinBudget": true
  },
  "collectedPerSource": {
-  "nextjobz": 45,
-  "alljobs": 20,
+  "nextjobz": 68,
+  "alljobs": 0,
   "remote": 4,
   "sr-polygon": 0,
   "sr-nagorik": 0,
@@ -33,7 +33,7 @@
  },
  "postsInFilePerSource": {
   "Alljobs (Teletalk)": 373,
-  "NextJobz": 1403,
+  "NextJobz": 1398,
   "Trakstar Hire": 3,
   "SmartRecruiters": 38,
   "Himalayas": 1,
@@ -43,13 +43,13 @@
   "Freshteam": 22
  },
  "removed": {
-  "expired": 0,
+  "expired": 45,
   "too_old": 3,
   "no_apply_link": 0,
   "asks_for_money": 0,
-  "merged": 26,
+  "merged": 29,
   "no_title": 0,
-  "closed_on_company_board": 1,
+  "closed_on_company_board": 0,
   "source_switched_off": 0,
   "held_for_review": 0,
   "over_size_limit": 0
@@ -60,13 +60,13 @@
    "id": "nextjobz",
    "type": "nextjobz",
    "enabled": true,
-   "collected": 45
+   "collected": 68
   },
   {
    "id": "alljobs",
    "type": "alljobs",
    "enabled": true,
-   "collected": 20
+   "collected": 0
   },
   {
    "id": "remote",
@@ -223,8 +223,8 @@
   }
  ],
  "keywords": {
-  "postsRead": 45,
-  "postsWithSkills": 31,
+  "postsRead": 68,
+  "postsWithSkills": 63,
   "ran": true
  },
  "governmentPlaces": {
@@ -234,11 +234,11 @@
   "stillWithoutPlace": 148
  },
  "slim": {
-  "websiteLeftOut": 54,
-  "educationShortened": 11,
+  "websiteLeftOut": 37,
+  "educationShortened": 13,
   "educationLeftLong": 7,
   "keptLongToKeepMatching": 7,
-  "skillsMovedToKeywords": 7
+  "skillsMovedToKeywords": 2
  },
  "repaired": {
   "governmentCategoryAdded": 0
@@ -294,8 +294,8 @@
   }
  ],
  "pagesRead": {
-  "nextjobz.com.bd": 48,
-  "alljobs.teletalk.com.bd": 23,
+  "nextjobz.com.bd": 71,
+  "alljobs.teletalk.com.bd": 3,
   "jobicy.com": 1,
   "remoteok.com": 1,
   "himalayas.app": 1,
@@ -311,11 +311,11 @@
  "blockedByRobotsTxt": [],
  "requestsFailed": [],
  "matching": {
-  "postsRead": 1852,
-  "engineReadMs": 1431,
+  "postsRead": 1847,
+  "engineReadMs": 1249,
   "postsPerSource": {
    "Alljobs (Teletalk)": 373,
-   "NextJobz": 1403,
+   "NextJobz": 1398,
    "Trakstar Hire": 3,
    "SmartRecruiters": 38,
    "Himalayas": 1,
@@ -325,12 +325,12 @@
    "Freshteam": 22
   },
   "classifiedHow": {
-   "title": 1407,
-   "category": 172,
+   "title": 1401,
+   "category": 173,
    "spelling": 14,
-   "keyword": 249,
-   "none": 1,
-   "skills": 9
+   "keyword": 247,
+   "skills": 11,
+   "none": 1
   },
   "noFieldFound": {
    "count": 1,
@@ -344,7 +344,7 @@
    ]
   },
   "noRoleFound": {
-   "count": 215,
+   "count": 219,
    "percent": 12
   },
   "noLocationFound": {
@@ -414,11 +414,11 @@
    ]
   },
   "noExperienceLevel": {
-   "count": 471,
-   "percent": 25
+   "count": 473,
+   "percent": 26
   },
   "noSkillFound": {
-   "count": 458,
+   "count": 455,
    "percent": 25
   },
   "noDeadline": {
@@ -426,7 +426,7 @@
    "percent": 4
   },
   "noSalary": {
-   "count": 1728,
+   "count": 1723,
    "percent": 93
   },
   "topUnclassifiedTitles": [
