@@ -1,21 +1,21 @@
 {
  "run": {
-  "startedAt": "2026-11-20T10:13:55+06:00",
-  "finishedAt": "2026-11-20T10:16:51+06:00",
-  "newPostsCollected": 72,
-  "postsInFile": 1847,
-  "fileBytes": 1311769
+  "startedAt": "2026-11-20T22:20:13+06:00",
+  "finishedAt": "2026-11-20T22:21:57+06:00",
+  "newPostsCollected": 34,
+  "postsInFile": 1850,
+  "fileBytes": 1314345
  },
  "size": {
-  "fileBytes": 1311769,
-  "downloadBytes": 200268,
+  "fileBytes": 1314345,
+  "downloadBytes": 200665,
   "budgetBytes": 358400,
   "withinBudget": true
  },
  "collectedPerSource": {
-  "nextjobz": 68,
+  "nextjobz": 31,
   "alljobs": 0,
-  "remote": 4,
+  "remote": 3,
   "sr-polygon": 0,
   "sr-nagorik": 0,
   "sr-gigalogy": 0,
@@ -33,7 +33,7 @@
  },
  "postsInFilePerSource": {
   "Alljobs (Teletalk)": 373,
-  "NextJobz": 1398,
+  "NextJobz": 1401,
   "Trakstar Hire": 3,
   "SmartRecruiters": 38,
   "Himalayas": 1,
@@ -43,8 +43,8 @@
   "Freshteam": 22
  },
  "removed": {
-  "expired": 45,
-  "too_old": 3,
+  "expired": 0,
+  "too_old": 2,
   "no_apply_link": 0,
   "asks_for_money": 0,
   "merged": 29,
@@ -60,7 +60,7 @@
    "id": "nextjobz",
    "type": "nextjobz",
    "enabled": true,
-   "collected": 68
+   "collected": 31
   },
   {
    "id": "alljobs",
@@ -72,7 +72,7 @@
    "id": "remote",
    "type": "remote_boards",
    "enabled": true,
-   "collected": 4
+   "collected": 3
   },
   {
    "id": "companies",
@@ -223,8 +223,8 @@
   }
  ],
  "keywords": {
-  "postsRead": 68,
-  "postsWithSkills": 63,
+  "postsRead": 31,
+  "postsWithSkills": 30,
   "ran": true
  },
  "governmentPlaces": {
@@ -234,11 +234,11 @@
   "stillWithoutPlace": 148
  },
  "slim": {
-  "websiteLeftOut": 37,
-  "educationShortened": 13,
+  "websiteLeftOut": 20,
+  "educationShortened": 9,
   "educationLeftLong": 7,
   "keptLongToKeepMatching": 7,
-  "skillsMovedToKeywords": 2
+  "skillsMovedToKeywords": 0
  },
  "repaired": {
   "governmentCategoryAdded": 0
@@ -294,7 +294,7 @@
   }
  ],
  "pagesRead": {
-  "nextjobz.com.bd": 71,
+  "nextjobz.com.bd": 34,
   "alljobs.teletalk.com.bd": 3,
   "jobicy.com": 1,
   "remoteok.com": 1,
@@ -311,11 +311,11 @@
  "blockedByRobotsTxt": [],
  "requestsFailed": [],
  "matching": {
-  "postsRead": 1847,
-  "engineReadMs": 1249,
+  "postsRead": 1850,
+  "engineReadMs": 1388,
   "postsPerSource": {
    "Alljobs (Teletalk)": 373,
-   "NextJobz": 1398,
+   "NextJobz": 1401,
    "Trakstar Hire": 3,
    "SmartRecruiters": 38,
    "Himalayas": 1,
@@ -325,7 +325,7 @@
    "Freshteam": 22
   },
   "classifiedHow": {
-   "title": 1401,
+   "title": 1404,
    "category": 173,
    "spelling": 14,
    "keyword": 247,
@@ -426,7 +426,7 @@
    "percent": 4
   },
   "noSalary": {
-   "count": 1723,
+   "count": 1726,
    "percent": 93
   },
   "topUnclassifiedTitles": [

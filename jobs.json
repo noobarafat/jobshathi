@@ -1,6 +1,6 @@
 {
- "updatedAt": "2026-11-20T10:13:55+06:00",
- "count": 1847,
+ "updatedAt": "2026-11-20T22:20:13+06:00",
+ "count": 1850,
  "jobs": [
   {
    "id": "alljobs:GJOB15385",
@@ -329,6 +329,57 @@
    "source": "Alljobs (Teletalk)",
    "url": "https://alljobs.teletalk.com.bd/jobs/government/1178?jobId=15372",
    "logo": "https://alljobs.teletalk.com.bd/media/public/recruiter/organization/logo/gov-job-organization-logo-1795061441532.png"
+  },
+  {
+   "id": "nextjobz:IJOB202684791",
+   "title": "Sales & Marketing Junior Executive",
+   "company": "Medi Tech Novara Limited",
+   "cat": "Marketing / Sales",
+   "loc": "Dhaka, Bangladesh",
+   "type": "Full-time",
+   "salary": "Negotiable",
+   "exp": "0 to 1 years",
+   "req": "B2B Sales, Business Development, Communication, Lead Generation, Market Research, MS Office, Negotiation, Pharma Sales, Presentation, Problem Solving, Sales, Target Achievement, Sales & Marketing, Corporate Sales, Medical Equipment Sales, Healthcare Sales, Pharmaceutical sales",
+   "postedAt": "2026-11-20",
+   "deadline": "2026-12-20",
+   "vacancies": 1,
+   "source": "NextJobz",
+   "url": "https://nextjobz.com.bd/jobs/sales-marketing-junior-executive-IJOB202684791",
+   "site": "https://nextjobz.com.bd/company/medi-tech-novara-limited-292685"
+  },
+  {
+   "id": "nextjobz:IJOB202684789",
+   "title": "Digital Marketing & Graphic Design Executive",
+   "company": "Medi Tech Novara Limited",
+   "cat": "Graphic Design / Animation",
+   "loc": "Dhaka, Bangladesh",
+   "type": "Full-time",
+   "salary": "Negotiable",
+   "exp": "2 to 3 years",
+   "req": "Branding, Business Development, Canva, Communication, Content Writing, Digital Marketing, Excel, Facebook Ads, Google Ads, Google Analytics, Graphic Design, Illustrator, Lead Generation, MS Word, Photoshop, Presentation, Problem Solving, Recruitment, SEO, Social Media, Typing, Video Editing",
+   "postedAt": "2026-11-20",
+   "deadline": "2026-12-21",
+   "vacancies": 1,
+   "source": "NextJobz",
+   "url": "https://nextjobz.com.bd/jobs/digital-marketing-graphic-design-executive-IJOB202684789",
+   "site": "https://nextjobz.com.bd/company/medi-tech-novara-limited-292685"
+  },
+  {
+   "id": "nextjobz:IJOB202684790",
+   "title": "Executive Personal Secretary to the Managing Director (MD)",
+   "company": "Medi Tech Novara Limited",
+   "cat": "General Management / Administration",
+   "loc": "Dhaka, Bangladesh",
+   "type": "Full-time",
+   "salary": "Negotiable",
+   "exp": "3 to 5 years",
+   "req": "Communication, English Communication, Excel, MS Word, Presentation, Public Relations, Executive Assistance, Administrative support, Calendar Management, Business Correspondence, International relations, Meeting coordination, Travel Management",
+   "postedAt": "2026-11-20",
+   "deadline": "2026-12-20",
+   "vacancies": 1,
+   "source": "NextJobz",
+   "url": "https://nextjobz.com.bd/jobs/executive-personal-secretary-to-the-managing-director-md-IJOB202684790",
+   "site": "https://nextjobz.com.bd/company/medi-tech-novara-limited-292685"
   },
   {
    "id": "alljobs:GJOB15345",
