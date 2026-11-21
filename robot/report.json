@@ -1,21 +1,21 @@
 {
  "run": {
-  "startedAt": "2026-11-21T10:14:21+06:00",
-  "finishedAt": "2026-11-21T10:16:45+06:00",
-  "newPostsCollected": 41,
-  "postsInFile": 1840,
-  "fileBytes": 1308258
+  "startedAt": "2026-11-21T21:34:01+06:00",
+  "finishedAt": "2026-11-21T21:35:50+06:00",
+  "newPostsCollected": 36,
+  "postsInFile": 1850,
+  "fileBytes": 1315339
  },
  "size": {
-  "fileBytes": 1308258,
-  "downloadBytes": 199767,
+  "fileBytes": 1315339,
+  "downloadBytes": 201318,
   "budgetBytes": 358400,
   "withinBudget": true
  },
  "collectedPerSource": {
-  "nextjobz": 40,
+  "nextjobz": 34,
   "alljobs": 0,
-  "remote": 1,
+  "remote": 2,
   "sr-polygon": 0,
   "sr-nagorik": 0,
   "sr-gigalogy": 0,
@@ -33,21 +33,21 @@
  },
  "postsInFilePerSource": {
   "Alljobs (Teletalk)": 373,
-  "NextJobz": 1391,
+  "NextJobz": 1399,
+  "Jobicy": 3,
   "Trakstar Hire": 3,
   "SmartRecruiters": 38,
   "Himalayas": 1,
   "Lever": 10,
-  "Jobicy": 1,
   "Remote OK": 1,
   "Freshteam": 22
  },
  "removed": {
-  "expired": 24,
+  "expired": 0,
   "too_old": 0,
   "no_apply_link": 0,
   "asks_for_money": 0,
-  "merged": 27,
+  "merged": 26,
   "no_title": 0,
   "closed_on_company_board": 0,
   "source_switched_off": 0,
@@ -60,7 +60,7 @@
    "id": "nextjobz",
    "type": "nextjobz",
    "enabled": true,
-   "collected": 40
+   "collected": 34
   },
   {
    "id": "alljobs",
@@ -72,7 +72,7 @@
    "id": "remote",
    "type": "remote_boards",
    "enabled": true,
-   "collected": 1
+   "collected": 2
   },
   {
    "id": "companies",
@@ -223,8 +223,8 @@
   }
  ],
  "keywords": {
-  "postsRead": 40,
-  "postsWithSkills": 35,
+  "postsRead": 34,
+  "postsWithSkills": 33,
   "ran": true
  },
  "governmentPlaces": {
@@ -234,11 +234,11 @@
   "stillWithoutPlace": 148
  },
  "slim": {
-  "websiteLeftOut": 26,
-  "educationShortened": 9,
+  "websiteLeftOut": 27,
+  "educationShortened": 11,
   "educationLeftLong": 7,
   "keptLongToKeepMatching": 7,
-  "skillsMovedToKeywords": 0
+  "skillsMovedToKeywords": 1
  },
  "repaired": {
   "governmentCategoryAdded": 0
@@ -294,7 +294,7 @@
   }
  ],
  "pagesRead": {
-  "nextjobz.com.bd": 43,
+  "nextjobz.com.bd": 37,
   "alljobs.teletalk.com.bd": 3,
   "jobicy.com": 1,
   "remoteok.com": 1,
@@ -311,31 +311,36 @@
  "blockedByRobotsTxt": [],
  "requestsFailed": [],
  "matching": {
-  "postsRead": 1840,
-  "engineReadMs": 993,
+  "postsRead": 1850,
+  "engineReadMs": 1204,
   "postsPerSource": {
    "Alljobs (Teletalk)": 373,
-   "NextJobz": 1391,
+   "NextJobz": 1399,
+   "Jobicy": 3,
    "Trakstar Hire": 3,
    "SmartRecruiters": 38,
    "Himalayas": 1,
    "Lever": 10,
-   "Jobicy": 1,
    "Remote OK": 1,
    "Freshteam": 22
   },
   "classifiedHow": {
-   "title": 1395,
-   "keyword": 244,
-   "category": 174,
+   "title": 1400,
+   "category": 176,
+   "none": 2,
+   "keyword": 246,
    "spelling": 15,
-   "skills": 11,
-   "none": 1
+   "skills": 11
   },
   "noFieldFound": {
-   "count": 1,
+   "count": 2,
    "percent": 0,
    "examples": [
+    {
+     "title": "Finnish Tech Linguistic Tester",
+     "company": "Welo Global",
+     "source": "Jobicy"
+    },
     {
      "title": "খাদেম",
      "company": "Islamic Research & Dawah Center",
@@ -344,7 +349,7 @@
    ]
   },
   "noRoleFound": {
-   "count": 221,
+   "count": 226,
    "percent": 12
   },
   "noLocationFound": {
@@ -418,18 +423,29 @@
    "percent": 25
   },
   "noSkillFound": {
-   "count": 449,
+   "count": 450,
    "percent": 24
   },
   "noDeadline": {
-   "count": 75,
+   "count": 77,
    "percent": 4
   },
   "noSalary": {
-   "count": 1718,
+   "count": 1727,
    "percent": 93
   },
   "topUnclassifiedTitles": [
+   {
+    "title": "Finnish Tech Linguistic Tester",
+    "count": 1,
+    "sources": [
+     "Jobicy"
+    ],
+    "portalCategory": [
+     "QA & Testing"
+    ],
+    "suggestion": "add \"finnish tech linguistic tester\" to syn of role \"sqa\" (SQA / Software Tester) in src/taxonomy.js"
+   },
    {
     "title": "খাদেম",
     "count": 1,
