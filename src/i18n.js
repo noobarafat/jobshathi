@@ -190,3 +190,20 @@ Object.assign(TEXT, {
   freshMany: ['{n} new matches since your last visit', 'গতবারের পর {n}টি নতুন ম্যাচ'], freshOne: ['1 new match since your last visit', 'গতবারের পর ১টি নতুন ম্যাচ'],
   seeThem: ['See them', 'দেখুন'], fFresh: ['New since last visit', 'গতবারের পর নতুন'],
 });
+
+/* ───────── iPhone and iPad: install help, the Home Screen app's own data, Google sign-in there ───────── */
+Object.assign(TEXT, {
+  iosStep1: ['In Safari, tap the Share button (at the bottom of the screen, or inside the ⋯ menu on newer iPhones).', 'Safari-তে Share বোতাম চাপুন (স্ক্রিনের নিচে, বা নতুন iPhone-এ ⋯ মেনুর ভেতরে)।'],
+  iosStep2: ['Scroll down and tap “Add to Home Screen”.', 'নিচে স্ক্রল করে “Add to Home Screen” চাপুন।'],
+  iosStep3: ['Tap “Add”, then open JobShathi from your Home Screen.', '“Add” চাপুন, তারপর হোম স্ক্রিন থেকে জবসাথী খুলুন।'],
+  iosOwnCopy: ['Good to know: on iPhone the Home Screen app keeps its own data, apart from Safari, so your profile does not move over by itself. Open the app and set up your profile there once (about a minute).', 'জেনে রাখুন: iPhone-এ হোম স্ক্রিনের অ্যাপ Safari থেকে আলাদা করে নিজের তথ্য রাখে, তাই প্রোফাইল নিজে থেকে চলে যায় না। অ্যাপটি খুলে সেখানে একবার প্রোফাইল সেট আপ করুন (প্রায় এক মিনিট)।'],
+  androidStep1: ['In Chrome, open the ⋮ menu (top right).', 'Chrome-এ ⋮ মেনু খুলুন (উপরে ডানে)।'],
+  androidStep2: ['Tap “Install app” or “Add to Home screen”.', '“Install app” বা “Add to Home screen” চাপুন।'],
+  installOthers: ['Other phones and computers', 'অন্য ফোন ও কম্পিউটার'],
+  openSafari: ['This page is open inside another app, which cannot install it. Open it in Safari first: tap ⋯ or the share icon and choose “Open in Safari” or “Open in browser”.', 'পাতাটি অন্য একটি অ্যাপের ভেতরে খোলা, সেখান থেকে ইনস্টল হয় না। আগে Safari-তে খুলুন: ⋯ বা শেয়ার আইকন চেপে “Open in Safari” বা “Open in browser” বেছে নিন।'],
+  openChrome: ['This page is open inside another app, which cannot install it. Open it in Chrome first: tap ⋮ and choose “Open in Chrome” or “Open in browser”.', 'পাতাটি অন্য একটি অ্যাপের ভেতরে খোলা, সেখান থেকে ইনস্টল হয় না। আগে Chrome-এ খুলুন: ⋮ চেপে “Open in Chrome” বা “Open in browser” বেছে নিন।'],
+  iosHomeFirst: ['On iPhone? Add JobShathi to your Home Screen first, then set up inside the app.', 'iPhone ব্যবহার করছেন? আগে জবসাথী হোম স্ক্রিনে যোগ করুন, তারপর অ্যাপের ভেতরে সেট আপ করুন।'],
+  iosHow: ['How?', 'কীভাবে?'],
+  iosLinkSafari: ['Already use JobShathi from your Home Screen? On iPhone, links open in Safari: open the app and search for this job’s title.', 'হোম স্ক্রিন থেকে জবসাথী ব্যবহার করেন? iPhone-এ লিংক Safari-তে খোলে: অ্যাপটি খুলে এই চাকরির নাম দিয়ে খুঁজুন।'],
+  errIosGoogle: ['Google sign-in could not finish inside the iPhone Home Screen app. You can still use JobShathi here: what you set up is saved on this phone.', 'iPhone-এর হোম স্ক্রিন অ্যাপের ভেতরে Google সাইন ইন শেষ হলো না। তবুও এখানে জবসাথী ব্যবহার করতে পারবেন: যা সেট আপ করবেন তা এই ফোনে সংরক্ষিত থাকে।'],
+});

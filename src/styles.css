@@ -238,7 +238,8 @@ input:focus, select:focus { border-color: var(--brand); outline: 3px solid var(-
 .scroller::-webkit-scrollbar { display: none; }
 .scroller .chip { flex: none; white-space: nowrap; }
 .result-bar { display: flex; align-items: center; justify-content: space-between; gap: 10px; color: var(--ink-2); font-size: .94rem; }
-.result-bar select { width: auto; min-height: 40px; padding: 4px 10px; border-radius: 12px; font-weight: 600; }
+/* 1rem (16px): iPhone zooms the page in when a box with smaller text is tapped, and stays zoomed */
+.result-bar select { width: auto; min-height: 40px; padding: 4px 10px; border-radius: 12px; font-weight: 600; font-size: 1rem; }
 .empty { padding: 30px 20px; text-align: center; color: var(--ink-2); display: grid; gap: 6px; justify-items: center; }
 .empty b { color: var(--ink); font-size: 1.08rem; }
 .empty .btn { margin-top: 8px; }
@@ -472,7 +473,7 @@ main { padding-bottom: 118px; }
 .fx-btn[data-on] { border-color: var(--brand); color: var(--brand-strong); font-weight: 600; }
 .fx-btn .n { color: var(--brand-strong); }
 .fx-on { margin-top: 10px; gap: 6px; }
-.fx-sheet select { width: auto; max-width: 100%; min-height: 36px; padding: 4px 12px; border-radius: 999px; font-size: .92rem; }
+.fx-sheet select { width: auto; max-width: 100%; min-height: 36px; padding: 4px 12px; border-radius: 999px; font-size: 1rem; }
 .empty-acts { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; }
 
 /* ── a shared job: the invitation, closed jobs and their similar ones; new matches since the last visit ── */
@@ -487,3 +488,21 @@ main { padding-bottom: 118px; }
 .fresh-line span { flex: 1; }
 .fresh-line b { display: inline-flex; align-items: center; gap: 2px; white-space: nowrap; }
 .fresh-line b svg { width: 16px; height: 16px; }
+
+/* ── iPhone and iPad ── */
+/* install help: numbered steps, each with the icon the person will look for */
+.install-steps { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; counter-reset: st; }
+.install-steps li { counter-increment: st; display: grid; grid-template-columns: 40px 1fr; gap: 12px; align-items: center; padding: 12px 14px; border-radius: 14px; background: var(--surface-2); border: 1px solid var(--line); }
+.install-steps .ico { position: relative; width: 40px; height: 40px; border-radius: 12px; display: grid; place-items: center; background: var(--brand-soft); color: var(--brand-strong); }
+.install-steps .ico svg { width: 22px; height: 22px; }
+.install-steps .ico::after { content: counter(st); position: absolute; top: -6px; left: -6px; width: 20px; height: 20px; border-radius: 99px; background: var(--brand); color: var(--brand-ink, #fff); font-size: .75rem; font-weight: 800; display: grid; place-items: center; }
+.other-devices summary { font-size: 1rem; color: var(--ink-2); padding: 4px 0; }
+.other-devices[open] summary svg { transform: rotate(90deg); }
+/* the welcome page on an iPhone in Safari: install first, then set up */
+.ios-first { display: flex; gap: 8px; align-items: flex-start; color: var(--ink-2); font-size: .95rem; }
+.ios-first > svg { margin-top: .2em; color: var(--brand); }
+.ios-first .link { padding: 0 2px; text-decoration: underline; }
+/* a sheet with no buttons at the bottom: its last line clear of the iPhone's home bar */
+.sheet-body:last-child { padding-bottom: calc(18px + env(safe-area-inset-bottom, 0px)); }
+/* dragging on the dark area behind a sheet does not scroll the page under it */
+.scrim { touch-action: none; }

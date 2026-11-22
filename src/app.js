@@ -38,6 +38,12 @@
   const blankMore = () => ({ fields: [], levels: [], places: [], types: [], due: 0, paid: false }); // the Filters sheet's choices
   const newFilter = () => ({ bucket: 'fit', quick: [], sort: 'match', q: '', more: blankMore() });
   const inFrame = (() => { try { return window.self !== window.top; } catch { return true; } })();
+  /* The device, for the install help. iPadOS says it is a Mac, but a Mac has no touch screen. */
+  const UA = navigator.userAgent || '';
+  const IOS = /iPhone|iPad|iPod/.test(UA) || (/Macintosh/.test(UA) && navigator.maxTouchPoints > 1);
+  const ANDROID = /Android/.test(UA);
+  // the browsers inside Facebook, Messenger, Instagram, LinkedIn… cannot add a page to the home screen
+  const IN_APP = /FBAN|FBAV|FB_IAB|FBIOS|Messenger|Instagram|LinkedInApp|Line\/|MicroMessenger|Snapchat|TikTok|musical_ly|Twitter/i.test(UA);
   const S = {
     account: Store.get('account', null), profile: Store.get('profile', null), marks: Object.assign(emptyMarks(), Store.get('marks', {})),
     lang: Store.get('lang', (navigator.language || '').toLowerCase().startsWith('bn') ? 'bn' : 'en'), theme: Store.get('theme', 'auto'),
@@ -78,6 +84,8 @@
     home: '<path d="M4 11l8-7 8 7v8a1 1 0 0 1-1 1h-4v-6H9v6H5a1 1 0 0 1-1-1z"/>', chevR: '<path d="M9 6l6 6-6 6"/>', chevL: '<path d="M15 6l-6 6 6 6"/>', download: '<path d="M12 4v11M7.5 11l4.5 4.5 4.5-4.5M5 20h14"/>',
     sliders: '<path d="M4 7h9M17 7h3M4 17h3M11 17h9"/><circle cx="15" cy="7" r="2"/><circle cx="9" cy="17" r="2"/>',
     share: '<circle cx="18" cy="5.5" r="2.5"/><circle cx="6" cy="12" r="2.5"/><circle cx="18" cy="18.5" r="2.5"/><path d="M8.2 10.8l7.6-4.1M8.2 13.2l7.6 4.1"/>',
+    iosShare: '<path d="M12 3v12M8 7l4-4 4 4"/><path d="M8 10H6a1 1 0 0 0-1 1v9a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-9a1 1 0 0 0-1-1h-2"/>', addBox: '<rect x="4" y="4" width="16" height="16" rx="4"/><path d="M12 8.5v7M8.5 12h7"/>',
+    dots: '<circle cx="5.5" cy="12" r="1.2"/><circle cx="12" cy="12" r="1.2"/><circle cx="18.5" cy="12" r="1.2"/>',
     tracker: '<path d="M10 6h10M10 12h10M10 18h10"/><path d="M3.5 6l1.2 1.2L7 5M3.5 12l1.2 1.2L7 11M3.5 18l1.2 1.2L7 17"/>', spark: '<path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8z"/>',
   };
   const FICON = {
@@ -210,6 +218,7 @@
     return `<section class="hero"><div><h1>${t('heroTitle')}</h1><p class="lead">${t('heroLead')}</p>
       <div class="cta"><button type="button" class="btn primary big" data-a="start">${t('getStarted')}</button>
       ${!S.account && cloudOn() ? `<div class="have"><span>${t('haveAccount')}</span><button type="button" class="btn" data-a="google" data-fid="google" ${S.busy === 'google' ? 'disabled' : ''}>${GLOGO}${S.busy === 'google' ? t('wait') : t('googleBtn')}</button></div>` : ''}
+      ${IOS && !S.installed ? `<p class="ios-first">${ic('iosShare')}<span>${t('iosHomeFirst')} <button type="button" class="link" data-a="install" data-fid="ios-how">${t('iosHow')}</button></span></p>` : ''}
       <div class="trust"><span>${ic('check')}${t('trust1')}</span><span>${ic('check')}${t('trust2')}</span><span>${ic('check')}${t('trust3')}</span></div></div></div>
       <div>${demo}</div></section>
       <ol class="steps"><li><div><b>${t('how1')}</b><span>${t('how1d')}</span></div></li><li><div><b>${t('how2')}</b><span>${t('how2d')}</span></div></li><li><div><b>${t('how3')}</b><span>${t('how3d')}</span></div></li></ol>
@@ -572,7 +581,7 @@
     return { label: j.title, head: `<div class="d-top">${logo(j, 'lg')}<div><h2 id="sheet-title">${esc(j.title)}</h2><div class="hint" style="font-size:1rem">${esc(j.company)}</div></div><span></span></div>`,
       body: `${j.scam ? `<div class="flag scam">${ic('alert')}<span>${t('scam')}</span></div>` : ''}
         <div class="d-facts">${fact(t('fLocation'), esc(j.loc.text || t('cLocUnknown')))}${fact(t('fSalary'), payWords(j))}${fact(t('fType'), esc(typeName(j.type)))}${fact(t('fDeadline'), deadlineWords(j))}${fact(t('fEdu'), esc(j.eduText))}${fact(t('fVac'), j.vacancies ? num(j.vacancies) : '')}${fact(t('fSource'), esc([j.source].concat(j.alsoOn).filter(Boolean).join(', ')))}</div>
-        <div class="card panel join"><b>${t('joinTitle')}</b><span class="hint">${t('joinLead')}</span><div><button type="button" class="btn soft" data-a="start" data-fid="join-start">${t('getStarted')}</button></div></div>`,
+        <div class="card panel join"><b>${t('joinTitle')}</b><span class="hint">${t('joinLead')}</span><div><button type="button" class="btn soft" data-a="start" data-fid="join-start">${t('getStarted')}</button></div>${IOS && !S.installed ? `<span class="hint">${t('iosLinkSafari')}</span>` : ''}</div>`,
       foot: `${applyLink(j)}${shareBtn(j)}` };
   }
   /* Similar open jobs for a shared job that has closed: the same role, else the same field, else a word of
@@ -594,6 +603,23 @@
       body: `<div class="flag note">${ic('info')}<span>${t('closedLead')}</span></div>
         <div><div class="group-title"><span>${t('similarTitle')}</span></div>${sim.length ? `<div class="stack-s">${sim.map(row).join('')}</div>` : `<p class="hint">${t('noSimilar')}</p>`}</div>`, foot: '' };
   }
+  /* Install help for this device. An iPhone has no install button: Safari's Share menu has "Add to Home Screen",
+     and the app added there keeps its own data, apart from Safari (so someone who set up in Safari is told). */
+  function sheetInstall() {
+    const step = (icon, text) => `<li><span class="ico">${ic(icon)}</span><span>${text}</span></li>`;
+    const note = key => `<div class="flag note">${ic('info')}<span>${t(key)}</span></div>`;
+    let main = '', others = [t('installAndroid'), t('installIos'), t('installPc')];
+    if (IOS) {
+      main = (IN_APP ? note('openSafari') : '') + `<ol class="install-steps">${step('iosShare', t('iosStep1'))}${step('addBox', t('iosStep2'))}${step('check', t('iosStep3'))}</ol>` + (S.account ? `<p class="hint">${t('iosOwnCopy')}</p>` : '');
+      others = [t('installAndroid'), t('installPc')];
+    } else if (ANDROID) {
+      main = (IN_APP ? note('openChrome') : '') + `<ol class="install-steps">${step('dots', t('androidStep1'))}${step('download', t('androidStep2'))}</ol>`;
+      others = [t('installIos'), t('installPc')];
+    }
+    const rest = `<div class="howto">${others.map(x => `<p>${x}</p>`).join('')}</div>`;
+    return { label: t('installTitle'), head: `<div><h2 id="sheet-title">${t('installTitle')}</h2><div class="hint" style="font-size:1rem">${t('installLead')}</div></div>`,
+      body: (main ? `${main}<details class="other-devices"><summary>${t('installOthers')}${ic('chevR')}</summary>${rest}</details>` : rest) + (inFrame ? `<div class="banner">${ic('info')}<span>${t('installPreview')}</span></div>` : ''), foot: '' };
+  }
   /** The sheet in two parts: the frame (head and foot, drawn at once) and the body (drawn right after). */
   function sheetParts() {
     if (!S.sheet) return { frame: '', body: '' };
@@ -603,7 +629,7 @@
       c = r ? sheetJob(r) : j ? sheetVisitor(j) : sheetClosed(S.sheet);
     }
     else if (S.sheet.kind === 'filters') { if (!S.fd) S.fd = JSON.parse(JSON.stringify(S.f.more)); c = sheetFilters(); }
-    else c = { label: t('installTitle'), head: `<div><h2 id="sheet-title">${t('installTitle')}</h2><div class="hint" style="font-size:1rem">${t('installLead')}</div></div>`, body: `<div class="howto"><p>${t('installAndroid')}</p><p>${t('installIos')}</p><p>${t('installPc')}</p></div>${inFrame ? `<div class="banner">${ic('info')}<span>${t('installPreview')}</span></div>` : ''}`, foot: '' };
+    else c = sheetInstall();
     const anim = sheetShown ? 'style="animation:none"' : '';
     return { body: c.body, frame: `<div class="scrim" data-a="close" ${anim}></div><div class="sheet" role="dialog" aria-modal="true" aria-labelledby="sheet-title" ${anim}>
       <div class="sheet-head"><span class="grab" aria-hidden="true"></span>${c.head}<button type="button" class="icon-btn" data-a="close" data-fid="sheet-close" aria-label="${t('close')}">${ic('x')}</button></div>
@@ -850,7 +876,14 @@
 
   /* ── online account ── */
   const SILENT = ['auth/popup-closed-by-user', 'auth/cancelled-popup-request', 'auth/user-cancelled'];
+  /* The app added to an iPhone's Home Screen: Google's sign-in window opens in Safari, which often cannot hand
+     the result back to the app. Say so plainly, instead of nothing happening after the person signed in. */
+  const IOS_APP = IOS && S.installed;
+  const IOS_POPUP = [...SILENT, 'auth/popup-blocked', 'auth/operation-not-supported-in-this-environment', 'auth/web-storage-unsupported', 'ios-wait'];
+  /** On the iPhone app a sign-in window that never reports back would leave the button on "Please wait": give up after 2 minutes. */
+  const iosGuard = p => (IOS_APP ? Promise.race([p, new Promise(ok => setTimeout(() => ok({ ok: false, code: 'ios-wait' }), 120000))]) : p);
   function cloudError(code) {
+    if (IOS_APP && IOS_POPUP.includes(code)) return t('errIosGoogle');
     if (SILENT.includes(code)) return '';
     if (!navigator.onLine || code === 'offline' || code === 'auth/network-request-failed') return t('errOffline');
     if (code === 'auth/popup-blocked') return t('errPopup');
@@ -890,8 +923,14 @@
     if (u) await reconcile(u);
     resolveRoute(); render();
   }
+  /* Safari may clear a site's saved data after 7 days of not being opened; asking to keep it stops that where Safari
+     agrees (it never asks the person). Only on iPhone/iPad: Firefox would show a question for it. */
+  function keepData() {
+    if (IOS && S.account && navigator.storage && navigator.storage.persist) navigator.storage.persisted().then(p => p || navigator.storage.persist()).catch(() => {});
+  }
   /* A new account: signed in anonymously in the person's name, no extra step. */
   async function afterCreate() {
+    keepData();
     if (!(await Cloud.start())) return;
     const r = await Cloud.ensureUser();
     if (r.ok) { markUser(r.user); Sync.push(); }
@@ -901,7 +940,7 @@
   async function googleSignIn() {
     if (!Cloud.ready()) { toast(t(navigator.onLine ? 'errCloud' : 'errOffline')); Cloud.start().then(connect); return; }
     busy('google');
-    const r = await Cloud.signInGoogle();
+    const r = await iosGuard(Cloud.signInGoogle());
     if (!r.ok) { S.busy = ''; const m = cloudError(r.code); render(); if (m) toast(m); return; }
     const got = await Cloud.load(r.user.uid);
     S.busy = '';
@@ -915,7 +954,7 @@
   async function googleLink() {
     if (!Cloud.ready()) { toast(t(navigator.onLine ? 'errCloud' : 'errOffline')); Cloud.start().then(connect); return; }
     busy('google');
-    const had = Cloud.user(), r = await Cloud.linkGoogle();
+    const had = Cloud.user(), r = await iosGuard(Cloud.linkGoogle());
     if (!r.ok) { S.busy = ''; const m = cloudError(r.code); render(); if (m) toast(m); return; }
     let msg = t('tLinked');
     if (r.switched || !had) {
@@ -1239,6 +1278,6 @@
   // the page restores scroll itself (a closed job leaves the list where it was; a new page starts at the top)
   try { history.scrollRestoration = 'manual'; } catch { /* an old browser: it restores as it likes */ }
   entry(false, {}, null); // this entry is the first one (d: 0)
-  recompute(); resolveRoute(); render(); loadLiveJobs(); connect(); setTimeout(checkVersion, 4000);
+  recompute(); resolveRoute(); render(); loadLiveJobs(); connect(); setTimeout(checkVersion, 4000); keepData();
 })();
 

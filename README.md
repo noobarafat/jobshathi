@@ -128,6 +128,18 @@ The goal: no single action freezes the screen for more than 0.2 s with the CPU s
 - **Sharing a job** makes a link `?job=<id>&t=<title>&r=<role>` (or `&f=<field>`). Opening it shows that job; someone without a profile sees the post and "See jobs like this every day". When the job has closed, the title and role find similar open jobs. The link part is taken off the address once read.
 - **"X new matches since your last visit"** (Home): the browser keeps the ids of the matches seen at the last visit (`jobshathi:seen`, never sent anywhere). A match not among them is new; matches that appear because the profile changed are not counted as new.
 
+## iPhone and iPad
+
+The app works when added to the Home Screen from Safari (iOS has no install button and no `beforeinstallprompt`).
+
+- **Icon:** `pwa/icons/apple-touch-icon.png`, 180×180, square and fully opaque (iOS rounds the corners itself and turns transparent pixels black).
+- **Install help** (`sheetInstall()`): on an iPhone the steps are Share → "Add to Home Screen" → "Add"; inside Facebook, Messenger, Instagram and similar apps it first says to open the page in Safari (Chrome on Android). Other devices are folded under "Other phones and computers".
+- **The Home Screen app keeps its own data**, apart from Safari, so a profile made in Safari does not move over. The welcome page in Safari on an iPhone says to add the app first and set up inside it, and the install help says so to someone who already has a profile. A shared link always opens in Safari on an iPhone, and the job sheet says so.
+- **No Back button, no reload:** every screen has its own way back (close, Back, Cancel, the tab bar), "Update" appears inside the app when a new version is out, and jobs are refreshed when the app is opened again.
+- **Notch and home bar:** the page, the tab bar, sheets and the setup buttons use `env(safe-area-inset-*)`. Boxes with text are at least 16px, or iPhone zooms the page in when one is tapped.
+- **Saved data:** Safari can clear a site's data after 7 days without a visit; the app asks to keep it (`navigator.storage.persist()`, iPhone/iPad only). Home Screen apps are not cleared this way.
+- **Google sign-in inside the Home Screen app** uses a pop-up window, which iOS opens in Safari and which often cannot report back. When it fails, the app says so (`errIosGoogle`) instead of doing nothing. A sign-in that works there needs the redirect flow with Firebase's sign-in helper served from the app's own site (`noobarafat.github.io/__/auth/`) and that address added in Google Cloud; not done yet. Until then the app works fully without Google on an iPhone.
+
 ## Anonymous word counting
 
 Profile words (typed job titles and skills) that the dictionary does not know are counted in Firestore, `wordStats/{word}`: the document's name is the word and it holds one number. No user id, no time. The app never sends a word with 3 digits in a row, with `@`, `://` or `www.`, or one shorter than 2 or longer than 40 characters or with more than 4 words, and sends each word once from a device. `firestore.rules` allows only adding 1 and keeps the same limits on the word; nobody can read the counts from the app. The admin page (later) may list only words counted 3 or more times. The Privacy Policy must mention this counting.
