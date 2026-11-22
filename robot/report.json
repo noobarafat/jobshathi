@@ -1,21 +1,21 @@
 {
  "run": {
-  "startedAt": "2026-11-21T21:34:01+06:00",
-  "finishedAt": "2026-11-21T21:35:50+06:00",
-  "newPostsCollected": 36,
-  "postsInFile": 1850,
-  "fileBytes": 1315339
+  "startedAt": "2026-11-22T09:25:47+06:00",
+  "finishedAt": "2026-11-22T09:28:33+06:00",
+  "newPostsCollected": 50,
+  "postsInFile": 1826,
+  "fileBytes": 1307685
  },
  "size": {
-  "fileBytes": 1315339,
-  "downloadBytes": 201318,
+  "fileBytes": 1307685,
+  "downloadBytes": 201255,
   "budgetBytes": 358400,
   "withinBudget": true
  },
  "collectedPerSource": {
-  "nextjobz": 34,
+  "nextjobz": 49,
   "alljobs": 0,
-  "remote": 2,
+  "remote": 1,
   "sr-polygon": 0,
   "sr-nagorik": 0,
   "sr-gigalogy": 0,
@@ -32,8 +32,8 @@
   "ts-kazsoftware": 0
  },
  "postsInFilePerSource": {
-  "Alljobs (Teletalk)": 373,
-  "NextJobz": 1399,
+  "Alljobs (Teletalk)": 347,
+  "NextJobz": 1401,
   "Jobicy": 3,
   "Trakstar Hire": 3,
   "SmartRecruiters": 38,
@@ -43,11 +43,11 @@
   "Freshteam": 22
  },
  "removed": {
-  "expired": 0,
+  "expired": 45,
   "too_old": 0,
   "no_apply_link": 0,
   "asks_for_money": 0,
-  "merged": 26,
+  "merged": 29,
   "no_title": 0,
   "closed_on_company_board": 0,
   "source_switched_off": 0,
@@ -60,7 +60,7 @@
    "id": "nextjobz",
    "type": "nextjobz",
    "enabled": true,
-   "collected": 34
+   "collected": 49
   },
   {
    "id": "alljobs",
@@ -72,7 +72,7 @@
    "id": "remote",
    "type": "remote_boards",
    "enabled": true,
-   "collected": 2
+   "collected": 1
   },
   {
    "id": "companies",
@@ -223,8 +223,8 @@
   }
  ],
  "keywords": {
-  "postsRead": 34,
-  "postsWithSkills": 33,
+  "postsRead": 49,
+  "postsWithSkills": 43,
   "ran": true
  },
  "governmentPlaces": {
@@ -234,11 +234,11 @@
   "stillWithoutPlace": 148
  },
  "slim": {
-  "websiteLeftOut": 27,
-  "educationShortened": 11,
+  "websiteLeftOut": 30,
+  "educationShortened": 7,
   "educationLeftLong": 7,
   "keptLongToKeepMatching": 7,
-  "skillsMovedToKeywords": 1
+  "skillsMovedToKeywords": 0
  },
  "repaired": {
   "governmentCategoryAdded": 0
@@ -294,7 +294,7 @@
   }
  ],
  "pagesRead": {
-  "nextjobz.com.bd": 37,
+  "nextjobz.com.bd": 53,
   "alljobs.teletalk.com.bd": 3,
   "jobicy.com": 1,
   "remoteok.com": 1,
@@ -311,11 +311,11 @@
  "blockedByRobotsTxt": [],
  "requestsFailed": [],
  "matching": {
-  "postsRead": 1850,
-  "engineReadMs": 1204,
+  "postsRead": 1826,
+  "engineReadMs": 744,
   "postsPerSource": {
-   "Alljobs (Teletalk)": 373,
-   "NextJobz": 1399,
+   "Alljobs (Teletalk)": 347,
+   "NextJobz": 1401,
    "Jobicy": 3,
    "Trakstar Hire": 3,
    "SmartRecruiters": 38,
@@ -325,11 +325,11 @@
    "Freshteam": 22
   },
   "classifiedHow": {
-   "title": 1400,
-   "category": 176,
+   "title": 1376,
+   "category": 177,
    "none": 2,
    "keyword": 246,
-   "spelling": 15,
+   "spelling": 14,
    "skills": 11
   },
   "noFieldFound": {
@@ -349,12 +349,12 @@
    ]
   },
   "noRoleFound": {
-   "count": 226,
+   "count": 228,
    "percent": 12
   },
   "noLocationFound": {
-   "count": 183,
-   "percent": 10,
+   "count": 170,
+   "percent": 9,
    "examples": [
     {
      "title": "Office Assistant Cum-Computer Typist",
@@ -419,20 +419,20 @@
    ]
   },
   "noExperienceLevel": {
-   "count": 468,
-   "percent": 25
+   "count": 430,
+   "percent": 24
   },
   "noSkillFound": {
-   "count": 450,
-   "percent": 24
+   "count": 412,
+   "percent": 23
   },
   "noDeadline": {
    "count": 77,
    "percent": 4
   },
   "noSalary": {
-   "count": 1727,
-   "percent": 93
+   "count": 1716,
+   "percent": 94
   },
   "topUnclassifiedTitles": [
    {
