@@ -1,27 +1,27 @@
 {
  "run": {
-  "startedAt": "2026-11-22T09:25:47+06:00",
-  "finishedAt": "2026-11-22T09:28:33+06:00",
-  "newPostsCollected": 50,
-  "postsInFile": 1826,
-  "fileBytes": 1307685
+  "startedAt": "2026-11-22T21:37:23+06:00",
+  "finishedAt": "2026-11-22T21:41:35+06:00",
+  "newPostsCollected": 104,
+  "postsInFile": 1900,
+  "fileBytes": 1364066
  },
  "size": {
-  "fileBytes": 1307685,
-  "downloadBytes": 201255,
+  "fileBytes": 1364066,
+  "downloadBytes": 209582,
   "budgetBytes": 358400,
   "withinBudget": true
  },
  "collectedPerSource": {
-  "nextjobz": 49,
-  "alljobs": 0,
+  "nextjobz": 98,
+  "alljobs": 4,
   "remote": 1,
   "sr-polygon": 0,
   "sr-nagorik": 0,
   "sr-gigalogy": 0,
   "sr-niftycoders": 0,
   "sr-portonics": 0,
-  "sr-optimizely": 0,
+  "sr-optimizely": 1,
   "lever-fieldnation": 0,
   "ft-shikho": 0,
   "ft-technext": 0,
@@ -32,24 +32,24 @@
   "ts-kazsoftware": 0
  },
  "postsInFilePerSource": {
-  "Alljobs (Teletalk)": 347,
-  "NextJobz": 1401,
-  "Jobicy": 3,
-  "Trakstar Hire": 3,
+  "Alljobs (Teletalk)": 351,
+  "NextJobz": 1470,
   "SmartRecruiters": 38,
+  "Jobicy": 3,
+  "Remote OK": 2,
+  "Trakstar Hire": 3,
   "Himalayas": 1,
   "Lever": 10,
-  "Remote OK": 1,
   "Freshteam": 22
  },
  "removed": {
-  "expired": 45,
+  "expired": 0,
   "too_old": 0,
   "no_apply_link": 0,
   "asks_for_money": 0,
   "merged": 29,
   "no_title": 0,
-  "closed_on_company_board": 0,
+  "closed_on_company_board": 1,
   "source_switched_off": 0,
   "held_for_review": 0,
   "over_size_limit": 0
@@ -60,13 +60,13 @@
    "id": "nextjobz",
    "type": "nextjobz",
    "enabled": true,
-   "collected": 49
+   "collected": 98
   },
   {
    "id": "alljobs",
    "type": "alljobs",
    "enabled": true,
-   "collected": 0
+   "collected": 4
   },
   {
    "id": "remote",
@@ -125,7 +125,7 @@
    "enabled": true,
    "how": "public career page, then each job page's schema.org data",
    "listed": 12,
-   "collected": 0
+   "collected": 1
   },
   {
    "id": "lever-fieldnation",
@@ -223,22 +223,22 @@
   }
  ],
  "keywords": {
-  "postsRead": 49,
-  "postsWithSkills": 43,
+  "postsRead": 99,
+  "postsWithSkills": 81,
   "ran": true
  },
  "governmentPlaces": {
-  "withoutPlace": 148,
+  "withoutPlace": 139,
   "fromOrgPlacesFile": 0,
   "fromOrganisationName": 0,
-  "stillWithoutPlace": 148
+  "stillWithoutPlace": 139
  },
  "slim": {
-  "websiteLeftOut": 30,
-  "educationShortened": 7,
+  "websiteLeftOut": 39,
+  "educationShortened": 25,
   "educationLeftLong": 7,
   "keptLongToKeepMatching": 7,
-  "skillsMovedToKeywords": 0
+  "skillsMovedToKeywords": 2
  },
  "repaired": {
   "governmentCategoryAdded": 0
@@ -294,12 +294,13 @@
   }
  ],
  "pagesRead": {
-  "nextjobz.com.bd": 53,
-  "alljobs.teletalk.com.bd": 3,
+  "nextjobz.com.bd": 102,
+  "alljobs.teletalk.com.bd": 7,
   "jobicy.com": 1,
   "remoteok.com": 1,
   "himalayas.app": 1,
   "careers.smartrecruiters.com": 12,
+  "jobs.smartrecruiters.com": 1,
   "api.lever.co": 1,
   "shikho.freshteam.com": 1,
   "technext.freshteam.com": 1,
@@ -311,26 +312,26 @@
  "blockedByRobotsTxt": [],
  "requestsFailed": [],
  "matching": {
-  "postsRead": 1826,
-  "engineReadMs": 744,
+  "postsRead": 1900,
+  "engineReadMs": 1045,
   "postsPerSource": {
-   "Alljobs (Teletalk)": 347,
-   "NextJobz": 1401,
-   "Jobicy": 3,
-   "Trakstar Hire": 3,
+   "Alljobs (Teletalk)": 351,
+   "NextJobz": 1470,
    "SmartRecruiters": 38,
+   "Jobicy": 3,
+   "Remote OK": 2,
+   "Trakstar Hire": 3,
    "Himalayas": 1,
    "Lever": 10,
-   "Remote OK": 1,
    "Freshteam": 22
   },
   "classifiedHow": {
-   "title": 1376,
-   "category": 177,
+   "title": 1424,
+   "category": 186,
+   "keyword": 261,
    "none": 2,
-   "keyword": 246,
-   "spelling": 14,
-   "skills": 11
+   "spelling": 15,
+   "skills": 12
   },
   "noFieldFound": {
    "count": 2,
@@ -349,13 +350,31 @@
    ]
   },
   "noRoleFound": {
-   "count": 228,
-   "percent": 12
+   "count": 240,
+   "percent": 13
   },
   "noLocationFound": {
-   "count": 170,
+   "count": 173,
    "percent": 9,
    "examples": [
+    {
+     "title": "Security Guard",
+     "company": "Bangladesh Export Processing Zones Authority(BEPZA)",
+     "loc": "",
+     "source": "Alljobs (Teletalk)"
+    },
+    {
+     "title": "Office Sohayok",
+     "company": "Bangladesh Export Processing Zones Authority(BEPZA)",
+     "loc": "",
+     "source": "Alljobs (Teletalk)"
+    },
+    {
+     "title": "Security Officer",
+     "company": "Bangladesh Export Processing Zones Authority(BEPZA)",
+     "loc": "",
+     "source": "Alljobs (Teletalk)"
+    },
     {
      "title": "Office Assistant Cum-Computer Typist",
      "company": "Bangladesh Competition Commission(CCB)",
@@ -397,41 +416,23 @@
      "company": "Bangladesh Petroleum Corporation(BPC)",
      "loc": "",
      "source": "Alljobs (Teletalk)"
-    },
-    {
-     "title": "Assistant Manager (Distribution and Marketing)",
-     "company": "Bangladesh Petroleum Corporation(BPC)",
-     "loc": "",
-     "source": "Alljobs (Teletalk)"
-    },
-    {
-     "title": "Assistant Manager (Finance)",
-     "company": "Bangladesh Petroleum Corporation(BPC)",
-     "loc": "",
-     "source": "Alljobs (Teletalk)"
-    },
-    {
-     "title": "Deputy Manager (General Workshop)",
-     "company": "Bangladesh Petroleum Corporation(BPC)",
-     "loc": "",
-     "source": "Alljobs (Teletalk)"
     }
    ]
   },
   "noExperienceLevel": {
-   "count": 430,
-   "percent": 24
-  },
-  "noSkillFound": {
-   "count": 412,
+   "count": 439,
    "percent": 23
   },
+  "noSkillFound": {
+   "count": 417,
+   "percent": 22
+  },
   "noDeadline": {
-   "count": 77,
+   "count": 78,
    "percent": 4
   },
   "noSalary": {
-   "count": 1716,
+   "count": 1787,
    "percent": 94
   },
   "topUnclassifiedTitles": [
