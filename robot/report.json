@@ -1,25 +1,25 @@
 {
  "run": {
-  "startedAt": "2026-11-25T11:38:29+06:00",
-  "finishedAt": "2026-11-25T11:41:06+06:00",
-  "newPostsCollected": 55,
-  "postsInFile": 1934,
-  "fileBytes": 1401016
+  "startedAt": "2026-11-26T00:09:27+06:00",
+  "finishedAt": "2026-11-26T00:12:21+06:00",
+  "newPostsCollected": 66,
+  "postsInFile": 1907,
+  "fileBytes": 1380950
  },
  "size": {
-  "fileBytes": 1401016,
-  "downloadBytes": 217246,
+  "fileBytes": 1380950,
+  "downloadBytes": 213822,
   "budgetBytes": 358400,
   "withinBudget": true
  },
  "collectedPerSource": {
-  "nextjobz": 55,
-  "alljobs": 0,
-  "remote": 0,
+  "nextjobz": 58,
+  "alljobs": 6,
+  "remote": 1,
   "sr-polygon": 0,
   "sr-nagorik": 0,
   "sr-gigalogy": 0,
-  "sr-niftycoders": 0,
+  "sr-niftycoders": 1,
   "sr-portonics": 0,
   "sr-optimizely": 0,
   "lever-fieldnation": 0,
@@ -32,22 +32,22 @@
   "ts-kazsoftware": 0
  },
  "postsInFilePerSource": {
-  "Alljobs (Teletalk)": 345,
-  "NextJobz": 1511,
-  "SmartRecruiters": 37,
+  "Alljobs (Teletalk)": 336,
+  "NextJobz": 1491,
+  "SmartRecruiters": 38,
+  "Remote OK": 3,
   "Jobicy": 3,
-  "Remote OK": 2,
   "Trakstar Hire": 3,
   "Himalayas": 1,
   "Lever": 10,
   "Freshteam": 22
  },
  "removed": {
-  "expired": 0,
+  "expired": 68,
   "too_old": 0,
   "no_apply_link": 0,
   "asks_for_money": 0,
-  "merged": 27,
+  "merged": 25,
   "no_title": 0,
   "closed_on_company_board": 0,
   "source_switched_off": 0,
@@ -60,19 +60,19 @@
    "id": "nextjobz",
    "type": "nextjobz",
    "enabled": true,
-   "collected": 55
+   "collected": 58
   },
   {
    "id": "alljobs",
    "type": "alljobs",
    "enabled": true,
-   "collected": 0
+   "collected": 6
   },
   {
    "id": "remote",
    "type": "remote_boards",
    "enabled": true,
-   "collected": 0
+   "collected": 1
   },
   {
    "id": "companies",
@@ -108,8 +108,8 @@
    "type": "smartrecruiters",
    "enabled": true,
    "how": "public career page, then each job page's schema.org data",
-   "listed": 0,
-   "collected": 0
+   "listed": 1,
+   "collected": 1
   },
   {
    "id": "sr-portonics",
@@ -223,22 +223,22 @@
   }
  ],
  "keywords": {
-  "postsRead": 55,
-  "postsWithSkills": 48,
+  "postsRead": 59,
+  "postsWithSkills": 52,
   "ran": true
  },
  "governmentPlaces": {
-  "withoutPlace": 133,
+  "withoutPlace": 139,
   "fromOrgPlacesFile": 0,
-  "fromOrganisationName": 0,
+  "fromOrganisationName": 6,
   "stillWithoutPlace": 133
  },
  "slim": {
-  "websiteLeftOut": 31,
-  "educationShortened": 7,
+  "websiteLeftOut": 35,
+  "educationShortened": 13,
   "educationLeftLong": 7,
   "keptLongToKeepMatching": 7,
-  "skillsMovedToKeywords": 0
+  "skillsMovedToKeywords": 1
  },
  "repaired": {
   "governmentCategoryAdded": 0
@@ -294,12 +294,13 @@
   }
  ],
  "pagesRead": {
-  "nextjobz.com.bd": 59,
-  "alljobs.teletalk.com.bd": 3,
+  "nextjobz.com.bd": 62,
+  "alljobs.teletalk.com.bd": 9,
   "jobicy.com": 1,
   "remoteok.com": 1,
   "himalayas.app": 1,
-  "careers.smartrecruiters.com": 12,
+  "careers.smartrecruiters.com": 13,
+  "jobs.smartrecruiters.com": 1,
   "api.lever.co": 1,
   "shikho.freshteam.com": 1,
   "technext.freshteam.com": 1,
@@ -311,31 +312,36 @@
  "blockedByRobotsTxt": [],
  "requestsFailed": [],
  "matching": {
-  "postsRead": 1934,
-  "engineReadMs": 805,
+  "postsRead": 1907,
+  "engineReadMs": 1457,
   "postsPerSource": {
-   "Alljobs (Teletalk)": 345,
-   "NextJobz": 1511,
-   "SmartRecruiters": 37,
+   "Alljobs (Teletalk)": 336,
+   "NextJobz": 1491,
+   "SmartRecruiters": 38,
+   "Remote OK": 3,
    "Jobicy": 3,
-   "Remote OK": 2,
    "Trakstar Hire": 3,
    "Himalayas": 1,
    "Lever": 10,
    "Freshteam": 22
   },
   "classifiedHow": {
-   "title": 1435,
+   "title": 1416,
    "category": 197,
-   "keyword": 274,
-   "skills": 12,
-   "spelling": 14,
-   "none": 2
+   "keyword": 266,
+   "skills": 11,
+   "none": 3,
+   "spelling": 14
   },
   "noFieldFound": {
-   "count": 2,
+   "count": 3,
    "percent": 0,
    "examples": [
+    {
+     "title": "Associate, Payment Integrity",
+     "company": "Oscar Health",
+     "source": "Remote OK"
+    },
     {
      "title": "Finnish Tech Linguistic Tester",
      "company": "Welo Global",
@@ -349,11 +355,11 @@
    ]
   },
   "noRoleFound": {
-   "count": 251,
+   "count": 250,
    "percent": 13
   },
   "noLocationFound": {
-   "count": 160,
+   "count": 156,
    "percent": 8,
    "examples": [
     {
@@ -419,22 +425,33 @@
    ]
   },
   "noExperienceLevel": {
-   "count": 436,
-   "percent": 23
+   "count": 425,
+   "percent": 22
   },
   "noSkillFound": {
-   "count": 410,
+   "count": 405,
    "percent": 21
   },
   "noDeadline": {
-   "count": 77,
+   "count": 79,
    "percent": 4
   },
   "noSalary": {
-   "count": 1816,
+   "count": 1786,
    "percent": 94
   },
   "topUnclassifiedTitles": [
+   {
+    "title": "Associate, Payment Integrity",
+    "count": 1,
+    "sources": [
+     "Remote OK"
+    ],
+    "portalCategory": [
+     "programming"
+    ],
+    "suggestion": "no close role; may need a new role in src/taxonomy.js"
+   },
    {
     "title": "Finnish Tech Linguistic Tester",
     "count": 1,
