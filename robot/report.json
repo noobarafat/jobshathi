@@ -1,19 +1,19 @@
 {
  "run": {
-  "startedAt": "2026-11-25T01:03:44+06:00",
-  "finishedAt": "2026-11-25T01:07:04+06:00",
-  "newPostsCollected": 77,
-  "postsInFile": 1906,
-  "fileBytes": 1378302
+  "startedAt": "2026-11-25T11:38:29+06:00",
+  "finishedAt": "2026-11-25T11:41:06+06:00",
+  "newPostsCollected": 55,
+  "postsInFile": 1934,
+  "fileBytes": 1401016
  },
  "size": {
-  "fileBytes": 1378302,
-  "downloadBytes": 213432,
+  "fileBytes": 1401016,
+  "downloadBytes": 217246,
   "budgetBytes": 358400,
   "withinBudget": true
  },
  "collectedPerSource": {
-  "nextjobz": 77,
+  "nextjobz": 55,
   "alljobs": 0,
   "remote": 0,
   "sr-polygon": 0,
@@ -33,7 +33,7 @@
  },
  "postsInFilePerSource": {
   "Alljobs (Teletalk)": 345,
-  "NextJobz": 1483,
+  "NextJobz": 1511,
   "SmartRecruiters": 37,
   "Jobicy": 3,
   "Remote OK": 2,
@@ -43,7 +43,7 @@
   "Freshteam": 22
  },
  "removed": {
-  "expired": 111,
+  "expired": 0,
   "too_old": 0,
   "no_apply_link": 0,
   "asks_for_money": 0,
@@ -60,7 +60,7 @@
    "id": "nextjobz",
    "type": "nextjobz",
    "enabled": true,
-   "collected": 77
+   "collected": 55
   },
   {
    "id": "alljobs",
@@ -223,8 +223,8 @@
   }
  ],
  "keywords": {
-  "postsRead": 77,
-  "postsWithSkills": 66,
+  "postsRead": 55,
+  "postsWithSkills": 48,
   "ran": true
  },
  "governmentPlaces": {
@@ -234,11 +234,11 @@
   "stillWithoutPlace": 133
  },
  "slim": {
-  "websiteLeftOut": 47,
-  "educationShortened": 11,
+  "websiteLeftOut": 31,
+  "educationShortened": 7,
   "educationLeftLong": 7,
   "keptLongToKeepMatching": 7,
-  "skillsMovedToKeywords": 3
+  "skillsMovedToKeywords": 0
  },
  "repaired": {
   "governmentCategoryAdded": 0
@@ -294,7 +294,7 @@
   }
  ],
  "pagesRead": {
-  "nextjobz.com.bd": 80,
+  "nextjobz.com.bd": 59,
   "alljobs.teletalk.com.bd": 3,
   "jobicy.com": 1,
   "remoteok.com": 1,
@@ -311,11 +311,11 @@
  "blockedByRobotsTxt": [],
  "requestsFailed": [],
  "matching": {
-  "postsRead": 1906,
-  "engineReadMs": 1517,
+  "postsRead": 1934,
+  "engineReadMs": 805,
   "postsPerSource": {
    "Alljobs (Teletalk)": 345,
-   "NextJobz": 1483,
+   "NextJobz": 1511,
    "SmartRecruiters": 37,
    "Jobicy": 3,
    "Remote OK": 2,
@@ -325,11 +325,11 @@
    "Freshteam": 22
   },
   "classifiedHow": {
-   "title": 1417,
-   "category": 194,
-   "keyword": 268,
+   "title": 1435,
+   "category": 197,
+   "keyword": 274,
+   "skills": 12,
    "spelling": 14,
-   "skills": 11,
    "none": 2
   },
   "noFieldFound": {
@@ -349,7 +349,7 @@
    ]
   },
   "noRoleFound": {
-   "count": 247,
+   "count": 251,
    "percent": 13
   },
   "noLocationFound": {
@@ -423,7 +423,7 @@
    "percent": 23
   },
   "noSkillFound": {
-   "count": 409,
+   "count": 410,
    "percent": 21
   },
   "noDeadline": {
@@ -431,7 +431,7 @@
    "percent": 4
   },
   "noSalary": {
-   "count": 1790,
+   "count": 1816,
    "percent": 94
   },
   "topUnclassifiedTitles": [
