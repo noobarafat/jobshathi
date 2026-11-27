@@ -1,23 +1,23 @@
 {
  "run": {
-  "startedAt": "2026-11-26T23:52:30+06:00",
-  "finishedAt": "2026-11-26T23:55:18+06:00",
-  "newPostsCollected": 65,
-  "postsInFile": 1983,
-  "fileBytes": 1437125
+  "startedAt": "2026-11-27T11:18:12+06:00",
+  "finishedAt": "2026-11-27T11:21:29+06:00",
+  "newPostsCollected": 75,
+  "postsInFile": 1927,
+  "fileBytes": 1408898
  },
  "size": {
-  "fileBytes": 1437125,
-  "downloadBytes": 221542,
+  "fileBytes": 1408898,
+  "downloadBytes": 218808,
   "budgetBytes": 358400,
   "withinBudget": true
  },
  "collectedPerSource": {
-  "nextjobz": 57,
-  "alljobs": 6,
+  "nextjobz": 74,
+  "alljobs": 0,
   "remote": 1,
   "sr-polygon": 0,
-  "sr-nagorik": 1,
+  "sr-nagorik": 0,
   "sr-gigalogy": 0,
   "sr-niftycoders": 0,
   "sr-portonics": 0,
@@ -32,8 +32,8 @@
   "ts-kazsoftware": 0
  },
  "postsInFilePerSource": {
-  "Alljobs (Teletalk)": 350,
-  "NextJobz": 1553,
+  "Alljobs (Teletalk)": 313,
+  "NextJobz": 1534,
   "SmartRecruiters": 38,
   "Remote OK": 3,
   "Jobicy": 3,
@@ -43,13 +43,13 @@
   "Freshteam": 22
  },
  "removed": {
-  "expired": 0,
+  "expired": 101,
   "too_old": 0,
   "no_apply_link": 0,
   "asks_for_money": 0,
-  "merged": 28,
+  "merged": 30,
   "no_title": 0,
-  "closed_on_company_board": 1,
+  "closed_on_company_board": 0,
   "source_switched_off": 0,
   "held_for_review": 0,
   "over_size_limit": 0
@@ -60,13 +60,13 @@
    "id": "nextjobz",
    "type": "nextjobz",
    "enabled": true,
-   "collected": 57
+   "collected": 74
   },
   {
    "id": "alljobs",
    "type": "alljobs",
    "enabled": true,
-   "collected": 6
+   "collected": 0
   },
   {
    "id": "remote",
@@ -93,7 +93,7 @@
    "enabled": true,
    "how": "public career page, then each job page's schema.org data",
    "listed": 10,
-   "collected": 1
+   "collected": 0
   },
   {
    "id": "sr-gigalogy",
@@ -223,8 +223,8 @@
   }
  ],
  "keywords": {
-  "postsRead": 58,
-  "postsWithSkills": 36,
+  "postsRead": 74,
+  "postsWithSkills": 64,
   "ran": true
  },
  "governmentPlaces": {
@@ -234,11 +234,11 @@
   "stillWithoutPlace": 129
  },
  "slim": {
-  "websiteLeftOut": 47,
-  "educationShortened": 19,
+  "websiteLeftOut": 42,
+  "educationShortened": 12,
   "educationLeftLong": 8,
   "keptLongToKeepMatching": 8,
-  "skillsMovedToKeywords": 6
+  "skillsMovedToKeywords": 2
  },
  "repaired": {
   "governmentCategoryAdded": 0
@@ -294,13 +294,12 @@
   }
  ],
  "pagesRead": {
-  "nextjobz.com.bd": 60,
-  "alljobs.teletalk.com.bd": 9,
+  "nextjobz.com.bd": 77,
+  "alljobs.teletalk.com.bd": 3,
   "jobicy.com": 1,
   "remoteok.com": 1,
   "himalayas.app": 1,
   "careers.smartrecruiters.com": 13,
-  "jobs.smartrecruiters.com": 1,
   "api.lever.co": 1,
   "shikho.freshteam.com": 1,
   "technext.freshteam.com": 1,
@@ -312,11 +311,11 @@
  "blockedByRobotsTxt": [],
  "requestsFailed": [],
  "matching": {
-  "postsRead": 1983,
-  "engineReadMs": 1195,
+  "postsRead": 1927,
+  "engineReadMs": 1551,
   "postsPerSource": {
-   "Alljobs (Teletalk)": 350,
-   "NextJobz": 1553,
+   "Alljobs (Teletalk)": 313,
+   "NextJobz": 1534,
    "SmartRecruiters": 38,
    "Remote OK": 3,
    "Jobicy": 3,
@@ -326,9 +325,9 @@
    "Freshteam": 22
   },
   "classifiedHow": {
-   "title": 1469,
-   "category": 205,
-   "keyword": 279,
+   "title": 1414,
+   "category": 207,
+   "keyword": 276,
    "skills": 13,
    "none": 3,
    "spelling": 14
@@ -355,12 +354,12 @@
    ]
   },
   "noRoleFound": {
-   "count": 264,
-   "percent": 13
+   "count": 263,
+   "percent": 14
   },
   "noLocationFound": {
-   "count": 156,
-   "percent": 8,
+   "count": 137,
+   "percent": 7,
    "examples": [
     {
      "title": "1st Class Master",
@@ -425,20 +424,20 @@
    ]
   },
   "noExperienceLevel": {
-   "count": 459,
-   "percent": 23
+   "count": 409,
+   "percent": 21
   },
   "noSkillFound": {
-   "count": 432,
-   "percent": 22
+   "count": 381,
+   "percent": 20
   },
   "noDeadline": {
    "count": 79,
    "percent": 4
   },
   "noSalary": {
-   "count": 1850,
-   "percent": 93
+   "count": 1809,
+   "percent": 94
   },
   "topUnclassifiedTitles": [
    {
