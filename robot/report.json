@@ -1,19 +1,19 @@
 {
  "run": {
-  "startedAt": "2026-11-27T11:18:12+06:00",
-  "finishedAt": "2026-11-27T11:21:29+06:00",
-  "newPostsCollected": 75,
+  "startedAt": "2026-11-27T23:38:23+06:00",
+  "finishedAt": "2026-11-27T23:40:03+06:00",
+  "newPostsCollected": 30,
   "postsInFile": 1927,
   "fileBytes": 1408898
  },
  "size": {
   "fileBytes": 1408898,
-  "downloadBytes": 218808,
+  "downloadBytes": 218809,
   "budgetBytes": 358400,
   "withinBudget": true
  },
  "collectedPerSource": {
-  "nextjobz": 74,
+  "nextjobz": 29,
   "alljobs": 0,
   "remote": 1,
   "sr-polygon": 0,
@@ -43,7 +43,7 @@
   "Freshteam": 22
  },
  "removed": {
-  "expired": 101,
+  "expired": 0,
   "too_old": 0,
   "no_apply_link": 0,
   "asks_for_money": 0,
@@ -60,7 +60,7 @@
    "id": "nextjobz",
    "type": "nextjobz",
    "enabled": true,
-   "collected": 74
+   "collected": 29
   },
   {
    "id": "alljobs",
@@ -223,22 +223,22 @@
   }
  ],
  "keywords": {
-  "postsRead": 74,
-  "postsWithSkills": 64,
+  "postsRead": 29,
+  "postsWithSkills": 27,
   "ran": true
  },
  "governmentPlaces": {
-  "withoutPlace": 129,
+  "withoutPlace": 121,
   "fromOrgPlacesFile": 0,
   "fromOrganisationName": 0,
-  "stillWithoutPlace": 129
+  "stillWithoutPlace": 121
  },
  "slim": {
-  "websiteLeftOut": 42,
-  "educationShortened": 12,
+  "websiteLeftOut": 21,
+  "educationShortened": 4,
   "educationLeftLong": 8,
   "keptLongToKeepMatching": 8,
-  "skillsMovedToKeywords": 2
+  "skillsMovedToKeywords": 0
  },
  "repaired": {
   "governmentCategoryAdded": 0
@@ -294,7 +294,7 @@
   }
  ],
  "pagesRead": {
-  "nextjobz.com.bd": 77,
+  "nextjobz.com.bd": 32,
   "alljobs.teletalk.com.bd": 3,
   "jobicy.com": 1,
   "remoteok.com": 1,
@@ -312,7 +312,7 @@
  "requestsFailed": [],
  "matching": {
   "postsRead": 1927,
-  "engineReadMs": 1551,
+  "engineReadMs": 1182,
   "postsPerSource": {
    "Alljobs (Teletalk)": 313,
    "NextJobz": 1534,
